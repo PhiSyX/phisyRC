@@ -37,8 +37,8 @@
 1. Les options de la commande `client` sont:
    | OPTION | DESCRIPTION |
    | ------ | ----------- |
-   | `--gui` | Lance l'application de Chat en mode graphique |
    | `--tui` | Lance l'application de Chat en mode textuel |
+   | `--gui` | Lance l'application de Chat en mode graphique |
 
 2. Les options de la commande `server` sont:
    | OPTION | DESCRIPTION |

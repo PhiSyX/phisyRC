@@ -2,8 +2,41 @@
 
 ## Application
 
-**phisyRC** est une application de Chat utilisant le protocole
+**phisyRC** est une application complète de Chat utilisant le protocole
 **I**nternet **R**elay **C**hat (**IRC**) comme moyen de communication.
+
+L'**I**nterface **U**tilisateur de l'application de Chat **phisyRC** est
+développée sous plusieurs formes:
+
+1. **T**extuel (**TUI**) pour le terminal.
+
+	L'interface est minimaliste.
+
+2. **G**raphique (**GUI**) pour le bureau.
+
+3. **W**eb pour les navigateurs modernes.
+
+4. **M**obile pour les appareils mobiles.
+
+## Administration
+
+Un panel d'administration est disponible pour les **op**érateurs **IRC**
+(IRCop's) des serveurs et permet de gérer la configuration IRC, les sanctions
+des utilisateurs, les canaux, etc, de _leurs_ serveurs IRC.
+
+## IRC - [**I**nternet **R**elay **C**hat](./irc/README.md).
+
+**phisyRC** utilise le protocole [**IRC**](https://datatracker.ietf.org/doc/html/rfc1459)
+comme moyen de communication. Les spécifications suivantes sont utilisées:
+
+-   [[IRC](https://datatracker.ietf.org/doc/html/rfc2812)] : Client Protocol
+-   [[IRC-ARCH](https://datatracker.ietf.org/doc/html/rfc2810)] : Architecture
+-   [[IRC-CHAN](https://datatracker.ietf.org/doc/html/rfc2811)] : Channel Management
+-   [[IRC-SERVER](https://datatracker.ietf.org/doc/html/rfc2813)] : Server Protocol
+
+Toutefois, **phisyRC** se laisse la liberté de ne pas implémenter TOUTES les
+fonctionnalités du protocole IRC, et d'implémenter des fonctionnalités
+qui ne sont pas dans le protocole IRC ;-).
 
 ## CLI - [**C**ommand **L**ine **I**nterface](./cli/README.md).
 
@@ -12,9 +45,9 @@
 1. Lancer l'application de Chat (front-end).
 
     ```sh
-    phisyrc client --gui # en mode graphique.
-    # ou
     phisyrc client --tui # en mode textuel.
+    # ou
+    phisyrc client --gui # en mode graphique.
     ```
 
 2. Ouvrir les connexions aux serveurs IRC (back-end).
@@ -59,8 +92,8 @@
 1. Les options de la commande `client` sont:
    | OPTION | DESCRIPTION |
    | ------ | ----------- |
-   | `--gui` | Lance l'application de Chat en mode graphique |
    | `--tui` | Lance l'application de Chat en mode textuel |
+   | `--gui` | Lance l'application de Chat en mode graphique |
 
 2. Les options de la commande `server` sont:
    | OPTION | DESCRIPTION |

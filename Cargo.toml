@@ -1,0 +1,26 @@
+[package]
+name = "phisyrc"
+version = "0.1.0"
+edition = "2021"
+license-file = "./LICENSE"
+publish = false
+
+[[bin]]
+name = "phisyrc"
+path = "./phisyrc.rs"
+
+[workspace]
+members = ["cli", "daemon", "irc"]
+
+[dependencies]
+cli = { path = "cli", package = "phisyrcli" }
+daemon = { path = "daemon", package = "phisyrcd" }
+irc = { path = "irc", package = "phisyrc-irc" }
+
+async-trait = "^0.1"
+crossterm = { version = "^0.24", default-features = false, features = [
+	"event-stream",
+] }
+futures = { version = "^0.3" }
+tokio = { version = "^1.20", features = ["full"] }
+tui = { version = "^0.18", default-features = false, features = ["crossterm"] }

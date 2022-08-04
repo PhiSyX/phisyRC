@@ -4,3 +4,6 @@
 target/
 
 *.lock
+
+.env.local
+.env.*.local

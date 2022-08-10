@@ -9,16 +9,14 @@ mod app {
 	pub use self::{r#mod::*, ui::*};
 }
 
-use cli::{phisyrc, Command, CommandClient, CommandServer, SubCommandServer};
+use cli::{Command, CommandClient, CommandServer, SubCommandServer};
 use daemon::IrcDaemon;
 use irc::IRC;
 
 use self::app::{App, UI};
 
-#[tokio::main]
-async fn main() {
-	let args = phisyrc::arguments();
-
+#[phisyrc::setup]
+async fn main(args: cli::phisyrc) {
 	match args.command {
 		| Some(Command::Client(client)) => handle_client_command(client).await,
 		| Some(Command::Server(server)) => handle_server_command(server).await,

@@ -6,7 +6,10 @@ use core::fmt;
 
 use proc_macro::TokenStream;
 use syn::{
-	__private::{quote::quote, Span, ToTokens, TokenStream2},
+	__private::{
+		quote::{quote, quote_spanned},
+		Span, ToTokens, TokenStream2,
+	},
 	spanned::Spanned,
 };
 
@@ -212,6 +215,14 @@ impl<'a> EnvAnalyzerError<'a> {
 			| Self::IsNotContainsLiteral(span, _)
 			| Self::ParseError(span, _) => span,
 		}
+	}
+
+	pub(super) fn compile_error(self) -> TokenStream {
+		let err_str = self.to_string();
+		let tokens = quote_spanned! {
+			self.span() => compile_error!(#err_str);
+		};
+		TokenStream::from(tokens)
 	}
 }
 

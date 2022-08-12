@@ -6,7 +6,27 @@ mod env;
 mod setup;
 
 use proc_macro::TokenStream;
-use syn::__private::quote::quote_spanned;
+
+// Utilisation:
+// ```rust
+//    #[phisyrc::setup]
+//    fn main() {}
+// ```
+//
+// ```rust
+//    use cli::CLI;
+//    #[phisyrc::setup]
+//    fn main(args: CLI<...>) {}
+// ```
+#[proc_macro_attribute]
+pub fn setup(_: TokenStream, input: TokenStream) -> TokenStream {
+	let function_input = syn::parse_macro_input!(input as syn::ItemFn);
+	let analyzer = setup::SetupAnalyzer::new(function_input);
+	match analyzer.build() {
+		| Ok(ok) => ok,
+		| Err(err) => err.compile_error(),
+	}
+}
 
 // Utilisation:
 //
@@ -23,67 +43,6 @@ pub fn env_trait_derive(input: TokenStream) -> proc_macro::TokenStream {
 	let analyzer = env::EnvAnalyzer::new(struct_input);
 	match analyzer.parse() {
 		| Ok(ok) => ok,
-		| Err(err) => {
-			let err_str = err.to_string();
-			let tokens = quote_spanned! {
-				err.span() => compile_error!(#err_str);
-			};
-			TokenStream::from(tokens)
-		}
+		| Err(err) => err.compile_error(),
 	}
-}
-
-// Utilisation:
-// ```rust
-//    #[phisyrc::setup]
-//    fn main() {}
-// ```
-//
-// ```rust
-//    use cli::CLI;
-//    #[phisyrc::setup]
-//    fn main(args: CLI<...>) {}
-// ```
-#[proc_macro_attribute]
-pub fn setup(_: TokenStream, input: TokenStream) -> TokenStream {
-	let input_function = syn::parse_macro_input!(input as syn::ItemFn);
-
-	let ident = &input_function.sig.ident;
-
-	if ident.ne("main") {
-		let tokens = quote_spanned! {
-			ident.span() =>
-				compile_error!(
-				   "#[phisyrc::setup] ne peut être utilisé que sur la fonction \
-					principale: fn main() {}"
-				);
-		};
-
-		return TokenStream::from(tokens);
-	}
-
-	let inputs = &input_function.sig.inputs;
-	let total_args_expected: u8 = 2;
-
-	let result = match inputs.len() {
-		| 0 => {
-			setup::build_fn(&input_function, setup::function_with_zeroed_arg)
-		}
-		| 1 => setup::build_fn(&input_function, setup::function_with_one_arg),
-		| 2 => setup::build_fn(&input_function, setup::function_with_two_args),
-		| _ => {
-			let err_msg = format!(
-				"la fonction principale comporte trop de paramètres ({} / {} max).",
-				inputs.len(),
-				total_args_expected
-			);
-
-			quote_spanned! {
-				ident.span() =>
-					compile_error!(#err_msg);
-			}
-		}
-	};
-
-	result.into()
 }

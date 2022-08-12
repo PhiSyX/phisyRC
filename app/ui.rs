@@ -5,16 +5,10 @@
 mod graphical;
 mod textual;
 
-pub use self::{graphical::GUI, textual::TUI};
-
-// --------- //
-// Interface //
-// --------- //
-
-#[async_trait::async_trait]
-pub trait UInterface {
-	async fn launch() -> std::io::Result<()>;
-}
+pub use self::{
+	graphical::{TypeGui, TypeGuiError, GUI},
+	textual::TUI,
+};
 
 // ----------- //
 // Énumération //
@@ -23,7 +17,7 @@ pub trait UInterface {
 /// Interface utilisateur
 pub enum UI {
 	/// Interface utilisateur graphique
-	Graphical,
+	Graphical(TypeGui),
 
 	/// Interface utilisateur textuel
 	Textual,

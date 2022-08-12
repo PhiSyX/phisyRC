@@ -1,0 +1,12 @@
+[package]
+name = "phisyrc-env"
+version = "0.1.0"
+edition = "2021"
+license-file = "../LICENSE"
+publish = false
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]
+phisyrc = { path = "../macro", package = "phisyrc-macro" }

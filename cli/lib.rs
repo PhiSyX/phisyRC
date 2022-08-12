@@ -44,14 +44,14 @@ where
 }
 
 #[allow(non_camel_case_types)]
-pub type phisyrc =
+pub type phisyrc_cli =
 	CLI<self::flags::Flags, self::options::Options, self::commands::Command>;
 
 // -------------- //
 // Implementation //
 // -------------- //
 
-impl phisyrc {
+impl phisyrc_cli {
 	/// Construit la structure [CLI] à partir des arguments de la ligne de
 	/// commande (basé sur [std::env::args_os]).
 	pub fn arguments() -> Self {

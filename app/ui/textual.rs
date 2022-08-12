@@ -21,7 +21,6 @@ use tui::{
 };
 
 use self::home::HomeView;
-use super::UInterface;
 
 // --------- //
 // Interface //
@@ -116,19 +115,18 @@ impl<W: Write> TUI<W> {
 	}
 }
 
-// -------------- //
-// Implémentation // -> Interface
-// -------------- //
-
-#[async_trait::async_trait]
-impl UInterface for TUI<io::Stdout> {
-	async fn launch() -> io::Result<()> {
+impl TUI<io::Stdout> {
+	pub(crate) async fn launch() -> io::Result<()> {
 		let view = View::default();
 		let stdout = io::stdout();
 		let mut tui = Self::new(stdout)?;
 		tui.run(view).await
 	}
 }
+
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
 
 #[async_trait::async_trait]
 impl ViewInterface for View {

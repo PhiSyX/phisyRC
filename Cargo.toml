@@ -10,13 +10,14 @@ name = "phisyrc"
 path = "./phisyrc.rs"
 
 [workspace]
-members = ["cli", "daemon", "irc", "macro"]
+members = ["cli", "daemon", "env", "irc", "macro"]
 
 [dependencies]
 cli = { path = "cli", package = "phisyrcli" }
 daemon = { path = "daemon", package = "phisyrcd" }
+env = { path = "env", package = "phisyrc-env" }
 irc = { path = "irc", package = "phisyrc-irc" }
-phisyrc ={ path = "macro", package = "phisyrc-macro" }
+phisyrc = { path = "macro", package = "phisyrc-macro" }
 
 async-trait = "^0.1"
 crossterm = { version = "^0.24", default-features = false, features = [

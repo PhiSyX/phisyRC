@@ -4,7 +4,7 @@
 
 use std::io;
 
-use super::{UInterface, GUI, TUI, UI};
+use super::{GUI, TUI, UI};
 
 // --------- //
 // Structure //
@@ -21,7 +21,7 @@ impl App {
 	/// [textuel](Ui::Textual).
 	pub async fn launch(ui: UI) -> io::Result<()> {
 		match ui {
-			| UI::Graphical => GUI::launch().await,
+			| UI::Graphical(gui) => GUI::launch(gui).await,
 			| UI::Textual => TUI::launch().await,
 		}
 	}

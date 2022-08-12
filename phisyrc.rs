@@ -4,39 +4,62 @@
 
 mod app {
 	mod r#mod;
+	mod output;
 	mod ui;
 
-	pub use self::{r#mod::*, ui::*};
+	pub use self::{output::*, r#mod::*, ui::*};
 }
 
-use cli::{Command, CommandClient, CommandServer, SubCommandServer};
+use app::{AppResult, TypeGui};
+use cli::{
+	phisyrc_cli, Command, CommandClient, CommandServer, SubCommandServer,
+};
 use daemon::IrcDaemon;
+use env::phisyrc_env;
 use irc::IRC;
 
 use self::app::{App, UI};
 
 #[phisyrc::setup]
-async fn main(args: cli::phisyrc) {
-	match args.command {
-		| Some(Command::Client(client)) => handle_client_command(client).await,
+async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
+	match cli_args.command {
+		| Some(Command::Client(client)) => {
+			let type_gui = env_args.gui_to_use.parse()?;
+			handle_client_command(client.into(), type_gui).await
+		}
+
 		| Some(Command::Server(server)) => handle_server_command(server).await,
-		| None => App::launch(UI::Graphical)
-			.await
-			.expect("l'interface graphique"),
+
+		| None => {
+			let type_gui = env_args.gui_to_use.parse()?;
+			handle_client_command(Default::default(), type_gui).await
+		}
 	}
+	.expect("CLI");
+
+	Ok(())
 }
 
-async fn handle_client_command(client: CommandClient) {
+async fn handle_client_command(
+	client: Option<CommandClient>,
+	type_gui: TypeGui,
+) -> AppResult<()> {
+	if client.is_none() {
+		return Ok(App::launch(UI::Graphical(type_gui)).await?);
+	}
+
+	let client = client.unwrap();
+
 	let ui = if client.options.tui {
 		UI::Textual
 	} else {
-		UI::Graphical
+		UI::Graphical(type_gui)
 	};
 
-	App::launch(ui).await.expect("l'interface graphique");
+	Ok(App::launch(ui).await?)
 }
 
-async fn handle_server_command(server: CommandServer) {
+async fn handle_server_command(server: CommandServer) -> AppResult<()> {
 	match server.command {
 		| Some(cmd) => match cmd {
 			| SubCommandServer::Restart { id } => {
@@ -53,5 +76,7 @@ async fn handle_server_command(server: CommandServer) {
 				IRC::run();
 			}
 		}
-	}
+	};
+
+	Ok(())
 }

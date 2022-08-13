@@ -4,31 +4,42 @@
 
 use std::collections::HashMap;
 
-use super::{style::Position, Alignment, Cell, Row, Style};
+use super::{style::Position, Alignment, Cell, Row, Style, STYLE_BLANK};
 
 #[derive(Clone, Debug)]
 pub struct GridLayout<'d> {
 	rows: Vec<Row<'d>>,
+
 	style: Style,
+
+	widths: HashMap<usize, usize>,
 	max_width: usize,
-	max_widths: HashMap<usize, usize>,
 
 	separate_rows: bool,
-	has_top_boarder: bool,
-	has_bottom_boarder: bool,
+	boarder: GridBoarder,
+}
+
+#[derive(Clone, Debug)]
+pub struct GridBoarder {
+	top: bool,
+	bottom: bool,
 }
 
 impl<'d> GridLayout<'d> {
 	pub fn new() -> Self {
 		Self {
 			rows: Vec::new(),
-			style: Style::blank(),
+			style: STYLE_BLANK,
+
+			widths: HashMap::new(),
 			max_width: std::usize::MAX,
-			max_widths: HashMap::new(),
 
 			separate_rows: true,
-			has_top_boarder: true,
-			has_bottom_boarder: true,
+
+			boarder: GridBoarder {
+				top: true,
+				bottom: true,
+			},
 		}
 	}
 
@@ -38,8 +49,8 @@ impl<'d> GridLayout<'d> {
 	}
 
 	pub fn without_boarder(mut self) -> Self {
-		self.has_top_boarder = false;
-		self.has_bottom_boarder = false;
+		self.boarder.top = false;
+		self.boarder.bottom = false;
 		self
 	}
 
@@ -48,7 +59,7 @@ impl<'d> GridLayout<'d> {
 		self
 	}
 
-	pub fn add_row(
+	pub fn add_line(
 		&mut self,
 		cells: impl IntoIterator<Item = impl Into<Cell<'d>>>,
 	) {
@@ -82,19 +93,19 @@ impl<'d> GridLayout<'d> {
 			previous_separator.replace(separator.to_owned());
 
 			if self.rows[index].separator
-				&& ((index == 0 && self.has_top_boarder)
+				&& ((index == 0 && self.boarder.top)
 					|| index != 0 && self.separate_rows)
 			{
-				Self::buffer_line(&mut print_buffer, separator);
+				Self::add_newline_to_buffer(&mut print_buffer, separator);
 			}
 
-			Self::buffer_line(
+			Self::add_newline_to_buffer(
 				&mut print_buffer,
 				&self.rows[index].format(&max_widths, &self.style),
 			);
 		});
 
-		if self.has_bottom_boarder {
+		if self.boarder.bottom {
 			let separator = self.rows.last().unwrap().generate_separator(
 				&max_widths,
 				&self.style,
@@ -102,7 +113,7 @@ impl<'d> GridLayout<'d> {
 				None,
 			);
 
-			Self::buffer_line(&mut print_buffer, separator);
+			Self::add_newline_to_buffer(&mut print_buffer, separator);
 		}
 
 		print_buffer
@@ -127,10 +138,8 @@ impl<'d> GridLayout<'d> {
 						min[index] =
 							core::cmp::max(min[index], column_widths[index].1);
 
-						let mut max_width = *self
-							.max_widths
-							.get(&index)
-							.unwrap_or(&self.max_width);
+						let mut max_width =
+							*self.widths.get(&index).unwrap_or(&self.max_width);
 
 						max_width = core::cmp::max(min[index], max_width);
 
@@ -149,41 +158,40 @@ impl<'d> GridLayout<'d> {
 		);
 
 		self.rows.iter().for_each(|row| {
-			let mut col_index = 0;
-
-			row.cells.iter().for_each(|cell| {
-				let mut total_col_width = 0;
-				(col_index..col_index + cell.colspan).for_each(|i| {
-					total_col_width += max_widths[i];
-				});
+			row.cells.iter().fold(0, |mut column_index, cell| {
+				let total_col_width = (column_index
+					..column_index + cell.colspan)
+					.fold(0, |total, index| total + max_widths[index]);
 
 				if cell.width() != total_col_width
 					&& cell.alignment == Alignment::Center
 					&& total_col_width as f32 % 2.0 <= 0.001
 				{
 					let mut max_col_width = self.max_width;
-					if let Some(specific_width) =
-						self.max_widths.get(&col_index)
+					if let Some(specific_width) = self.widths.get(&column_index)
 					{
 						max_col_width = *specific_width;
 					}
 
-					if max_widths[col_index] < max_col_width {
-						max_widths[col_index] += 1;
+					if max_widths[column_index] < max_col_width {
+						max_widths[column_index] += 1;
 					}
 				}
+
 				if cell.colspan > 1 {
-					col_index += cell.colspan - 1;
+					column_index += cell.colspan - 1;
 				} else {
-					col_index += 1;
+					column_index += 1;
 				}
+
+				column_index
 			});
 		});
 
 		max_widths
 	}
 
-	fn buffer_line(buffer: &mut String, line: impl AsRef<str>) {
+	fn add_newline_to_buffer(buffer: &mut String, line: impl AsRef<str>) {
 		buffer.push_str(&format!("{}\n", line.as_ref()));
 	}
 }

@@ -3,6 +3,75 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 // --------- //
+// Constante //
+// --------- //
+
+pub const STYLE_BLANK: Style = Style {
+	top: CornerStyle::all('\0'),
+	bottom: CornerStyle::all('\0'),
+
+	left: '\0',
+	right: '\0',
+
+	intersection: '\0',
+	vertical: '\0',
+	horizontal: '\0',
+};
+
+pub const STYLE_ROUNDED: Style = Style {
+	top: CornerStyle {
+		left: '╭',
+		right: '╮',
+		intersection: '┬',
+	},
+
+	bottom: CornerStyle {
+		left: '╰',
+		right: '╯',
+		intersection: '┴',
+	},
+
+	left: '├',
+	right: '┤',
+
+	vertical: '│',
+	horizontal: '─',
+	intersection: '┼',
+};
+
+pub const STYLE_SIMPLE: Style = Style {
+	top: CornerStyle::all('+'),
+	bottom: CornerStyle::all('+'),
+
+	left: '+',
+	right: '+',
+
+	intersection: '+',
+	vertical: '|',
+	horizontal: '-',
+};
+
+pub const STYLE_THIN: Style = Style {
+	top: CornerStyle {
+		left: '┌',
+		right: '┐',
+		intersection: '┬',
+	},
+	bottom: CornerStyle {
+		left: '└',
+		right: '┘',
+		intersection: '┴',
+	},
+
+	left: '├',
+	right: '┤',
+
+	vertical: '│',
+	horizontal: '─',
+	intersection: '┼',
+};
+
+// --------- //
 // Structure //
 // --------- //
 
@@ -53,82 +122,7 @@ pub(crate) enum Position {
 // -------------- //
 
 impl Style {
-	pub fn simple() -> Self {
-		Self {
-			top: CornerStyle::all('+'),
-			bottom: CornerStyle::all('+'),
-
-			left: '+',
-			right: '+',
-
-			intersection: '+',
-			vertical: '|',
-			horizontal: '-',
-		}
-	}
-
-	pub fn thin() -> Self {
-		Self {
-			top: CornerStyle {
-				left: '┌',
-				right: '┐',
-				intersection: '┬',
-			},
-			bottom: CornerStyle {
-				left: '└',
-				right: '┘',
-				intersection: '┴',
-			},
-
-			left: '├',
-			right: '┤',
-
-			vertical: '│',
-			horizontal: '─',
-			intersection: '┼',
-		}
-	}
-
-	pub fn rounded() -> Self {
-		Self {
-			top: CornerStyle {
-				left: '╭',
-				right: '╮',
-				intersection: '┬',
-			},
-
-			bottom: CornerStyle {
-				left: '╰',
-				right: '╯',
-				intersection: '┴',
-			},
-
-			left: '├',
-			right: '┤',
-
-			vertical: '│',
-			horizontal: '─',
-			intersection: '┼',
-		}
-	}
-
-	pub fn blank() -> Self {
-		Self {
-			top: CornerStyle::all('\0'),
-			bottom: CornerStyle::all('\0'),
-
-			left: '\0',
-			right: '\0',
-
-			vertical: '\0',
-			horizontal: '\0',
-			intersection: '\0',
-		}
-	}
-}
-
-impl Style {
-	pub(crate) fn start_for_position(&self, position: Position) -> char {
+	pub(crate) const fn start_position(&self, position: Position) -> char {
 		match position {
 			| Position::First => self.top.left,
 			| Position::Middle => self.left,
@@ -136,7 +130,7 @@ impl Style {
 		}
 	}
 
-	pub(crate) fn end_for_position(&self, position: Position) -> char {
+	pub(crate) const fn end_position(&self, position: Position) -> char {
 		match position {
 			| Position::First => self.top.right,
 			| Position::Middle => self.right,
@@ -144,7 +138,7 @@ impl Style {
 		}
 	}
 
-	pub(crate) fn intersect_for_position(&self, position: Position) -> char {
+	pub(crate) const fn intersect_position(&self, position: Position) -> char {
 		match position {
 			| Position::First => self.top.intersection,
 			| Position::Middle => self.intersection,
@@ -152,7 +146,7 @@ impl Style {
 		}
 	}
 
-	pub(crate) fn merge_intersection_for_position(
+	pub(crate) const fn merge_intersection_position(
 		&self,
 		top: char,
 		bottom: char,
@@ -169,13 +163,13 @@ impl Style {
 		} else if top == self.bottom.intersection && bottom == self.horizontal {
 			self.horizontal
 		} else {
-			self.intersect_for_position(position)
+			self.intersect_position(position)
 		}
 	}
 }
 
 impl CornerStyle {
-	fn all(ch: char) -> Self {
+	const fn all(ch: char) -> Self {
 		Self {
 			left: ch,
 			right: ch,

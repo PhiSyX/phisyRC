@@ -120,7 +120,7 @@ impl<'d> Row<'d> {
 		}
 
 		lines.iter().for_each(|line| {
-			temporary_buffer.push_str(line.clone().as_str());
+			temporary_buffer.push_str(line);
 			temporary_buffer.push(style.vertical);
 			temporary_buffer.push('\n');
 		});
@@ -144,13 +144,13 @@ impl<'d> Row<'d> {
 			| None => 1,
 		};
 
-		temporary_buffer.push(style.start_for_position(row));
+		temporary_buffer.push(style.start_position(row));
 
 		let mut current_column = 0;
 
-		for (index, column_width) in widths.iter().enumerate() {
+		for (index, width) in widths.iter().enumerate() {
 			if index == next_intersection {
-				temporary_buffer.push(style.intersect_for_position(row));
+				temporary_buffer.push(style.intersect_position(row));
 
 				current_column += 1;
 
@@ -163,16 +163,11 @@ impl<'d> Row<'d> {
 				temporary_buffer.push(style.horizontal);
 			}
 
-			temporary_buffer.push_str(
-				str::repeat(
-					style.horizontal.to_string().as_str(),
-					*column_width,
-				)
-				.as_str(),
-			);
+			temporary_buffer
+				.push_str(&str::repeat(&style.horizontal.to_string(), *width));
 		}
 
-		temporary_buffer.push(style.end_for_position(row));
+		temporary_buffer.push(style.end_position(row));
 
 		let mut out = String::new();
 
@@ -184,9 +179,11 @@ impl<'d> Row<'d> {
 					} else if pair.0 != style.horizontal
 						|| pair.1 != style.horizontal
 					{
-						out.push(style.merge_intersection_for_position(
-							pair.1, pair.0, row,
-						));
+						out.push(
+							style.merge_intersection_position(
+								pair.1, pair.0, row,
+							),
+						);
 					} else {
 						out.push(style.horizontal);
 					}
@@ -233,20 +230,18 @@ impl<'d> Row<'d> {
 	) -> String {
 		match alignment {
 			| Alignment::Left => {
-				format!("{}{}", text, str::repeat(" ", padding))
+				let r = str::repeat(" ", padding);
+				format!("{text}{r}")
 			}
 			| Alignment::Right => {
-				format!("{}{}", str::repeat(" ", padding), text)
+				let l = str::repeat(" ", padding);
+				format!("{l}{text}")
 			}
 			| Alignment::Center => {
 				let half_padding = padding as f32 / 2.0;
-
-				format!(
-					"{}{}{}",
-					str::repeat(" ", half_padding.ceil() as usize),
-					text,
-					str::repeat(" ", half_padding.floor() as usize)
-				)
+				let l = str::repeat(" ", half_padding.ceil() as usize);
+				let r = str::repeat(" ", half_padding.floor() as usize);
+				format!("{l}{text}{r}",)
 			}
 		}
 	}

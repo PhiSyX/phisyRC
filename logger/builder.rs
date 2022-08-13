@@ -50,7 +50,7 @@ impl Builder {
 					echo.time.map(|t| t.format("%Y-%m-%d@%H:%M:%S"));
 
 				if let Some(time) = local_date_format {
-					echo.table.add_row([
+					echo.table.add_line([
 						Cell::new(&echo.level).with_alignment(Alignment::Right),
 						Cell::new(&echo.delimiter),
 						Cell::new(time),
@@ -60,7 +60,7 @@ impl Builder {
 						Cell::new(message),
 					]);
 				} else {
-					echo.table.add_row([
+					echo.table.add_line([
 						Cell::new(&echo.level).with_alignment(Alignment::Right),
 						Cell::new(&echo.delimiter),
 						Cell::new(record.target().dark_grey()),

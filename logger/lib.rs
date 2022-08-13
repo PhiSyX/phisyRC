@@ -97,6 +97,9 @@ impl Log for Logger {
 			record.level().to_string()
 		};
 
+		let mut table =
+			GridLayout::default().define_max_width(80).without_boarder();
+
 		let mut echo = Echo {
 			time: if self.timestamp {
 				Some(Local::now())
@@ -110,7 +113,7 @@ impl Log for Logger {
 			},
 			level,
 			record_level: record.level(),
-			table: &mut GridLayout::default(),
+			table: &mut table,
 		};
 
 		let text = (self.format_fn)(&mut echo, message, record);

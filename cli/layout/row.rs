@@ -132,7 +132,7 @@ impl<'d> Row<'d> {
 
 	pub(crate) fn generate_separator(
 		&self,
-		column_widths: &[usize],
+		widths: &[usize],
 		style: &Style,
 		row: Position,
 		previous_separator: Option<&String>,
@@ -148,7 +148,7 @@ impl<'d> Row<'d> {
 
 		let mut current_column = 0;
 
-		for (index, column_width) in column_widths.iter().enumerate() {
+		for (index, column_width) in widths.iter().enumerate() {
 			if index == next_intersection {
 				temporary_buffer.push(style.intersect_for_position(row));
 

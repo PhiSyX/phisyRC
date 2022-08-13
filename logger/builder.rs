@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use cli::layout::{Alignment, Cell};
+use cli::{
+	layout::{Alignment, Cell},
+	style::Stylize,
+};
 use log::{LevelFilter, SetLoggerError};
 
 use crate::{FilterFn, FormatFn, Logger};
@@ -43,35 +46,26 @@ impl Builder {
 			colorized: self.colorized,
 			timestamp: self.timestamp,
 			format_fn: self.format_fn.unwrap_or(|echo, message, record| {
-				let time = echo.time.map(|t| t.format("%Y-%m-%d@%H:%M:%S"));
+				let local_date_format =
+					echo.time.map(|t| t.format("%Y-%m-%d@%H:%M:%S"));
 
-				let col_level =
-					Cell::new(&echo.level).with_alignment(Alignment::Right);
-
-				let col_target = Cell::new(record.target());
-				let col_message = Cell::new(message);
-
-				let delimiter_1 = Cell::new(&echo.delimiter);
-				let delimiter_2 = Cell::new(':');
-
-				if let Some(time) = time {
-					let time = Cell::new(time);
+				if let Some(time) = local_date_format {
 					echo.table.add_row([
-						col_level,
-						delimiter_1.clone(),
-						time,
-						delimiter_1,
-						col_target,
-						delimiter_2,
-						col_message,
+						Cell::new(&echo.level).with_alignment(Alignment::Right),
+						Cell::new(&echo.delimiter),
+						Cell::new(time),
+						Cell::new(&echo.delimiter),
+						Cell::new(record.target().dark_grey()),
+						Cell::new("->".dark_red()),
+						Cell::new(message),
 					]);
 				} else {
 					echo.table.add_row([
-						col_level,
-						delimiter_1,
-						col_target,
-						delimiter_2,
-						col_message,
+						Cell::new(&echo.level).with_alignment(Alignment::Right),
+						Cell::new(&echo.delimiter),
+						Cell::new(record.target().dark_grey()),
+						Cell::new("->".dark_red()),
+						Cell::new(message),
 					]);
 				}
 

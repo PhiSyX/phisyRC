@@ -15,7 +15,7 @@ pub struct Echo<'a> {
 	pub(super) delimiter: String,
 	pub(super) level: String,
 	pub(super) record_level: Level,
-	pub(super) table: &'a mut GridLayout<'a, 80>,
+	pub(super) table: &'a mut GridLayout<'a>,
 }
 
 // -------------- //

@@ -7,7 +7,7 @@ use std::collections::HashMap;
 use super::{style::Position, Alignment, Cell, Row, Style};
 
 #[derive(Clone, Debug)]
-pub struct GridLayout<'d, const W: usize> {
+pub struct GridLayout<'d> {
 	rows: Vec<Row<'d>>,
 	style: Style,
 	max_width: usize,
@@ -18,12 +18,12 @@ pub struct GridLayout<'d, const W: usize> {
 	has_bottom_boarder: bool,
 }
 
-impl<'d, const W: usize> GridLayout<'d, W> {
+impl<'d> GridLayout<'d> {
 	pub fn new() -> Self {
 		Self {
 			rows: Vec::new(),
 			style: Style::blank(),
-			max_width: W,
+			max_width: std::usize::MAX,
 			max_widths: HashMap::new(),
 
 			separate_rows: true,
@@ -34,6 +34,12 @@ impl<'d, const W: usize> GridLayout<'d, W> {
 
 	pub fn with_style(mut self, style: Style) -> Self {
 		self.style = style;
+		self
+	}
+
+	pub fn without_boarder(mut self) -> Self {
+		self.has_top_boarder = false;
+		self.has_bottom_boarder = false;
 		self
 	}
 
@@ -103,15 +109,15 @@ impl<'d, const W: usize> GridLayout<'d, W> {
 	}
 }
 
-impl<'d, const W: usize> GridLayout<'d, W> {
+impl<'d> GridLayout<'d> {
 	fn calculate_max_widths(&self) -> Vec<usize> {
-		let num_columns = self
+		let total_columns = self
 			.rows
 			.iter()
 			.fold(0, |n, row| core::cmp::max(row.total_columns(), n));
 
 		let (_, mut max_widths) = self.rows.iter().fold(
-			(vec![0; num_columns], vec![0; num_columns]),
+			(vec![0; total_columns], vec![0; total_columns]),
 			|acc, row| {
 				let column_widths = row.split_column();
 
@@ -182,13 +188,13 @@ impl<'d, const W: usize> GridLayout<'d, W> {
 	}
 }
 
-impl<'d, const W: usize> Default for GridLayout<'d, W> {
+impl<'d> Default for GridLayout<'d> {
 	fn default() -> Self {
 		GridLayout::new()
 	}
 }
 
-impl<'d, const W: usize> ToString for GridLayout<'d, W> {
+impl<'d> ToString for GridLayout<'d> {
 	fn to_string(&self) -> String {
 		self.render()
 	}

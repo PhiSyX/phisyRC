@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use std::{borrow::Cow, cmp};
+use std::{borrow::Cow, cmp, collections::HashSet};
+
+use unicode_width::UnicodeWidthStr;
 
 use super::Alignment;
 
@@ -58,15 +60,23 @@ impl<'d> Cell<'d> {
 	pub(crate) fn wrapped_content(&self, width: usize) -> Vec<String> {
 		let pad_char = if self.padding { ' ' } else { '\0' };
 
+		let hidden: HashSet<usize> = STRIP_ANSI_RE
+			.find_iter(&self.data)
+			.flat_map(|m| m.start()..m.end())
+			.collect();
+
 		let mut output = Vec::default();
 
 		let mut temporary_buffer = String::default();
 
 		temporary_buffer.push(pad_char);
 
+		let mut byte_index = 0;
+
 		for ch in self.data.chars() {
-			if str_len(&temporary_buffer) >= width - pad_char.len_utf8()
-				|| ch == '\n'
+			if !hidden.contains(&byte_index)
+				&& (str_len(&temporary_buffer) >= width - pad_char.len_utf8()
+					|| ch == '\n')
 			{
 				temporary_buffer.push(pad_char);
 				output.push(temporary_buffer);
@@ -74,9 +84,12 @@ impl<'d> Cell<'d> {
 				temporary_buffer.push(pad_char);
 
 				if ch == '\n' {
+					byte_index += 1;
 					continue;
 				}
 			}
+
+			byte_index += ch.len_utf8();
 
 			temporary_buffer.push(ch);
 		}
@@ -89,7 +102,14 @@ impl<'d> Cell<'d> {
 	}
 }
 
-// TODO(phisyx): strip ansi
 pub fn str_len(string: &str) -> usize {
-	string.len()
+	let stripped = STRIP_ANSI_RE.replace_all(string, "");
+	stripped.width()
+}
+
+lazy_static::lazy_static! {
+	static ref STRIP_ANSI_RE: regex::Regex = regex::Regex::new(
+		r"[\x1b\x9b][\[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-PRZcf-nqry=><]"
+	)
+	.unwrap();
 }

@@ -145,6 +145,7 @@ impl SetupAnalyzer {
 				logger::Logger::builder()
 					.with_color()
 					.with_level(level_filter)
+					.with_timestamp()
 					.build()
 					.expect("Impossible d'initialiser le logger.");
 

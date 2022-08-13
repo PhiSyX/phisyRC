@@ -14,9 +14,8 @@ use app::{AppResult, TypeGui};
 use cli::{
 	phisyrc_cli, Command, CommandClient, CommandServer, SubCommandServer,
 };
-use daemon::IrcDaemon;
 use env::phisyrc_env;
-use irc::IRC;
+use irc::{IrcDaemon, IRC};
 
 use self::app::{App, UI};
 

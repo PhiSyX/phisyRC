@@ -10,7 +10,7 @@ name = "phisyrc"
 path = "./phisyrc.rs"
 
 [workspace]
-members = ["cli", "daemon", "env", "irc", "macro"]
+members = ["cli", "env", "irc", "logger", "macro"]
 
 [dependencies]
 cli = { path = "cli", package = "phisyrcli" }

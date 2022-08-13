@@ -2,9 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use irc::IRC;
+use super::IRC;
+
+// --------- //
+// Structure //
+// --------- //
 
 pub struct IrcDaemon;
+
+// -------------- //
+// Implémentation //
+// -------------- //
 
 impl IrcDaemon {
 	pub fn spawn() {

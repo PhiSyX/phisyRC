@@ -1,5 +1,11 @@
-.vscode/
-.idea/
+.cargo/*
+!.cargo/*.example.toml
+
+.idea/*
+
+.phisyrc/*
+
+.vscode/*
 
 target/
 
@@ -7,5 +13,3 @@ target/
 
 .env.local
 .env.*.local
-
-.phisyrc/

@@ -11,7 +11,7 @@ mod app {
 }
 
 use app::{AppResult, TypeGui};
-use cli::{
+use cli::app::{
 	phisyrc_cli, Command, CommandClient, CommandServer, SubCommandServer,
 };
 use env::phisyrc_env;
@@ -19,7 +19,7 @@ use irc::{IrcDaemon, IRC};
 
 use self::app::{App, UI};
 
-#[phisyrc::setup]
+#[phisyrc::setup(logger)]
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
 	match cli_args.command {
 		| Some(Command::Client(client)) => {

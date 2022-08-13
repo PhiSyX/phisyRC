@@ -6,7 +6,7 @@ mod home;
 
 use std::io::{self, Write};
 
-use crossterm::{
+use cli::{
 	event::{
 		self, Event, EventStream, KeyCode, KeyEvent, KeyModifiers, MouseEvent,
 	},

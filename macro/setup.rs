@@ -13,25 +13,48 @@ use syn::{
 	spanned::Spanned,
 };
 
+// --------- //
+// Structure //
+// --------- //
+
 pub(super) struct SetupAnalyzer {
+	attrs: syn::AttributeArgs,
 	function_input: syn::ItemFn,
 }
 
-pub(super) enum SetupAnalyzerError {
+// ----------- //
+// Énumération //
+// ----------- //
+
+pub(super) enum SetupAnalyzerError<'a> {
 	IsNotMainFunction(Span),
+
 	FirstArgumentInvalid(Span),
 	SecondArgumentInvalid(Span),
 	TooManyArguments(Span, usize),
+
+	UnknownAttribute(Span, &'a syn::Ident),
 }
 
+// -------------- //
+// Implémentation //
+// -------------- //
+
 impl SetupAnalyzer {
+	const LIST_OF_ATTRIBUTES: [&'static str; 1] = ["logger"];
 	const TOTAL_ARGS_EXPECTED: usize = 2;
 
-	pub(super) fn new(function_input: syn::ItemFn) -> Self {
-		Self { function_input }
+	pub(super) fn new(
+		function_input: syn::ItemFn,
+		attrs: syn::AttributeArgs,
+	) -> Self {
+		Self {
+			attrs,
+			function_input,
+		}
 	}
 
-	pub(super) fn build(self) -> Result<TokenStream, SetupAnalyzerError> {
+	pub(super) fn build(&self) -> Result<TokenStream, SetupAnalyzerError<'_>> {
 		if !self.is_main_function() {
 			return Err(SetupAnalyzerError::IsNotMainFunction(
 				self.function_input.span(),
@@ -56,22 +79,77 @@ impl SetupAnalyzer {
 	}
 
 	/// Construit la fonction principale.
-	fn build_main_fn(
-		&self,
-		setup_fn: fn(&Self) -> Result<TokenStream2, SetupAnalyzerError>,
+	fn build_main_fn<'a>(
+		&'a self,
+		setup_fn: fn(&'a Self) -> Result<TokenStream2, SetupAnalyzerError>,
 	) -> Result<TokenStream2, SetupAnalyzerError> {
-		let attrs = &self.function_input.attrs;
+		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
+			| syn::NestedMeta::Meta(meta) => match meta {
+				| syn::Meta::Path(path) => {
+					let ident = path.get_ident().expect("L'identifiant");
+					if Self::LIST_OF_ATTRIBUTES
+						.contains(&ident.to_string().as_str())
+					{
+						Ok(quote! {
+							let x = (&cli_args, &env_args);
+							with::#ident(x);
+						})
+					} else {
+						Err(SetupAnalyzerError::UnknownAttribute(
+							meta.span(),
+							ident,
+						))
+					}
+				}
+				| syn::Meta::List(_) => todo!("list"),
+				| syn::Meta::NameValue(_) => todo!("named_value"),
+			},
+			| syn::NestedMeta::Lit(_) => todo!("lit"),
+		});
+
+		let mut setup_by_attrs = Vec::with_capacity(maybe_attrs.len());
+		for attr in maybe_attrs {
+			setup_by_attrs.push(attr?);
+		}
+
+		let fn_attrs = &self.function_input.attrs;
 		let maybe_asyncness = self.function_input.sig.asyncness;
 		let output_type = &self.function_input.sig.output;
 		let block = &self.function_input.block;
 		let setup = setup_fn(self)?;
 
 		Ok(quote! {
-		#(#attrs)*
+		#(#fn_attrs)*
 		#[tokio::main]
 		#maybe_asyncness fn main() #output_type {
 			#setup
+			#(#setup_by_attrs)*
 			#block
+		}
+
+		mod with {
+			use super::*;
+
+			use cli::app::ProcessEnv;
+
+			/// Configure et initialise le logger.
+			pub(super) fn logger(args: (&phisyrc_cli, &phisyrc_env)) {
+				let (cli_args, env_args) = args;
+
+				let level_filter = match &cli_args.options.mode {
+					| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
+					| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
+					| ProcessEnv::TEST => logger::LevelFilter::Trace,
+				};
+
+				logger::Logger::builder()
+					.with_color()
+					.with_level(level_filter)
+					.build()
+					.expect("Impossible d'initialiser le logger.");
+
+				logger::trace!("Le logger a été initialisé.");
+			}
 		}
 		})
 	}
@@ -153,13 +231,14 @@ impl SetupAnalyzer {
 	}
 }
 
-impl SetupAnalyzerError {
+impl<'a> SetupAnalyzerError<'a> {
 	pub(super) fn span(self) -> Span {
 		match self {
 			| Self::IsNotMainFunction(span)
 			| Self::FirstArgumentInvalid(span)
 			| Self::SecondArgumentInvalid(span)
-			| Self::TooManyArguments(span, _) => span,
+			| Self::TooManyArguments(span, _)
+			| Self::UnknownAttribute(span, _) => span,
 		}
 	}
 
@@ -172,7 +251,11 @@ impl SetupAnalyzerError {
 	}
 }
 
-impl fmt::Display for SetupAnalyzerError {
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
+
+impl fmt::Display for SetupAnalyzerError<'_> {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
@@ -201,6 +284,10 @@ impl fmt::Display for SetupAnalyzerError {
 						SetupAnalyzer::TOTAL_ARGS_EXPECTED,
 						len
 					)
+				}
+
+				| Self::UnknownAttribute(_, ident) => {
+					format!("l'attribut `{}` n'est pas reconnu.", ident)
 				}
 			}
 		)

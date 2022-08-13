@@ -19,9 +19,10 @@ use proc_macro::TokenStream;
 //    fn main(args: CLI<...>) {}
 // ```
 #[proc_macro_attribute]
-pub fn setup(_: TokenStream, input: TokenStream) -> TokenStream {
+pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {
+	let attrs = syn::parse_macro_input!(attrs as syn::AttributeArgs);
 	let function_input = syn::parse_macro_input!(input as syn::ItemFn);
-	let analyzer = setup::SetupAnalyzer::new(function_input);
+	let analyzer = setup::SetupAnalyzer::new(function_input, attrs);
 	match analyzer.build() {
 		| Ok(ok) => ok,
 		| Err(err) => err.compile_error(),
@@ -37,7 +38,7 @@ pub fn setup(_: TokenStream, input: TokenStream) -> TokenStream {
 //        nick: String,
 //     }
 // ```
-#[proc_macro_derive(Env, attributes(var))]
+#[proc_macro_derive(Env, attributes(var, default))]
 pub fn env_trait_derive(input: TokenStream) -> proc_macro::TokenStream {
 	let struct_input = syn::parse_macro_input!(input as syn::ItemStruct);
 	let analyzer = env::EnvAnalyzer::new(struct_input);

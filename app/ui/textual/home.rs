@@ -4,8 +4,10 @@
 
 use std::borrow::BorrowMut;
 
-use cli::PROJECT_NAME;
-use crossterm::event::{KeyCode, KeyEvent, MouseEvent};
+use cli::{
+	event::{KeyCode, KeyEvent, MouseEvent},
+	PROJECT_NAME,
+};
 use tui::{
 	backend::Backend,
 	layout::{Alignment, Constraint, Direction, Layout, Rect},

@@ -10,3 +10,6 @@ path = "./lib.rs"
 
 [dependencies]
 clap = { version = "^3.2", features = ["derive", "env", "wrap_help"] }
+crossterm = { version = "^0.25", default-features = false, features = [
+	"event-stream",
+] }

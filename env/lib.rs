@@ -16,6 +16,9 @@ pub use self::{error::EnvError, interface::EnvInterface};
 #[derive(phisyrc::Env)]
 #[allow(non_camel_case_types)]
 pub struct phisyrc_env {
+	#[var(key = "DEBUG", default = "*")]
+	pub debug_filter: String,
+
 	#[var(key = "GUI", default = "flutter")]
 	pub gui_to_use: String,
 }

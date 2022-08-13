@@ -1,0 +1,12 @@
+# Renomme ce fichier en "config.toml", et modifie les occurrences de "<user>"
+# par le nom de ton utilisateur courant.
+
+[alias]
+b = "build --release -Z unstable-options --out-dir .phisyrc/"
+
+[build]
+rustflags = [
+    "--remap-path-prefix=C:\\Users\\<user>\\=",  # Windows
+    "--remap-path-prefix=/mnt/c/Users/<user>/=", # Windows + WSL
+    "--remap-path-prefix=/home/<user>/="         # Linux, ...
+]

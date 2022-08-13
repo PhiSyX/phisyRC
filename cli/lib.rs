@@ -4,18 +4,47 @@
 
 mod commands;
 mod flags;
+pub mod layout;
 mod options;
 
 use clap::{Args, Parser, Subcommand};
+pub use crossterm::*;
 
-pub use self::{commands::*, flags::*, options::*};
-
-/// Nom du projet.
+/// Nom du projet : ART.
 pub const PROJECT_NAME: &str = "
     / ' _   _ _
  /)/)/_) (// (
 /        /    `
 ";
+
+pub mod app {
+	use clap::Parser;
+
+	pub use super::{commands::*, flags::*, options::*};
+	use crate::{CLI, PROJECT_NAME};
+
+	#[allow(non_camel_case_types)]
+	pub type phisyrc_cli = CLI<Flags, Options, Command>;
+
+	// -------------- //
+	// Implementation //
+	// -------------- //
+
+	impl phisyrc_cli {
+		/// Construit la structure [CLI] à partir des arguments de la ligne de
+		/// commande (basé sur [std::env::args_os]).
+		pub fn arguments() -> Self {
+			Self::display_project();
+
+			Self::parse()
+		}
+
+		/// Affiche le nom du projet dans la console.
+		fn display_project() {
+			println!("{PROJECT_NAME}");
+		}
+	}
+}
 
 // --------- //
 // Structure //
@@ -41,27 +70,4 @@ where
 	/// Le commande.
 	#[clap(subcommand)]
 	pub command: Option<C>,
-}
-
-#[allow(non_camel_case_types)]
-pub type phisyrc_cli =
-	CLI<self::flags::Flags, self::options::Options, self::commands::Command>;
-
-// -------------- //
-// Implementation //
-// -------------- //
-
-impl phisyrc_cli {
-	/// Construit la structure [CLI] à partir des arguments de la ligne de
-	/// commande (basé sur [std::env::args_os]).
-	pub fn arguments() -> Self {
-		Self::display_project();
-
-		Self::parse()
-	}
-
-	/// Affiche le nom du projet dans la console.
-	fn display_project() {
-		println!("{PROJECT_NAME}");
-	}
 }

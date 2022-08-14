@@ -1,0 +1,3 @@
+[submodule "patches/chrono"]
+	path = patches/chrono
+	url = https://github.com/TWALL9/chrono/tree/update-time-dependency

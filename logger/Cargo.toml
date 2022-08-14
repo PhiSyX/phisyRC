@@ -9,6 +9,6 @@ publish = false
 path = "./lib.rs"
 
 [dependencies]
-chrono = "^0.4"
+chrono = { path = "../patches/chrono" }
 log = { version = "^0.4", features = ["std"] }
 cli = { path = "../cli", package = "phisyrcli" }

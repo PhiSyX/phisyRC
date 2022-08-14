@@ -6,6 +6,10 @@ use std::collections::HashMap;
 
 use super::{style::Position, Alignment, Cell, Row, Style, STYLE_BLANK};
 
+// --------- //
+// Structure //
+// --------- //
+
 #[derive(Clone, Debug)]
 pub struct GridLayout<'d> {
 	rows: Vec<Row<'d>>,
@@ -24,6 +28,10 @@ pub struct GridBoarder {
 	top: bool,
 	bottom: bool,
 }
+
+// -------------- //
+// Implémentation //
+// -------------- //
 
 impl<'d> GridLayout<'d> {
 	pub fn new() -> Self {
@@ -195,6 +203,10 @@ impl<'d> GridLayout<'d> {
 		buffer.push_str(&format!("{}\n", line.as_ref()));
 	}
 }
+
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
 
 impl<'d> Default for GridLayout<'d> {
 	fn default() -> Self {

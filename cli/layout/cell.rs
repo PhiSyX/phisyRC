@@ -8,6 +8,10 @@ use unicode_width::UnicodeWidthStr;
 
 use super::Alignment;
 
+// --------- //
+// Structure //
+// --------- //
+
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Cell<'d> {
@@ -16,6 +20,10 @@ pub struct Cell<'d> {
 	data: Cow<'d, str>,
 	padding: bool,
 }
+
+// -------------- //
+// Implémentation //
+// -------------- //
 
 impl<'d> Cell<'d> {
 	pub fn new(data: impl ToString) -> Self {

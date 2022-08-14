@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use std::cmp::max;
-
 use super::{str_len, style::Position, Alignment, Cell, Style};
+
+// --------- //
+// Structure //
+// --------- //
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -12,6 +14,10 @@ pub struct Row<'d> {
 	pub cells: Vec<Cell<'d>>,
 	pub separator: bool,
 }
+
+// -------------- //
+// Implémentation //
+// -------------- //
 
 impl<'d> Row<'d> {
 	pub fn new(
@@ -22,9 +28,9 @@ impl<'d> Row<'d> {
 			separator: true,
 		};
 
-		cells.into_iter().for_each(|entry| {
-			row.cells.push(entry.into());
-		});
+		cells
+			.into_iter()
+			.for_each(|entry| row.cells.push(entry.into()));
 
 		row
 	}
@@ -38,15 +44,14 @@ impl<'d> Row<'d> {
 		let mut spanned_columns = 0;
 		let mut row_height = 0;
 
-		self.cells.iter().for_each(|cell| {
+		for cell in &self.cells {
 			let width = (0..cell.colspan)
 				.fold(0, |width, j| width + widths[j + spanned_columns]);
-
 			let wrapped_cell = cell.wrapped_content(width + cell.colspan - 1);
-			row_height = max(row_height, wrapped_cell.len());
+			row_height = core::cmp::max(row_height, wrapped_cell.len());
 			wrapped_cells.push(wrapped_cell);
 			spanned_columns += cell.colspan;
-		});
+		}
 
 		spanned_columns = 0;
 
@@ -61,45 +66,44 @@ impl<'d> Row<'d> {
 				let cell_span = (0..cell.colspan)
 					.fold(0, |n, c| n + widths[spanned_columns + c]);
 
-				lines.iter_mut().enumerate().take(row_height).for_each(
-					|(row_index, row)| {
-						if wrapped_cells[column_index].len() > row_index {
-							let str_width = str_len(
-								&wrapped_cells[column_index][row_index],
-							);
+				let callback_fn = |(row_index, row): (usize, &mut String)| {
+					let mut _pad = String::default();
 
-							let mut padding = 0;
-							if cell_span >= str_width {
-								padding += cell_span - str_width;
+					if wrapped_cells[column_index].len() > row_index {
+						let str_width =
+							str_len(&wrapped_cells[column_index][row_index]);
 
-								if cell.colspan > 1 {
-									padding += style.vertical.len_utf8()
-										* (cell.colspan - 1);
-								}
+						let mut padding = 0;
+						if cell_span >= str_width {
+							padding += cell_span - str_width;
+
+							if cell.colspan > 1 {
+								padding += style.vertical.len_utf8()
+									* (cell.colspan - 1);
 							}
-
-							row.push_str(&format!(
-								"{}{}",
-								style.vertical,
-								self.padding_string(
-									padding,
-									cell.alignment,
-									&wrapped_cells[column_index][row_index]
-								)
-							));
-						} else {
-							row.push_str(&format!(
-								"{}{}",
-								style.vertical,
-								str::repeat(
-									" ",
-									widths[spanned_columns] * cell.colspan
-										+ cell.colspan - 1
-								)
-							));
 						}
-					},
-				);
+
+						_pad = self.padding_string(
+							padding,
+							cell.alignment,
+							&wrapped_cells[column_index][row_index],
+						);
+					} else {
+						_pad = str::repeat(
+							" ",
+							widths[spanned_columns] * cell.colspan
+								+ cell.colspan - 1,
+						);
+					}
+
+					row.push_str(&format!("{}{}", style.vertical, _pad));
+				};
+
+				lines
+					.iter_mut()
+					.enumerate()
+					.take(row_height)
+					.for_each(callback_fn);
 
 				spanned_columns += cell.colspan;
 			} else {
@@ -169,51 +173,49 @@ impl<'d> Row<'d> {
 
 		temporary_buffer.push(style.end_position(row));
 
-		let mut out = String::new();
+		if let Some(prev) = previous_separator {
+			let mut output = String::new();
 
-		match previous_separator {
-			| Some(prev) => {
-				for pair in temporary_buffer.chars().zip(prev.chars()) {
-					if pair.0 == style.left || pair.0 == style.right {
-						out.push(pair.0);
-					} else if pair.0 != style.horizontal
-						|| pair.1 != style.horizontal
-					{
-						out.push(
-							style.merge_intersection_position(
-								pair.1, pair.0, row,
-							),
-						);
-					} else {
-						out.push(style.horizontal);
-					}
+			for pair in temporary_buffer.chars().zip(prev.chars()) {
+				if pair.0 == style.left || pair.0 == style.right {
+					output.push(pair.0);
+				} else if pair.0 != style.horizontal
+					|| pair.1 != style.horizontal
+				{
+					output.push(
+						style.merge_intersection_position(pair.1, pair.0, row),
+					);
+				} else {
+					output.push(style.horizontal);
 				}
-				out
 			}
-			| None => temporary_buffer,
+
+			return output;
 		}
+
+		temporary_buffer
 	}
 
 	pub(crate) fn split_column(&self) -> Vec<(f32, usize)> {
-		let output =
-			self.cells.iter().fold(Vec::default(), |mut output, cell| {
-				let value = cell.split_width();
+		let callback_fn = |mut output: Vec<(f32, usize)>, cell: &Cell| {
+			let value = cell.split_width();
 
-				let min_w =
-					(cell.min_width() as f32 / cell.colspan as f32) as usize;
-				let add_1 =
-					cell.min_width() as f32 % cell.colspan as f32 > 0.001;
+			let min_w =
+				(cell.min_width() as f32 / cell.colspan as f32) as usize;
+			let add_1 = cell.min_width() as f32 % cell.colspan as f32 > 0.001;
 
-				(0..cell.colspan).for_each(|i| {
-					if add_1 && i == cell.colspan - 1 {
-						output.push((value + 1.0, min_w + 1));
-					} else {
-						output.push((value, min_w));
-					}
-				});
+			for i in 0..cell.colspan {
+				if add_1 && i == cell.colspan - 1 {
+					output.push((value + 1.0, min_w + 1));
+				} else {
+					output.push((value, min_w));
+				}
+			}
 
-				output
-			});
+			output
+		};
+
+		let output = self.cells.iter().fold(Vec::default(), callback_fn);
 
 		output
 	}

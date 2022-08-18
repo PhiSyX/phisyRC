@@ -118,9 +118,17 @@ impl SetupAnalyzer {
 		let block = &self.function_input.block;
 		let setup = setup_fn(self)?;
 
+		let maybe_tokio = if maybe_asyncness.is_some() {
+			quote! {
+				#[tokio::main]
+			}
+		} else {
+			quote! {}
+		};
+
 		Ok(quote! {
 		#(#fn_attrs)*
-		#[tokio::main]
+		#maybe_tokio
 		#maybe_asyncness fn main() #output_type {
 			#setup
 			#(#setup_by_attrs)*

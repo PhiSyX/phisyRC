@@ -1,0 +1,9 @@
+[info]
+admin = ["Mike 'PhiSyX' S. <admin@phisy.rc>", "John Doe <john@doe.org>"]
+description = "Serveur phisyRC"
+name = "irc.phisy.rc"
+network_name = "phisyRC"
+
+[[listen]]
+ip = "127.0.0.1"
+port = 6667

@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use core::fmt;
 use std::{env, io, process::Command, str::FromStr};
 
 // --------- //
@@ -71,5 +72,13 @@ impl FromStr for TypeGui {
 			| "tauri" => TypeGui::Tauri,
 			| _ => return Err(Self::Err::Invalid),
 		})
+	}
+}
+
+impl fmt::Display for TypeGuiError {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		match self {
+			| Self::Invalid => write!(f, "Type de GUI invalide"),
+		}
 	}
 }

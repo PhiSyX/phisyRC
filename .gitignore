@@ -3,7 +3,9 @@
 
 .idea/*
 
-.phisyrc/*
+.phisyrc/phisyrc*
+.phisyrc/config/*
+!.phisyrc/config/ircd.example.toml
 
 .vscode/*
 

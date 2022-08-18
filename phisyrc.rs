@@ -21,28 +21,33 @@ use self::app::{App, UI};
 
 #[phisyrc::setup(logger)]
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
-	match cli_args.command {
+	let output = match cli_args.command {
 		| Some(Command::Client(client)) => {
-			let type_gui = env_args.gui_to_use.parse()?;
-			handle_client_command(client.into(), type_gui).await
+			handle_client_command(client.into(), env_args.gui_to_use).await
 		}
-
 		| Some(Command::Server(server)) => handle_server_command(server).await,
-
 		| None => {
-			let type_gui = env_args.gui_to_use.parse()?;
-			handle_client_command(Default::default(), type_gui).await
+			handle_client_command(Default::default(), env_args.gui_to_use).await
 		}
-	}
-	.expect("CLI");
+	};
 
-	Ok(())
+	let exit_code = match output {
+		| Ok(()) => 0,
+		| Err(err) => {
+			eprintln!("{}", err);
+			1
+		}
+	};
+
+	std::process::exit(exit_code);
 }
 
 async fn handle_client_command(
 	client: Option<CommandClient>,
-	type_gui: TypeGui,
+	type_gui: String,
 ) -> AppResult<()> {
+	let type_gui = type_gui.parse::<TypeGui>()?;
+
 	if client.is_none() {
 		return Ok(App::launch(UI::Graphical(type_gui)).await?);
 	}

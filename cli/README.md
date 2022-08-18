@@ -41,9 +41,10 @@
    | `--gui` | Lance l'application de Chat en mode graphique |
 
 2. Les options de la commande `server` sont:
-   | OPTION | DESCRIPTION |
-   | ------ | ----------- |
-   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond |
+   | OPTION | DESCRIPTION | DEFAULT |
+   | ------ | ----------- | ------- |
+   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `false` |
+   | `--config` | Fichier de configuration IRC | `".phisyrc/config/ircd.toml"` |
 
 ## Drapeaux
 

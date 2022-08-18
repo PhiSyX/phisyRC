@@ -29,9 +29,9 @@ des utilisateurs, les canaux, etc, de _leurs_ serveurs IRC.
 **phisyRC** utilise le protocole [**IRC**](https://datatracker.ietf.org/doc/html/rfc1459)
 comme moyen de communication. Les spécifications suivantes sont utilisées:
 
--   [[IRC](https://datatracker.ietf.org/doc/html/rfc2812)] : Client Protocol
 -   [[IRC-ARCH](https://datatracker.ietf.org/doc/html/rfc2810)] : Architecture
 -   [[IRC-CHAN](https://datatracker.ietf.org/doc/html/rfc2811)] : Channel Management
+-   [[IRC-CLIENT](https://datatracker.ietf.org/doc/html/rfc2812)] : Client Protocol
 -   [[IRC-SERVER](https://datatracker.ietf.org/doc/html/rfc2813)] : Server Protocol
 
 Toutefois, **phisyRC** se laisse la liberté de ne pas implémenter TOUTES les
@@ -96,9 +96,10 @@ qui ne sont pas dans le protocole IRC ;-).
    | `--gui` | Lance l'application de Chat en mode graphique |
 
 2. Les options de la commande `server` sont:
-   | OPTION | DESCRIPTION |
-   | ------ | ----------- |
-   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond |
+   | OPTION | DESCRIPTION | DEFAULT |
+   | ------ | ----------- | ------- |
+   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `false` |
+   | `--config` | Fichier de configuration IRC | `".phisyrc/config/ircd.toml"` |
 
 ### Drapeaux
 

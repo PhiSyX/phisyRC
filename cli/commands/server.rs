@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use std::path::PathBuf;
+
 use crate::{app::EmptyFlags, CLI};
 
 pub type CommandServer =
@@ -17,6 +19,14 @@ pub struct CommandServerOptions {
 	/// Ouvre les connexions aux serveurs IRC en tâche de fond.
 	#[clap(short, long)]
 	pub daemon: bool,
+
+	/// Fichier de configuration IRC.
+	#[clap(
+		long,
+		parse(from_os_str),
+		default_value = ".phisyrc/config/ircd.toml"
+	)]
+	pub config: PathBuf,
 }
 
 // ----------- //

@@ -22,6 +22,8 @@ pub enum AppError {
 	Env(EnvError),
 
 	Gui(TypeGuiError),
+
+	IRC(irc::IrcError),
 }
 
 // -------------- //
@@ -46,6 +48,12 @@ impl From<TypeGuiError> for AppError {
 	}
 }
 
+impl From<irc::IrcError> for AppError {
+	fn from(err: irc::IrcError) -> Self {
+		Self::IRC(err)
+	}
+}
+
 impl fmt::Display for AppError {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
@@ -60,6 +68,9 @@ impl fmt::Display for AppError {
 				}
 				| Self::Gui(gui_err) => {
 					format!("de l'Interface Utilisateur Graphique: {gui_err}")
+				}
+				| Self::IRC(irc_err) => {
+					format!("IRC: {irc_err}")
 				}
 			}
 		)

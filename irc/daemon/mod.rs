@@ -2,7 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use std::path::Path;
+
 use super::IRC;
+use crate::output::IrcResult;
 
 // --------- //
 // Structure //
@@ -15,9 +18,9 @@ pub struct IrcDaemon;
 // -------------- //
 
 impl IrcDaemon {
-	pub fn spawn() {
+	pub async fn spawn(config_file: impl AsRef<Path>) -> IrcResult<()> {
 		println!("Lance le réseau IRC en tâche de fond.");
 
-		IRC::run();
+		IRC::run(config_file).await
 	}
 }

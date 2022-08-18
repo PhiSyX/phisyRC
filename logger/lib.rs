@@ -8,7 +8,8 @@ mod echo;
 use std::fmt::Arguments;
 
 use chrono::Local;
-use cli::{layout::GridLayout, style::Stylize};
+use cli::layout::GridLayout;
+pub use cli::style::Stylize;
 pub use log::*;
 
 use self::builder::Builder;

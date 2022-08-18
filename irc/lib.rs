@@ -2,9 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod config;
 mod daemon;
+mod output;
 
-pub use self::daemon::*;
+use std::path::Path;
+
+pub use self::{daemon::*, output::*};
 
 // --------- //
 // Structure //
@@ -17,7 +21,10 @@ pub struct IRC;
 // -------------- //
 
 impl IRC {
-	pub fn run() {
-		println!("Ouverture de la connexion aux serveurs IRC.");
+	pub async fn run(config_file: impl AsRef<Path>) -> IrcResult<()> {
+		logger::info!("Lancement de l'IRC...");
+
+		let config = config::load(config_file)?;
+		Ok(())
 	}
 }

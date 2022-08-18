@@ -75,9 +75,9 @@ async fn handle_server_command(server: CommandServer) -> AppResult<()> {
 		},
 		| None => {
 			if server.options.daemon {
-				IrcDaemon::spawn();
+				IrcDaemon::spawn(server.options.config).await?;
 			} else {
-				IRC::run();
+				IRC::run(server.options.config).await?;
 			}
 		}
 	};

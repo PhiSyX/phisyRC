@@ -11,4 +11,7 @@ path = "./lib.rs"
 [dependencies]
 logger = { path = "../logger", package = "phisyrc-logger" }
 
+lang = { git = "https://github.com/PhiSyX/lang", rev = "436a573c60ed5a4f6a18ed694b226aa6432302db" }
+
+serde = { version = "^1.0", features = ["derive"] }
 toml = { version = "^0.5" }

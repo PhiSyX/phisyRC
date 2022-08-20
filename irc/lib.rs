@@ -4,10 +4,12 @@
 
 mod config;
 mod daemon;
+mod message;
 mod output;
 
 use std::path::Path;
 
+pub(crate) use self::message::*;
 pub use self::{daemon::*, output::*};
 
 // --------- //

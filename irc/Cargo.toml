@@ -13,5 +13,13 @@ logger = { path = "../logger", package = "phisyrc-logger" }
 
 lang = { git = "https://github.com/PhiSyX/lang", rev = "436a573c60ed5a4f6a18ed694b226aa6432302db" }
 
+futures = { version = "^0.3" }
 serde = { version = "^1.0", features = ["derive"] }
+tokio = { version = "^1.20", features = [
+	"io-util",
+	"net",
+	"rt-multi-thread",
+	"sync",
+	"time",
+] }
 toml = { version = "^0.5" }

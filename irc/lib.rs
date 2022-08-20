@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod arch;
 mod config;
 mod daemon;
 mod message;
@@ -9,6 +10,7 @@ mod output;
 
 use std::path::Path;
 
+use self::arch::IrcNetwork;
 pub(crate) use self::message::*;
 pub use self::{daemon::*, output::*};
 
@@ -27,6 +29,10 @@ impl IRC {
 		logger::info!("Lancement de l'IRC...");
 
 		let config = config::load(config_file)?;
+
+		let network = IrcNetwork::new(&config)?;
+		network.try_establish_connections().await?;
+
 		Ok(())
 	}
 }

@@ -4,6 +4,8 @@
 
 use core::fmt;
 
+use crate::arch::{IrcNetworkError, IrcServerError};
+
 pub type IrcResult<T> = Result<T, IrcError>;
 
 // ----------- //
@@ -13,8 +15,8 @@ pub type IrcResult<T> = Result<T, IrcError>;
 #[derive(Debug)]
 pub enum IrcError {
 	IO(std::io::Error),
-
 	ParseConfigError(toml::de::Error),
+	Server(IrcServerError),
 }
 
 // -------------- //
@@ -33,18 +35,25 @@ impl From<toml::de::Error> for IrcError {
 	}
 }
 
+impl From<IrcNetworkError> for IrcError {
+	fn from(err: IrcNetworkError) -> Self {
+		match err {
+			| IrcNetworkError::IO(err) => Self::IO(err),
+			| IrcNetworkError::Server(err) => Self::Server(err),
+		}
+	}
+}
+
 impl fmt::Display for IrcError {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
 			"{}",
 			match self {
-				| Self::IO(io_err) => {
-					format!("{io_err}")
-				}
-				| Self::ParseConfigError(toml_err) => {
-					format!("[ParseConfigError]: {}", toml_err)
-				}
+				| Self::IO(io_err) => format!("{io_err}"),
+				| Self::ParseConfigError(toml_err) =>
+					format!("[ParseConfigError]: {toml_err}"),
+				| Self::Server(server_err) => format!("[Server]: {server_err}"),
 			}
 		)
 	}

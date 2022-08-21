@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 mod arch;
+mod commands;
 mod config;
 mod daemon;
 mod message;
@@ -11,7 +12,7 @@ mod output;
 use std::path::Path;
 
 use self::arch::IrcNetwork;
-pub(crate) use self::message::*;
+pub(crate) use self::{commands::*, message::*};
 pub use self::{daemon::*, output::*};
 
 // --------- //
@@ -33,6 +34,10 @@ impl IRC {
 		let network = IrcNetwork::new(&config)?;
 		network.try_establish_connections().await?;
 
-		Ok(())
+		loop {
+			tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+		}
+
+		// Ok(())
 	}
 }

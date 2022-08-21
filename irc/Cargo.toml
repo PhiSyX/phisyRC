@@ -22,4 +22,5 @@ tokio = { version = "^1.20", features = [
 	"sync",
 	"time",
 ] }
+tokio-util = { version = "^0.7", features = ["codec"] }
 toml = { version = "^0.5" }

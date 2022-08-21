@@ -5,22 +5,24 @@
 use core::fmt;
 use std::{net::SocketAddr, sync::Arc};
 
+use futures::{SinkExt, StreamExt};
+use lang::stream::prelude::*;
 use tokio::{
-	io,
-	sync::{Mutex, RwLock},
+	io::{self},
+	sync::RwLock,
 };
 
-use super::Client;
+// use super::Client;
 use crate::{
-	arch::{AtomicIrcNetwork, Connection, ListenerError, Socket},
+	arch::{AtomicIrcNetwork, ListenerError, Socket, SocketStream},
+	commands::IrcCommandNumeric,
 	config::IrcdListen,
+	message::{IrcCodec, IrcMessage, IrcMessageCommand, IrcMessageError},
 };
 
 // ---- //
 // Type //
 // ---- //
-
-pub type AtomicServer = Arc<Mutex<Server>>;
 
 pub type AtomicServerConfig = Arc<RwLock<ServerConfig>>;
 
@@ -148,36 +150,57 @@ impl Server {
 	/// Écoute sur la socket du serveur.
 	pub(crate) async fn try_establish_connection(
 		&self,
-	) -> Result<Connection, IrcServerError> {
+	) -> Result<SocketStream, IrcServerError> {
 		Ok(self.socket.listen().await?)
 	}
 
-	/// Intercepte les messages entrants que reçoit la connexion et les
-	/// traitent.
-	pub(crate) async fn intercept_messages(&self, connection: Connection) {
-		let m_connection = connection.shared();
-
-		let m_server = self.shared();
-		let m_client = Client::new(m_connection, m_server).shared();
-
-		let (tx_msg, mut rx_msg) = tokio::sync::mpsc::unbounded_channel();
-		let m_client1 = m_client.clone();
-		let t_client1 = tx_msg.clone();
+	/// Intercepte les messages entrants que reçoit le serveur de la
+	/// connexion/du client courant(e) et les traitent.
+	pub(crate) async fn intercept_messages(&self, socket: SocketStream) {
+		let mut stream = IrcCodec::new(socket.0);
 
 		tokio::spawn(async move {
-			m_client1.lock().await.process(t_client1).await;
-		});
+			while let Some(Ok(line)) = stream.next().await {
+				let bytestream = ByteStream::new(line);
+				let inputstream = InputStream::new(bytestream.chars());
 
-		tokio::spawn(async move {
-			while let Some(message) = rx_msg.recv().await {
-				logger::debug!("{:?}", message);
-				// self.connection.write().await.send_message(message).await;
+				let output =
+					IrcMessage::parse(inputstream).map(Self::handle_message);
+
+				if let Ok(response) = output.expect("une réponse").await {
+					logger::debug!("Output: {:?}", response,);
+
+					let msg = format!(
+						":{} {} {} :{}\r\n",
+						stream.get_ref().peer_addr().unwrap(),
+						response.code(),
+						"yournick",
+						response,
+					);
+
+					stream.send(msg).await.expect("l'envoie de la réponse");
+				}
 			}
 		});
 	}
 
-	fn shared(&self) -> AtomicServer {
-		Arc::new(Mutex::new(self.clone()))
+	/// Gère les message entrants et retourne la réponse appropriée.
+	//
+	// NOTE(phisyx): à ce moment-ci, nous ne savons pas si les commandes sont
+	// envoyées par un client (IRC-CLIENT) ou par un service ou un serveur.
+	async fn handle_message(
+		message: IrcMessage,
+	) -> Result<IrcCommandNumeric, IrcMessageError> {
+		logger::debug!("Input: {:#?}", &message);
+
+		let msg = IrcCommandNumeric::ERR_UNKNOWNCOMMAND {
+			command: match message.command {
+				IrcMessageCommand::Numeric { code, .. } => code,
+				IrcMessageCommand::Text { text, .. } => text,
+			},
+		};
+
+		Ok(msg)
 	}
 }
 

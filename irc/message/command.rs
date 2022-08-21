@@ -187,13 +187,6 @@ impl IrcMessageCommand {
 			}
 		})
 	}
-
-	pub(super) fn params(&self) -> &[String] {
-		match self {
-			| Self::Numeric { params, .. } => params,
-			| Self::Text { params, .. } => params,
-		}
-	}
 }
 
 impl IrcMessageCommandParams {

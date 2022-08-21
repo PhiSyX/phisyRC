@@ -2,21 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use std::sync::Arc;
-
-use tokio::sync::{mpsc::UnboundedSender, Mutex};
-
-use super::AtomicServer;
-use crate::{
-	arch::AtomicConnection,
-	message::{IrcMessage, IrcMessageError},
-};
-
-// ---- //
-// Type //
-// ---- //
-
-pub type AtomicClient = Arc<Mutex<Client>>;
+use std::sync::{atomic::AtomicBool, Arc};
 
 // --------- //
 // Structure //
@@ -28,11 +14,9 @@ pub type AtomicClient = Arc<Mutex<Client>>;
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Client {
-	connection: AtomicConnection,
-	server: AtomicServer,
-
 	pub label: Option<String>,
 	pub ty: Option<ClientType>,
+	pub registered: Arc<AtomicBool>,
 }
 
 #[derive(Debug)]
@@ -61,29 +45,11 @@ pub enum ClientType {
 // -------------- //
 
 impl Client {
-	pub(crate) fn new(
-		connection: AtomicConnection,
-		server: AtomicServer,
-	) -> Self {
+	pub(crate) fn new() -> Self {
 		Self {
-			connection,
-			server,
 			label: Default::default(),
 			ty: Default::default(),
+			registered: Default::default(),
 		}
-	}
-
-	pub(crate) fn shared(&self) -> AtomicClient {
-		Arc::new(Mutex::new(self.clone()))
-	}
-}
-
-impl Client {
-	// TODO(phisyx): améliorer cette partie-ci.
-	pub async fn process(
-		&self,
-		tx: UnboundedSender<Result<IrcMessage, IrcMessageError>>,
-	) {
-		self.connection.write().await.read_messages(tx).await;
 	}
 }

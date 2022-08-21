@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-mod connection;
 mod socket;
 
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::{io, sync::RwLock};
 
-pub(crate) use self::{connection::*, socket::*};
+pub(crate) use self::socket::*;
 use super::{
 	components::{IrcServerError, Server},
 	Client,
@@ -90,7 +89,7 @@ impl IrcNetwork {
 	) -> Result<(), IrcNetworkError> {
 		for (label, server) in self.servers.into_iter() {
 			logger::info!(
-				"Tentative d'établir la connexion au serveur « {} ».",
+				"Tentative d'établissement de la connexion au serveur « {} ».",
 				label
 			);
 
@@ -98,8 +97,8 @@ impl IrcNetwork {
 				server.ping_host().await?;
 
 				loop {
-					let connection = server.try_establish_connection().await?;
-					server.intercept_messages(connection).await;
+					let socket = server.try_establish_connection().await?;
+					server.intercept_messages(socket).await;
 				}
 
 				#[allow(unreachable_code)]
@@ -107,9 +106,7 @@ impl IrcNetwork {
 			});
 		}
 
-		loop {
-			tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-		}
+		Ok(())
 	}
 }
 

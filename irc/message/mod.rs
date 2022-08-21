@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod codec;
 mod command;
 mod prefix;
 mod tags;
@@ -11,8 +12,9 @@ use std::{collections::HashMap, str::Chars};
 
 use lang::{codepoints::CodePoint, stream::prelude::*};
 
+pub use self::{codec::*, command::IrcMessageCommand};
 use self::{
-	command::{IrcMessageCommand, IrcMessageCommandError},
+	command::IrcMessageCommandError,
 	prefix::{
 		IrcMessagePrefix, IrcMessagePrefixHostError, IrcMessagePrefixNickError,
 		IrcMessagePrefixUserError,

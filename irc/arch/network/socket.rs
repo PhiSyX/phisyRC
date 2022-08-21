@@ -5,9 +5,12 @@
 use core::fmt;
 use std::{net::SocketAddr, ops};
 
-use tokio::{net::TcpListener, time};
+use tokio::{
+	net::{TcpListener, TcpStream},
+	time,
+};
 
-use crate::arch::Connection;
+pub type SocketStream = (TcpStream, SocketAddr);
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -34,7 +37,7 @@ impl Socket {
 		Ok(Self { addr })
 	}
 
-	pub(crate) async fn listen(&self) -> Result<Connection, ListenerError> {
+	pub(crate) async fn listen(&self) -> Result<SocketStream, ListenerError> {
 		let listener = Listener::from(&self.addr).await?;
 
 		logger::info!("Connexion au serveur « {} » ouverte.", self.addr);
@@ -67,13 +70,13 @@ impl Socket {
 						.await;
 				}
 
-				| Ok((stream, sock_addr)) => {
+				| Ok((socket_stream, socket_addr)) => {
 					logger::info!(
 						"Client connecté « {} » sur le serveur « {} ».",
-						stream.peer_addr()?,
+						socket_stream.peer_addr()?,
 						self.addr
 					);
-					return Ok(Connection::new(stream, sock_addr));
+					return Ok((socket_stream, socket_addr));
 				}
 			}
 		}

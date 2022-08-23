@@ -3,28 +3,34 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use core::fmt;
-use std::{net::SocketAddr, sync::Arc};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::SystemTime};
 
+use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt};
 use lang::stream::prelude::*;
 use tokio::{
 	io::{self},
-	sync::RwLock,
+	net::TcpStream,
 };
+use tokio_util::codec::LinesCodecError;
 
-// use super::Client;
 use crate::{
-	arch::{AtomicIrcNetwork, ListenerError, Socket, SocketStream},
-	commands::IrcCommandNumeric,
+	arch::{
+		AtomicClient, AtomicNetwork, Client, ListenerError, Socket,
+		SocketStream,
+	},
+	commands::{IncomingCommand, IrcCommandNumeric, IrcReplies},
 	config::IrcdListen,
-	message::{IrcCodec, IrcMessage, IrcMessageCommand, IrcMessageError},
+	forever,
+	message::{IrcCodec, IrcMessage, IrcMessageCommand},
 };
 
 // ---- //
 // Type //
 // ---- //
 
-pub type AtomicServerConfig = Arc<RwLock<ServerConfig>>;
+pub type AtomicServerConfig = Arc<ServerConfig>;
+pub type AtomicServer = Arc<Server>;
 
 /// Type de drapeaux utilisateurs.
 type ServerUserFlags = [char; 1];
@@ -42,19 +48,21 @@ type ServerUserFlags = [char; 1];
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct Server {
-	pub network: AtomicIrcNetwork,
+	pub network: AtomicNetwork,
 
 	/// Configuration du serveur.
 	pub config: AtomicServerConfig,
 
 	/// Les clients connectés au serveur.
-	pub clients: Vec<SocketAddr>,
+	pub clients: HashMap<String, AtomicClient>,
 
 	/// Le nom du serveur.
 	pub label: String,
 
 	/// La socket du serveur.
 	pub socket: Socket,
+
+	pub created_at: DateTime<Utc>,
 }
 
 /// Cette structure contient les valeurs par défaut d'une configuration serveur
@@ -121,7 +129,7 @@ impl Server {
 
 	/// Crée un serveur IRC.
 	pub(crate) fn new(
-		network: AtomicIrcNetwork,
+		network: AtomicNetwork,
 		listen: &IrcdListen,
 	) -> Result<Self, IrcServerError> {
 		let config = ServerConfig::new(listen);
@@ -129,16 +137,23 @@ impl Server {
 		let label = format!("{}:{}", config.user.ip, config.user.port);
 		Ok(Self {
 			network,
-			config: Arc::new(RwLock::new(config)),
+			config: Arc::new(config),
 			clients: Default::default(),
 			label,
 			socket,
+			created_at: DateTime::from(SystemTime::now()),
 		})
 	}
 
 	/// Vérifie si une connexion vers une adresse est déjà établie.
 	pub(crate) async fn ping_host(&self) -> Result<(), IrcServerError> {
 		let addr = self.socket.addr;
+
+		logger::trace!(
+			"Vérifie que le serveur puisse démarrer à l'adresse {}.",
+			addr
+		);
+
 		let stream = std::net::TcpStream::connect(addr);
 		if stream.is_ok() {
 			Err(IrcServerError::AddrIsAlreadyEstablished(addr))
@@ -154,53 +169,196 @@ impl Server {
 		Ok(self.socket.listen().await?)
 	}
 
+	pub(crate) fn new_client(&mut self, socket: &SocketStream) -> AtomicClient {
+		let client = Client::new(self.shared(), socket.addr());
+		let client_addr = client.addr.to_string();
+		let atomic_client = client.shared();
+		self.clients.insert(client_addr, atomic_client.clone());
+		atomic_client
+	}
+
 	/// Intercepte les messages entrants que reçoit le serveur de la
 	/// connexion/du client courant(e) et les traitent.
-	pub(crate) async fn intercept_messages(&self, socket: SocketStream) {
-		let mut stream = IrcCodec::new(socket.0);
+	pub(crate) async fn intercept_messages(
+		&self,
+		client: AtomicClient,
+		mut irc: IrcCodec<TcpStream>,
+	) {
+		let server_config = self.config.clone();
 
-		tokio::spawn(async move {
-			while let Some(Ok(line)) = stream.next().await {
-				let bytestream = ByteStream::new(line);
-				let inputstream = InputStream::new(bytestream.chars());
-
-				let output =
-					IrcMessage::parse(inputstream).map(Self::handle_message);
-
-				if let Ok(response) = output.expect("une réponse").await {
-					logger::debug!("Output: {:?}", response,);
-
-					let msg = format!(
-						":{} {} {} :{}\r\n",
-						stream.get_ref().peer_addr().unwrap(),
-						response.code(),
-						"yournick",
-						response,
-					);
-
-					stream.send(msg).await.expect("l'envoie de la réponse");
-				}
+		forever! {{
+			let maybe_line = irc.next().await;
+			if maybe_line.is_none() {
+				continue;
 			}
-		});
+
+			// SAFETY(unwrap): la condition-ci-haut nous permet d'utiliser
+			// unwrap avec sûreté.
+			let bytes = match maybe_line.unwrap().as_ref() {
+				| Err(LinesCodecError::MaxLineLengthExceeded) => {
+					logger::info!("Send Quit: Max sendQ exceeded");
+					continue;
+				}
+
+				| Err(err) => {
+					logger::error!("{err}");
+					break;
+				}
+
+				| Ok(line) => {
+					logger::trace!(
+						"Le client « {} » a envoyé le message « {} ».",
+						client.lock().await.addr,
+						line
+					);
+					ByteStream::new(line)
+				},
+			};
+			let input = InputStream::new(bytes.chars());
+
+			// Output
+			let shared_client1 = client.clone();
+			let output = IrcMessage::parse(input)
+				.map(move |msg| {
+					logger::debug!("Le message analysé:\n{:#?}", &msg);
+					Self::handle_message(shared_client1, msg)
+				});
+
+
+			// Response output
+			let shared_client2 = client.clone();
+			let replies = output.expect("une réponse").await;
+
+			logger::debug!(
+				"La réponse pour le client de l'entrée précédente:\n{:#?}",
+				&replies
+			);
+
+			for reply in replies {
+				match reply {
+					| IrcReplies::Custom(msg) => {
+						let msg = format!(
+							":{} 371 {} :{}\r\n",
+							server_config.user.name,
+							shared_client2
+								.lock()
+								.await
+								.nick
+								.as_ref()
+								.unwrap_or(&"*".into()),
+							msg
+						);
+						irc
+							.send(msg)
+							.await
+							.expect("l'envoie de la réponse");
+					}
+
+					| IrcReplies::Numeric(reply) => {
+						let msg = format!(
+							":{} {} {} {}\r\n",
+							server_config.user.name,
+							reply.code(),
+							shared_client2
+								.lock()
+								.await
+								.nick
+								.as_ref()
+								.unwrap_or(&"*".into()),
+							reply,
+						);
+
+						irc
+							.send(msg)
+							.await
+							.expect("l'envoie de la réponse");
+					}
+				};
+			}
+		}}
 	}
 
 	/// Gère les message entrants et retourne la réponse appropriée.
 	//
 	// NOTE(phisyx): à ce moment-ci, nous ne savons pas si les commandes sont
-	// envoyées par un client (IRC-CLIENT) ou par un service ou un serveur.
+	// envoyées par un client (IRC-CLIENT) ou par un service ou un serveur
+	// (IRC-SERVER).
 	async fn handle_message(
+		shared_client: AtomicClient,
 		message: IrcMessage,
-	) -> Result<IrcCommandNumeric, IrcMessageError> {
-		logger::debug!("Input: {:#?}", &message);
+	) -> Vec<IrcReplies> {
+		// NOTE(phisyx): vérifie que la commande entrante est valide.
+		let command = match IncomingCommand::is_valid(&message.command) {
+			Ok(c) => c,
+			Err(err) => return vec![err],
+		};
+
+		logger::debug!("{:?}", &command);
+
+		let mut client = shared_client.lock().await;
+
+		if !client.is_registered() {
+			let reply = match command {
+				| IncomingCommand::PASS { .. } => {
+					match client.on_pass_registration(&command) {
+						| Ok(s) => IrcReplies::Custom(s),
+						| Err(err) => IrcReplies::Numeric(err),
+					}
+				}
+
+				| IncomingCommand::NICK { .. } => {
+					match client.on_nick_registration(&command).await {
+						| Ok(s) => IrcReplies::Custom(s),
+						| Err(err) => IrcReplies::Numeric(err),
+					}
+				}
+
+				| IncomingCommand::USER { .. } => {
+					match client.on_user_registration(&command).await {
+						| Ok(_) => return client.complete_registration().await,
+						| Err(err) => IrcReplies::Numeric(err),
+					}
+				}
+			};
+
+			/*
+			 * | _ => {
+			 * IrcReplies::Numeric(IrcCommandNumeric::ERR_NOTREGISTERED)
+			 * } */
+
+			return vec![reply];
+		}
 
 		let msg = IrcCommandNumeric::ERR_UNKNOWNCOMMAND {
 			command: match message.command {
 				IrcMessageCommand::Numeric { code, .. } => code,
-				IrcMessageCommand::Text { text, .. } => text,
+				IrcMessageCommand::Text { command, .. } => command,
 			},
 		};
 
-		Ok(msg)
+		vec![IrcReplies::Numeric(msg)]
+	}
+
+	pub(crate) fn shared(&self) -> AtomicServer {
+		Arc::new(self.clone())
+	}
+
+	pub(crate) async fn can_locate_nick(&self, nick: &str) -> bool {
+		let mut found = false;
+
+		for (_, client) in self.clients.iter() {
+			found = if let Some(label) = client.lock().await.nick.as_ref() {
+				label.to_lowercase() == nick.to_lowercase()
+			} else {
+				false
+			};
+
+			if found {
+				break;
+			}
+		}
+
+		found
 	}
 }
 

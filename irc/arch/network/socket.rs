@@ -10,7 +10,11 @@ use tokio::{
 	time,
 };
 
-pub type SocketStream = (TcpStream, SocketAddr);
+use crate::message::IrcCodec;
+
+// --------- //
+// Structure //
+// --------- //
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -18,16 +22,29 @@ pub struct Socket {
 	pub addr: SocketAddr,
 }
 
+#[derive(Debug)]
+pub struct SocketStream(TcpStream, SocketAddr);
+
 pub struct Listener {
 	pub listener: TcpListener,
 }
+
+// ----------- //
+// Énumération //
+// ----------- //
 
 #[derive(Debug)]
 pub enum ListenerError {
 	IO(std::io::Error),
 }
 
+// -------------- //
+// Implémentation //
+// -------------- //
+
+// NOTE(phisyx): Le terme chaussette est évidement utiliser pour le fun ;-)
 impl Socket {
+	/// Crée une nouvelle adresse chaussette à partir d'une IP et d'un port.
 	pub fn new(
 		ip: impl Into<String>,
 		port: impl Into<u16>,
@@ -37,6 +54,7 @@ impl Socket {
 		Ok(Self { addr })
 	}
 
+	/// Crée un nouvelle connexion.
 	pub(crate) async fn listen(&self) -> Result<SocketStream, ListenerError> {
 		let listener = Listener::from(&self.addr).await?;
 
@@ -76,19 +94,46 @@ impl Socket {
 						socket_stream.peer_addr()?,
 						self.addr
 					);
-					return Ok((socket_stream, socket_addr));
+					return Ok(SocketStream(socket_stream, socket_addr));
 				}
 			}
 		}
 	}
 }
 
+impl SocketStream {
+	/// IRC Codec
+	pub fn codec(self) -> IrcCodec<TcpStream> {
+		IrcCodec::new(self.stream())
+	}
+
+	/// Flux de la chaussette.
+	pub fn stream(self) -> TcpStream {
+		self.0
+	}
+
+	/// Adresse de la chaussette.
+	pub fn addr(&self) -> SocketAddr {
+		self.1
+	}
+
+	/// Adresse pair.
+	pub fn peer_addr(&self) -> SocketAddr {
+		self.0.peer_addr().expect("peer address")
+	}
+}
+
 impl Listener {
+	/// Créer une connexion TCP à partir d'une adresse chaussette.
 	pub async fn from(addr: &SocketAddr) -> Result<Self, ListenerError> {
 		let listener = TcpListener::bind(addr).await?;
 		Ok(Self { listener })
 	}
 }
+
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
 
 impl ops::Deref for Listener {
 	type Target = TcpListener;

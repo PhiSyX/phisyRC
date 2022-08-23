@@ -21,7 +21,7 @@ impl<S> IrcCodec<S>
 where
 	S: AsyncRead + AsyncWrite,
 {
-	const MAX_LINE_LENGTH: usize = 20_000;
+	const MAX_LINE_LENGTH: usize = 510;
 
 	pub fn new(stream: S) -> Self {
 		Self(Framed::new(

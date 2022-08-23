@@ -11,7 +11,7 @@ mod output;
 
 use std::path::Path;
 
-use self::arch::IrcNetwork;
+use self::arch::Network;
 pub(crate) use self::{commands::*, message::*};
 pub use self::{daemon::*, output::*};
 
@@ -31,7 +31,7 @@ impl IRC {
 
 		let config = config::load(config_file)?;
 
-		let network = IrcNetwork::new(&config)?;
+		let network = Network::new(&config)?;
 		network.try_establish_connections().await?;
 
 		loop {
@@ -40,4 +40,23 @@ impl IRC {
 
 		// Ok(())
 	}
+}
+
+#[macro_export]
+macro_rules! forever {
+	(
+		$before:stmt ;
+		loop $code:block
+		return $after:stmt ;
+	) => {
+		tokio::spawn(async move {
+			$before
+			loop $code
+			#[allow(unreachable_code)]
+			$after
+		});
+	};
+	($code:block) => {
+		tokio::spawn(async move { loop $code });
+	};
 }

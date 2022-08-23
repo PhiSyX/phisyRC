@@ -6,20 +6,17 @@ mod socket;
 
 use std::{collections::HashMap, sync::Arc};
 
-use tokio::{io, sync::RwLock};
+use tokio::io;
 
 pub(crate) use self::socket::*;
-use super::{
-	components::{IrcServerError, Server},
-	Client,
-};
-use crate::config::IrcdConfig;
+use super::components::{IrcServerError, Server};
+use crate::{arch::AtomicClient, config::IrcdConfig, forever};
 
 // ---- //
 // Type //
 // ---- //
 
-pub type AtomicIrcNetwork = Arc<RwLock<IrcNetwork>>;
+pub type AtomicNetwork = Arc<Network>;
 
 // --------- //
 // Structure //
@@ -33,11 +30,9 @@ pub type AtomicIrcNetwork = Arc<RwLock<IrcNetwork>>;
 /// pour le reste du réseau qu'il voit.
 #[derive(Debug)]
 #[derive(Clone)]
-pub struct IrcNetwork {
+pub struct Network {
 	pub config: IrcdConfig,
-	pub clients: HashMap<String, Client>,
 	pub servers: HashMap<String, Server>,
-	// pub channels: HashMap<String, Channel>,
 }
 
 #[derive(Debug)]
@@ -51,12 +46,11 @@ pub enum IrcNetworkError {
 // Implémentation //
 // -------------- //
 
-impl IrcNetwork {
+impl Network {
 	/// Crée un nouveau réseau IRC.
 	pub fn new(config: &IrcdConfig) -> Result<Self, IrcNetworkError> {
 		let network = Self {
 			config: config.to_owned(),
-			clients: Default::default(),
 			servers: Default::default(),
 		};
 
@@ -77,33 +71,30 @@ impl IrcNetwork {
 		Ok(self)
 	}
 
-	fn shared(&self) -> AtomicIrcNetwork {
-		Arc::new(RwLock::new(self.clone()))
+	fn shared(&self) -> AtomicNetwork {
+		Arc::new(self.clone())
 	}
 }
 
-impl IrcNetwork {
+impl Network {
 	/// Tente d'établir les connexions entre les serveurs du réseau.
 	pub async fn try_establish_connections(
 		self,
 	) -> Result<(), IrcNetworkError> {
-		for (label, server) in self.servers.into_iter() {
-			logger::info!(
-				"Tentative d'établissement de la connexion au serveur « {} ».",
-				label
-			);
+		for (label, mut server) in self.servers.into_iter() {
+			logger::info!("Tentative d'établissement de la connexion au serveur « {label} ».");
 
-			tokio::spawn(async move {
-				server.ping_host().await?;
+			forever! {
+			server.ping_host().await?;
 
-				loop {
-					let socket = server.try_establish_connection().await?;
-					server.intercept_messages(socket).await;
-				}
+			loop {
+				let socket: SocketStream = server.try_establish_connection().await?;
+				let client: AtomicClient = server.new_client(&socket);
+				server.intercept_messages(client, socket.codec()).await;
+			}
 
-				#[allow(unreachable_code)]
-				Ok::<(), IrcNetworkError>(())
-			});
+			return Ok::<(), IrcNetworkError>(());
+			};
 		}
 
 		Ok(())

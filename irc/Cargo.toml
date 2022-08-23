@@ -11,8 +11,9 @@ path = "./lib.rs"
 [dependencies]
 logger = { path = "../logger", package = "phisyrc-logger" }
 
-lang = { git = "https://github.com/PhiSyX/lang", rev = "436a573c60ed5a4f6a18ed694b226aa6432302db" }
+lang = { git = "https://github.com/PhiSyX/lang", rev = "d3c302f60ac046dde9e3fcede910292950956147" }
 
+chrono = { path = "../patches/chrono" }
 futures = { version = "^0.3" }
 serde = { version = "^1.0", features = ["derive"] }
 tokio = { version = "^1.20", features = [

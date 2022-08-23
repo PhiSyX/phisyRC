@@ -16,12 +16,27 @@ use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
 pub enum IrcMessageCommand {
 	/// Une commande numérique est dotée de 3 chiffres.
 	/// Cette commande est obligatoirement poursuivie par un paramètre.
-	Numeric { code: String, params: Vec<String> },
+	Numeric {
+		/// Code de 3 chiffres.
+		code: String,
+		/// Les informations supplémentaires de la commande numérique.
+		parameters: Vec<String>,
+	},
 
 	/// Une commande textuelle est dotée d'une suite de lettre alphabétique.
 	/// Cette commande PEUT être suivie de paramètres, mais n'est pas
 	/// obligatoire.
-	Text { text: String, params: Vec<String> },
+	Text {
+		/// La commande, par exemple: "PASS"
+		command: String,
+
+		/// Les paramètres/arguments de la commande, par exemple:
+		///
+		/// INPUT = "pass mot de passe"
+		///
+		/// parameters = ["mot", "de", "passe"]
+		parameters: Vec<String>,
+	},
 }
 
 pub struct IrcMessageCommandParams;
@@ -33,7 +48,6 @@ pub struct IrcMessageCommandParams;
 #[derive(Debug)]
 pub(super) enum IrcMessageCommandError {
 	InputStream,
-
 	InvalidCharacter,
 	NumericCodeIsTooLong,
 }
@@ -174,15 +188,17 @@ impl IrcMessageCommand {
 		assert!(state != State::Initial);
 
 		Ok(match state {
-			State::Numeric { .. } => IrcMessageCommand::Numeric {
+			| State::Numeric { .. } => IrcMessageCommand::Numeric {
 				code: temporary_buffer,
-				params: IrcMessageCommandParams::parse(stream)?,
+				parameters: IrcMessageCommandParams::parse(stream)?,
 			},
-			State::Text => IrcMessageCommand::Text {
-				text: temporary_buffer,
-				params: IrcMessageCommandParams::parse(stream)?,
+
+			| State::Text => IrcMessageCommand::Text {
+				command: temporary_buffer,
+				parameters: IrcMessageCommandParams::parse(stream)?,
 			},
-			State::Initial => {
+
+			| State::Initial => {
 				unreachable!("capturé par l'assertion plus-haut.")
 			}
 		})
@@ -374,7 +390,7 @@ mod tests {
 			output,
 			IrcMessageCommand::Numeric {
 				code: "001".to_owned(),
-				params: [
+				parameters: [
 					"PhiSyX".to_owned(),
 					"Welcome to the Internet Relay Network".to_owned()
 				]
@@ -390,8 +406,8 @@ mod tests {
 		assert_eq!(
 			output,
 			IrcMessageCommand::Text {
-				text: "NICK".to_owned(),
-				params: ["NAME".to_owned()].to_vec()
+				command: "NICK".to_owned(),
+				parameters: ["NAME".to_owned()].to_vec()
 			}
 		);
 	}

@@ -98,21 +98,6 @@ impl IrcMessage {
 			command,
 		})
 	}
-
-	pub fn lines(msg: &str) -> Vec<Result<Self, IrcMessageError>> {
-		let mut messages = Vec::new();
-
-		for raw in msg
-			.split_terminator(&['\r', '\n'])
-			.filter(|&b| !b.is_empty())
-		{
-			let bytes = ByteStream::from(raw);
-			let input = InputStream::new(bytes.chars());
-			messages.push(IrcMessage::parse(input));
-		}
-
-		messages
-	}
 }
 
 // -------------- //

@@ -37,6 +37,9 @@ pub struct IrcdInfo {
 #[derive(Clone)]
 #[derive(serde::Deserialize)]
 pub struct IrcdListen {
+	/// Nom du serveur IRC.
+	pub name: String,
+
 	/// L'IP du serveur IRC.
 	pub ip: String,
 

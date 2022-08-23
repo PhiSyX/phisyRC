@@ -122,3 +122,55 @@ macro_rules! command {
 	// length fields
     ($_t:tt : $sub:expr) => {$sub};
 }
+
+#[macro_export]
+macro_rules! numeric {
+	(
+		impl $numeric_enum:ident
+		$(
+        $(#[$attr:meta])*
+        | $code:tt <-> $numeric:ident $({ $(
+            $(#[$attr_field:meta])*
+            $field:ident
+        ),* })?
+                => $str:literal
+        )*
+	) => {
+	#[derive(Debug)]
+	#[allow(non_camel_case_types)]
+	pub enum $numeric_enum {
+		$(
+		$(#[$attr])*
+		$numeric $({
+			$(
+			$(#[$attr_field])*
+			$field : String
+			),*
+		})?
+		),*
+	}
+
+	impl $numeric_enum {
+		pub fn code(&self) -> &'static str {
+			match self {
+				$( | Self::$numeric { .. } => stringify!($code) ),*
+			}
+		}
+	}
+
+	impl ::core::fmt::Display for $numeric_enum {
+		fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+			use ::std::borrow::Cow;
+
+			let msg: Cow<str> = match self {
+				$(
+				| Self::$numeric $({$($field),*}),*
+					=> Cow::from(format!($str))
+				),*
+			};
+
+			write!(f, "{}", msg)
+		}
+	}
+	};
+}

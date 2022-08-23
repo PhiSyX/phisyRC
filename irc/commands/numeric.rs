@@ -2,106 +2,47 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use core::fmt;
-use std::borrow::Cow;
+use crate::numeric;
 
-// TODO(phisyx): utiliser une macro pour aller plus vite.
+numeric! { impl IrcCommandNumeric
+	// -------- //
+	// Réponses //
+	// -------- //
 
-// ----------- //
-// Énumération //
-// ----------- //
+	#[doc = include_str!("../docs/001-004.md")]
+	| 001 <-> RPL_WELCOME { nick, user, host }
+		=> ":Welcome to the Internet Relay Network {nick}!{user}@{host}"
 
-#[derive(Debug)]
-#[allow(non_camel_case_types)]
-pub enum IrcCommandNumeric {
-	ERR_UNKNOWNCOMMAND {
-		command: String,
-	},
-	ERR_NONICKNAMEGIVEN,
-	ERR_NICKNAMEINUSE {
-		nick: String,
-	},
-	ERR_NOTREGISTERED,
-	ERR_NEEDMOREPARAMS {
-		command: String,
-	},
-	ERR_ALREADYREGISTRED,
+	#[doc = include_str!("../docs/001-004.md")]
+	| 002  <->  RPL_YOURHOST { servername, ver }
+		=> ":Your host is {servername}, running version {ver}"
 
-	RPL_WELCOME {
-		nick: String,
-		user: String,
-		host: String,
-	},
-	RPL_YOURHOST {
-		servername: String,
-		ver: String,
-	},
-	RPL_CREATED {
-		date: String,
-	},
-}
+	#[doc = include_str!("../docs/001-004.md")]
+	| 003  <->  RPL_CREATED { date }
+		=> ":This server was created {date}"
 
-// -------------- //
-// Implémentation //
-// -------------- //
 
-impl IrcCommandNumeric {
-	pub fn code(&self) -> &'static str {
-		match self {
-			| Self::ERR_UNKNOWNCOMMAND { .. } => "421",
-			| Self::ERR_NONICKNAMEGIVEN => "431",
-			| Self::ERR_NICKNAMEINUSE { .. } => "433",
-			| Self::ERR_NOTREGISTERED => "451",
-			| Self::ERR_NEEDMOREPARAMS { .. } => "461",
-			| Self::ERR_ALREADYREGISTRED => "462",
+	// ------- //
+	// Erreurs //
+	// ------- //
 
-			| Self::RPL_WELCOME { .. } => "001",
-			| Self::RPL_YOURHOST { .. } => "002",
-			| Self::RPL_CREATED { .. } => "003",
-		}
-	}
-}
+	/// Renvoyé à un client enregistré pour indiquer que la commande  envoyée
+	/// est inconnue du serveur.
+	| 421 <-> ERR_UNKNOWNCOMMAND { command }
+		=> "{command} :Unknown command"
 
-// -------------- //
-// Implémentation // -> Interface
-// -------------- //
+	/// Renvoyé quand un paramètre de surnom (`nickname`) attendu pour une
+	/// commande et n'est pas trouvé.
+	| 431 <-> ERR_NONICKNAMEGIVEN
+		=> ":No nickname given"
 
-impl fmt::Display for IrcCommandNumeric {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let msg: Cow<str> = match self {
-			| Self::ERR_UNKNOWNCOMMAND { command } => {
-				Cow::from(format!("{command} :Unknown command"))
-			}
+	/// Renvoyé lorsqu'un message `NICK` est traité qui résulte en une tentative
+	/// de changement vers un surnom (`nickname`) existant.
+	| 433 <-> ERR_NICKNAMEINUSE { nick }
+		=> "{nick} :Nickname is already in use"
 
-			| Self::ERR_NONICKNAMEGIVEN => Cow::from(":No nickname given"),
-
-			| Self::ERR_NICKNAMEINUSE { nick } => {
-				Cow::from(format!("{nick}: Nickname is already in use"))
-			}
-
-			| Self::ERR_NOTREGISTERED => Cow::from(":You have not registered"),
-
-			| Self::ERR_NEEDMOREPARAMS { command } => {
-				Cow::from(format!("{command} :Not enough parameters"))
-			}
-
-			| Self::ERR_ALREADYREGISTRED => {
-				Cow::from(":Unauthorized command (already registered)")
-			}
-
-			| Self::RPL_WELCOME { nick, user, host } => Cow::from(format!(
-				":Welcome to the Internet Relay Network {nick}!{user}@{host}"
-			)),
-
-			| Self::RPL_YOURHOST { servername, ver } => Cow::from(format!(
-				"Your host is {servername}, running version {ver}"
-			)),
-
-			| Self::RPL_CREATED { date } => {
-				Cow::from(format!(":This server was created {date}"))
-			}
-		};
-
-		write!(f, "{}", msg)
-	}
+	/// Renvoyé par le serveur par de nombreuses commandes pour indiquer au
+	/// client qu'il n'a pas fourni suffisamment de paramètres.
+	| 461 <-> ERR_NEEDMOREPARAMS { command }
+		=> "{command} :Not enough parameters"
 }

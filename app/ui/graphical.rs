@@ -15,8 +15,8 @@ pub struct GUI;
 #[derive(Debug)]
 #[derive(Default)]
 pub enum TypeGui {
-	#[default]
 	Flutter,
+	#[default]
 	Tauri,
 }
 
@@ -49,7 +49,7 @@ impl GUI {
 			.current_dir("app/ui/graphical")
 			.arg("run")
 			.arg("--device-id")
-			.arg("windows")
+			.arg(env::consts::OS)
 			.spawn()
 			.map(|_| ())
 	}

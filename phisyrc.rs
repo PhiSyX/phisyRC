@@ -98,10 +98,16 @@ fn handle_make_password_command(
 	password: CommandMakePassword,
 	app_secret_key: String,
 ) -> AppResult<()> {
+	let config = argon2::Config {
+		variant: argon2::Variant::Argon2id,
+		thread_mode: argon2::ThreadMode::Parallel,
+		..argon2::Config::default()
+	};
+
 	if let Ok(passwd) = argon2::hash_encoded(
 		password.flags.password.as_bytes(),
 		app_secret_key.as_bytes(),
-		&argon2::Config::default(),
+		&config,
 	) {
 		println!("Le mot de passe Argon2 généré: {passwd}");
 	}

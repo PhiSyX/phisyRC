@@ -15,6 +15,7 @@ lang = { git = "https://github.com/PhiSyX/lang", rev = "d3c302f60ac046dde9e3fced
 
 chrono = { path = "../patches/chrono" }
 futures = { version = "^0.3" }
+argon2 = { version = "^1.0", package = "rust-argon2" }
 serde = { version = "^1.0", features = ["derive"] }
 tokio = { version = "^1.20", features = [
 	"io-util",

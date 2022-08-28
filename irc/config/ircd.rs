@@ -6,6 +6,8 @@ use core::fmt;
 
 use serde::Deserialize;
 
+use super::serde::SerdeValidation;
+
 // --------- //
 // Structure //
 // --------- //
@@ -47,12 +49,43 @@ pub struct IrcdListen {
 	/// exemple 6667.
 	#[serde(deserialize_with = "IrcdConfigPort::validate")]
 	pub port: IrcdConfigPort,
+
+	/// Le mot de passe du serveur IRC, s'il doit y en avoir un.
+	pub password: Option<IrcdPassword>,
 }
 
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(serde::Deserialize)]
 pub struct IrcdConfigPort(pub u16);
+
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(serde::Deserialize)]
+pub struct IrcdPassword {
+	#[serde(default, deserialize_with = "SerdeValidation::string_not_empty")]
+	/// Le mot de passe.
+	pub secret: String,
+
+	/// Algorithme à utiliser.
+	#[serde(default)]
+	pub algo: IrcdPasswordAlgorithm,
+}
+
+#[derive(Debug)]
+#[derive(Default)]
+#[derive(Clone)]
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum IrcdPasswordAlgorithm {
+	/// Mot de passe en texte clair directement dans la configuration. Non
+	/// recommandé.
+	Plain,
+
+	/// Mot de passe haché avec l'algorithme de hachage Argon2.
+	#[default]
+	Argon2,
+}
 
 // -------------- //
 // Implémentation //

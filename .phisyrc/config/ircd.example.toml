@@ -7,3 +7,16 @@ network_name = "phisyRC"
 [[listen]]
 ip = "127.0.0.1"
 port = 6667
+#
+# `password.secret` :  mot de passe secret.
+# `password.algo`   :  algorithme de hachage à utiliser -- "plain" | "argon2"`
+#               	   par défaut à "argon2" pour l'instant.
+#
+# Le mot de passe ci-dessous a été généré par la commande:
+#
+#   $ phisyrc make:password test
+#
+# Ce qui veut dire que le mot de passe en clair vaut "test".
+#
+password.secret = "$argon2id$v=19$m=4096,t=3,p=1$bjFwSWNFMjZIaTU5b2prbWQ4NzRkUnNvcGRpOWZESzg$cGLifK56EgDfkjyVkFcMM9/EsCxYBX+XRHQ71vxmhsE"
+password.algo = "argon2"

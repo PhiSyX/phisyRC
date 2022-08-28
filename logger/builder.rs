@@ -55,9 +55,12 @@ impl Builder {
 						Cell::new(&echo.delimiter),
 						Cell::new(time),
 						Cell::new(&echo.delimiter),
-						Cell::new(record.target().dark_grey()),
-						Cell::new("->".dark_red()),
-						Cell::new(message),
+						Cell::new(format!(
+							"{} {} {}",
+							record.target().dark_grey(),
+							"->".dark_red(),
+							message
+						)),
 					]);
 				} else {
 					echo.table.add_line([

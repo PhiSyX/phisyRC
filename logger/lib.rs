@@ -98,8 +98,9 @@ impl Log for Logger {
 			record.level().to_string()
 		};
 
-		let mut table =
-			GridLayout::default().define_max_width(80).without_boarder();
+		let mut table = GridLayout::default()
+			// .define_max_width(80)
+			.without_boarder();
 
 		let mut echo = Echo {
 			time: if self.timestamp {

@@ -3,9 +3,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 mod client;
+mod passwd;
 mod server;
 
-pub use self::{client::*, server::*};
+pub use self::{client::*, passwd::*, server::*};
 
 // ----------- //
 // Énumération //
@@ -23,4 +24,8 @@ pub enum Command {
 
 	/// Donne accès aux options du serveur.
 	Server(CommandServer),
+
+	/// Génération d'un mot de passe avec un algorithme.
+	#[clap(name = "make:password")]
+	MakePassword(CommandMakePassword),
 }

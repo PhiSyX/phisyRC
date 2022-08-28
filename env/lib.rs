@@ -21,4 +21,7 @@ pub struct phisyrc_env {
 
 	#[var(key = "GUI", default = "flutter")]
 	pub gui_to_use: String,
+
+	#[var(key = "APP_SECRET_KEY")]
+	pub app_secret_key: String,
 }

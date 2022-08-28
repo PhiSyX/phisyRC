@@ -14,7 +14,8 @@ mod app {
 
 use app::{AppResult, TypeGui};
 use cli::app::{
-	phisyrc_cli, Command, CommandClient, CommandServer, SubCommandServer,
+	phisyrc_cli, Command, CommandClient, CommandMakePassword, CommandServer,
+	SubCommandServer,
 };
 use env::phisyrc_env;
 use irc::{IrcDaemon, IRC};
@@ -27,7 +28,13 @@ async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
 		| Some(Command::Client(client)) => {
 			handle_client_command(client.into(), env_args.gui_to_use).await
 		}
+
 		| Some(Command::Server(server)) => handle_server_command(server).await,
+
+		| Some(Command::MakePassword(password)) => {
+			handle_make_password_command(password, env_args.app_secret_key)
+		}
+
 		| None => {
 			handle_client_command(Default::default(), env_args.gui_to_use).await
 		}
@@ -83,6 +90,21 @@ async fn handle_server_command(server: CommandServer) -> AppResult<()> {
 			}
 		}
 	};
+
+	Ok(())
+}
+
+fn handle_make_password_command(
+	password: CommandMakePassword,
+	app_secret_key: String,
+) -> AppResult<()> {
+	if let Ok(passwd) = argon2::hash_encoded(
+		password.flags.password.as_bytes(),
+		app_secret_key.as_bytes(),
+		&argon2::Config::default(),
+	) {
+		println!("Le mot de passe Argon2 généré: {passwd}");
+	}
 
 	Ok(())
 }

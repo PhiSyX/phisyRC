@@ -115,6 +115,8 @@ sont pas dans le protocole IRC ;-).
 3. Commande `make:password`:
 
    La commande prend un argument obligatoire, qui est le mot de passe à encoder.
+   Le mot de passe est encodé en fonction de la valeur de la variable
+   d'environnement `APP_SECRET_KEY`.
 
    Les options de la commande sont:
 
@@ -122,9 +124,34 @@ sont pas dans le protocole IRC ;-).
    | -------- | -------------------------------- | --------------------- | ---------- |
    | `--algo` | Algorithme de hachage à utiliser | `"plain"`, `"argon2"` | `"argon2"` |
 
+   Exemple
+
+   ```sh
+   $ phisyrc make:password test
+
+   Le mot de passe 'test' généré par Argon2: $argon2id$v=19$m=4096,t=3,p=1$bWQ5b2prMXBJY0UyNGRSc29wODZIZGk5ODduZkRLaTU$QwsRN6Ds44/mZb5abqBq8/Lzgb1Y33qRUcpUKXO6GF0
+   ```
+
 ### Drapeaux
 
 | DRAPEAU            | DESCRIPTION                                |
 | ------------------ | ------------------------------------------ |
 | `-h` / `--help`    | Affiche l'aide (strict minimum / complète) |
 | `-V` / `--version` | Affiche la version du programme            |
+
+## Variables d'environnement
+
+Les variables d'environnement suivantes sont acceptées dans l'application:
+
+| VARIABLE         | DESCRIPTION                           |
+| ---------------- | ------------------------------------- |
+| `APP_SECRET_KEY` | Clé secrète de l'application (requis) |
+| `DEBUG`          | Voir plus haut.                       |
+
+### TODO
+
+- [ ] Pouvoir définir les variables dans un fichier en fonction du mode
+      d'execution.
+  - [ ] Environnement de prod : `.env`
+  - [x] Environnement de dev : `.env.local`
+  - [ ] Environnement de test : `.env.test.local`

@@ -55,9 +55,14 @@ impl Socket {
 	}
 
 	/// Crée un nouvelle connexion.
-	pub(crate) async fn listen(&self) -> Result<SocketStream, ListenerError> {
-		let listener = Listener::from(&self.addr).await?;
+	pub(crate) async fn listen(&self) -> Result<Listener, ListenerError> {
+		Listener::from(&self.addr).await
+	}
 
+	pub(crate) async fn accept(
+		&self,
+		listener: &Listener,
+	) -> Result<SocketStream, ListenerError> {
 		logger::info!("Connexion au serveur « {} » ouverte.", self.addr);
 
 		let mut backoff: u8 = 1;

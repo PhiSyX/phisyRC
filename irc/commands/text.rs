@@ -4,7 +4,15 @@
 
 use crate::command;
 
-command! { impl IncomingCommand
+command! { impl IncomingUnregisteredCommand
+	<- PASS
+	<- NICK
+	<- USER
+	<- SERVER
+	<- QUIT
+}
+
+command! { impl IrcClientCommand
 	#[doc = include_str!("../docs/CONNECTION_REGISTRATION.md")]
 	/// >
 	/// > La commande `PASS` est utilisée pour définir un "mot de passe de

@@ -4,8 +4,25 @@
 
 use super::IrcCommandNumeric;
 
+// ----------- //
+// Énumération //
+// ----------- //
+
 #[derive(Debug)]
 pub enum IrcReplies {
-	Custom(&'static str),
+	Ignore,
+
+	Error(String),
+	Quit(Option<String>),
 	Numeric(IrcCommandNumeric),
+}
+
+// -------------- //
+// Implémentation //
+// -------------- //
+
+impl From<IrcCommandNumeric> for IrcReplies {
+	fn from(err: IrcCommandNumeric) -> Self {
+		Self::Numeric(err)
+	}
 }

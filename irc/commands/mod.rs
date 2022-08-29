@@ -36,7 +36,7 @@ macro_rules! command {
 	impl $incoming_cmd_enum {
 		fn can_take_parameters(command: impl AsRef<str>) -> usize {
 			match command.as_ref() {
-				$(| $(stringify!($command) => <[()]>::len(&[$(command!($field:())),*]),)*)?
+				$($( | stringify!($command) => <[()]>::len(&[$(command!($field:())),*]),)*)?
 				| _ => 0,
 			}
 		}
@@ -66,34 +66,50 @@ macro_rules! command {
 				}  => {
 					match command.to_uppercase().as_str() {
 						$(| cmd @ stringify!($command) => {
-							let size = Self::can_take_parameters(cmd);
+						let size = Self::can_take_parameters(cmd);
 
-							let fields: Vec<&str> = vec![$( $(stringify!($field)),*)?];
+						// NOTE(phisyx): dans le cas où la taille des arguments
+						// utilisateurs est plus petite que la taille des
+						// arguments qu'est censé prendre la commande.
+						//
+						// Par exemple commande: "USER <user>"
+						if parameters.len() < size {
+							return Err(
+								IrcReplies::Numeric(
+									IrcCommandNumeric::ERR_NEEDMOREPARAMS {
+										command: command.to_owned(),
+									}
+								)
+							);
+						}
 
-							let autofill: std::collections::HashMap<_, _> = fields.iter()
-								.zip(parameters.iter())
-								.collect();
+						let fields: Vec<&str> = vec![$( $(stringify!($field)),*)?];
 
-							$($(
-							if autofill[&stringify!($field)].is_empty() {
-								return Err(
-									IrcReplies::Numeric(
-										IrcCommandNumeric::ERR_NEEDMOREPARAMS {
-											command: command.to_owned(),
-										}
-									)
-								);
-							}
-							)*)?
+						let autofill: std::collections::HashMap<_, _> = fields.iter()
+							.zip(parameters.iter())
+							.collect();
 
-							let mut rest_of_parameters = parameters.clone();
-							rest_of_parameters.drain(0..size);
+						$($(
+						if autofill[&stringify!($field)].is_empty() {
+							return Err(
+								IrcReplies::Numeric(
+									IrcCommandNumeric::ERR_NEEDMOREPARAMS {
+										command: command.to_owned(),
+									}
+								)
+							);
+						}
+						)*)?
 
-							Ok(Self::$command {
-								parameters: rest_of_parameters,
-								$($($field: autofill[&stringify!($field)].to_owned()),*)?
-							})
+						let mut rest_of_parameters = parameters.clone();
+						rest_of_parameters.drain(0..size);
+
+						Ok(Self::$command {
+							parameters: rest_of_parameters,
+							$($($field: autofill[&stringify!($field)].to_owned()),*)?
+						})
 						},)*
+
 						| _ => Err(
 							IrcReplies::Numeric(
 								IrcCommandNumeric::ERR_UNKNOWNCOMMAND {

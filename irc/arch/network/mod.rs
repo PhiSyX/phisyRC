@@ -2,15 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod entity;
+mod server;
 mod socket;
 
 use std::{collections::HashMap, sync::Arc};
 
 use tokio::io;
 
-pub(crate) use self::socket::*;
-use super::components::{IrcServerError, Server};
-use crate::{arch::AtomicClient, config::IrcdConfig, forever};
+pub use self::server::{IrcServerError, Server};
+pub(crate) use self::{
+	entity::AtomicEntity, server::AtomicServerConfig, socket::*,
+};
+use crate::{config::IrcdConfig, forever};
 
 // ---- //
 // Type //
@@ -85,16 +89,19 @@ impl Network {
 			logger::info!("Tentative d'établissement de la connexion au serveur « {label} ».");
 
 			forever! {
-			server.ping_host().await?;
+				let listener = {
+					server.ping_host().await?;
+					server.try_establish_connection().await?
+				};
 
-			loop {
-				let socket: SocketStream = server.try_establish_connection().await?;
-				let client: AtomicClient = server.new_client(&socket);
-				server.intercept_messages(client, socket.codec()).await;
+				loop {
+					let socket: SocketStream = server.accept(&listener).await?;
+					let entity: AtomicEntity = server.new_entity(&socket);
+					server.intercept_messages(entity, socket.codec()).await;
+				}
+
+				return Ok::<(), IrcNetworkError>(());
 			}
-
-			return Ok::<(), IrcNetworkError>(());
-			};
 		}
 
 		Ok(())

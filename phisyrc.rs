@@ -15,7 +15,7 @@ mod app {
 use app::{AppResult, TypeGui};
 use cli::app::{
 	phisyrc_cli, Command, CommandClient, CommandMakePassword, CommandServer,
-	SubCommandServer,
+	PasswordAlgorithm, SubCommandServer,
 };
 use env::phisyrc_env;
 use irc::{IrcDaemon, IRC};
@@ -31,8 +31,8 @@ async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
 
 		| Some(Command::Server(server)) => handle_server_command(server).await,
 
-		| Some(Command::MakePassword(password)) => {
-			handle_make_password_command(password, env_args.app_secret_key)
+		| Some(Command::MakePassword(password_cli)) => {
+			handle_make_password_command(password_cli, env_args.app_secret_key)
 		}
 
 		| None => {
@@ -95,22 +95,35 @@ async fn handle_server_command(server: CommandServer) -> AppResult<()> {
 }
 
 fn handle_make_password_command(
-	password: CommandMakePassword,
+	password_cli: CommandMakePassword,
 	app_secret_key: String,
 ) -> AppResult<()> {
-	let config = argon2::Config {
-		variant: argon2::Variant::Argon2id,
-		thread_mode: argon2::ThreadMode::Parallel,
-		..argon2::Config::default()
+	let raw_password = &password_cli.flags.password;
+	let algo = &password_cli.options.algo;
+
+	let generated_password = match algo {
+		PasswordAlgorithm::Argon2 => {
+			let config = argon2::Config {
+				variant: argon2::Variant::Argon2id,
+				thread_mode: argon2::ThreadMode::Parallel,
+				..argon2::Config::default()
+			};
+
+			unsafe {
+				argon2::hash_encoded(
+					raw_password.as_bytes(),
+					app_secret_key.as_bytes(),
+					&config,
+				)
+				.unwrap_unchecked()
+			}
+		}
 	};
 
-	if let Ok(passwd) = argon2::hash_encoded(
-		password.flags.password.as_bytes(),
-		app_secret_key.as_bytes(),
-		&config,
-	) {
-		println!("Le mot de passe Argon2 généré: {passwd}");
-	}
+	println!(
+		"Le mot de passe '{}' généré par {}: {}",
+		raw_password, algo, generated_password,
+	);
 
 	Ok(())
 }

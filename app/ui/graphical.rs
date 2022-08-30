@@ -14,6 +14,7 @@ pub struct GUI;
 
 #[derive(Debug)]
 #[derive(Default)]
+#[derive(Copy, Clone)]
 pub enum TypeGui {
 	Flutter,
 	#[default]

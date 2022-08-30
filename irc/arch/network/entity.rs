@@ -83,10 +83,10 @@ impl Entity {
 		self.ty
 			.as_ref()
 			.and_then(|ty| match ty {
-				EntityType::Client(_) => {
+				| EntityType::Client(_) => {
 					ty.prefix().map(|p| format!("{}@{}", p, self.addr))
 				}
-				EntityType::Server(_) => ty.prefix(),
+				| EntityType::Server(_) => ty.prefix(),
 			})
 			.unwrap_or_else(|| self.server.config.user.name.clone())
 	}
@@ -232,22 +232,22 @@ impl Entity {
 impl EntityType {
 	fn is_registered(&self) -> bool {
 		match self {
-			EntityType::Client(client) => client.is_registered(),
-			EntityType::Server(server) => server.is_registered(),
+			| EntityType::Client(client) => client.is_registered(),
+			| EntityType::Server(server) => server.is_registered(),
 		}
 	}
 
 	fn prefix(&self) -> Option<String> {
 		match self {
-			Self::Client(client) => client.prefix(),
-			Self::Server(server) => server.prefix(),
+			| Self::Client(client) => client.prefix(),
+			| Self::Server(server) => server.prefix(),
 		}
 	}
 
 	fn prefix_based_on_reply(&self, reply: &IrcCommandNumeric) -> String {
 		match self {
-			EntityType::Client(client) => client.prefix_based_on_reply(reply),
-			EntityType::Server(server) => server.prefix_based_on_reply(reply),
+			| EntityType::Client(client) => client.prefix_based_on_reply(reply),
+			| EntityType::Server(server) => server.prefix_based_on_reply(reply),
 		}
 	}
 }

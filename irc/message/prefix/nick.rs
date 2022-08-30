@@ -55,7 +55,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 
 	loop {
 		match state {
-			State::Initial => {
+			| State::Initial => {
 				if input.is_empty() {
 					return Err(IrcMessagePrefixNickError::IsEmpty);
 				}
@@ -63,7 +63,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 				state.switch(State::First);
 			}
 
-			State::First => match stream.consume_next()? {
+			| State::First => match stream.consume_next()? {
 				// Point de code alphabétique.
 				//
 				// Ajouter le caractère au pseudonyme.
@@ -84,7 +84,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 				//
 				// Ajouter le caractère au pseudonyme.
 				// Passer à l'état [IrcPrefixNickState::AfterFirst].
-				codepoint @ (CodePoint::LEFT_SQUARE_BRACKET
+				| codepoint @ (CodePoint::LEFT_SQUARE_BRACKET
 				| CodePoint::RIGHT_SQUARE_BRACKET
 				| CodePoint::REVERSE_SOLIDUS
 				| CodePoint::Unit('`')
@@ -106,7 +106,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 				}
 			},
 
-			State::AfterFirst => match stream.consume_next()? {
+			| State::AfterFirst => match stream.consume_next()? {
 				// Point de code alphanumérique.
 				//
 				// Ajouter le point de code au pseudonyme.
@@ -125,7 +125,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 				// U+002D HYPHEN-MINUS (-)
 				//
 				// Ajouter le point de code au pseudonyme.
-				codepoint @ (CodePoint::LEFT_SQUARE_BRACKET
+				| codepoint @ (CodePoint::LEFT_SQUARE_BRACKET
 				| CodePoint::RIGHT_SQUARE_BRACKET
 				| CodePoint::REVERSE_SOLIDUS
 				| CodePoint::Unit('`')
@@ -166,11 +166,11 @@ impl fmt::Display for IrcMessagePrefixNickError {
 			f,
 			"{}",
 			match self {
-				Self::InputStream => "erreur d'analyse",
-				Self::IsEmpty => "le pseudonyme est vide",
-				Self::InvalidFirstCharacter =>
+				| Self::InputStream => "erreur d'analyse",
+				| Self::IsEmpty => "le pseudonyme est vide",
+				| Self::InvalidFirstCharacter =>
 					"le pseudonyme commence par un caractère invalide",
-				Self::InvalidCharacter =>
+				| Self::InvalidCharacter =>
 					"le pseudonyme contient un caractère invalide",
 			}
 		)

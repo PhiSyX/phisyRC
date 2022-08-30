@@ -82,7 +82,7 @@ impl IrcMessagePrefix {
 					// U+0040 COMMERCIAL AT (@)
 					//
 					// Passer à l'état [IrcMessagePrefixState::User].
-					codepoint @ (CodePoint::EXCLAMATION_MARK
+					| codepoint @ (CodePoint::EXCLAMATION_MARK
 					| CodePoint::COMMERCIAL_AT) => {
 						builder.push(codepoint);
 						builder.state.switch(BuilderState::User);
@@ -160,7 +160,7 @@ impl IrcMessagePrefix {
 					// Tous autres caractères.
 					//
 					// Il s'agit d'une erreur d'analyse.
-					_ => {
+					| _ => {
 						return Err(IrcMessageError::InvalidPrefix(
 							"Erreur d'analyse".to_owned(),
 						))

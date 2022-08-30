@@ -89,7 +89,7 @@ impl IrcMessageCommand {
 
 		loop {
 			match state {
-				State::Initial => match stream.consume_next()? {
+				| State::Initial => match stream.consume_next()? {
 					// Caractère numérique.
 					//
 					// Ajouter le chiffre au tampon temporaire.
@@ -155,7 +155,7 @@ impl IrcMessageCommand {
 					}
 				}
 
-				State::Text => match stream.consume_next()? {
+				| State::Text => match stream.consume_next()? {
 					// Caractère alphabétique.
 					//
 					// Ajouter la version majuscule de la lettre au tampon
@@ -271,7 +271,7 @@ impl IrcMessageCommandParams {
 
 		loop {
 			match state {
-				TrailingState::Initial => {
+				| TrailingState::Initial => {
 					match stream.consume_next()? {
 						// Espaces blancs.
 						//
@@ -311,7 +311,7 @@ impl IrcMessageCommandParams {
 					}
 				}
 
-				TrailingState::AfterColon => match stream.consume_next()? {
+				| TrailingState::AfterColon => match stream.consume_next()? {
 					// Saut de ligne.
 					//
 					// Arrêter l'analyse.
@@ -359,9 +359,9 @@ impl fmt::Display for IrcMessageCommandError {
 			f,
 			"{}",
 			match self {
-				Self::InputStream => "erreur d'analyse.",
-				Self::InvalidCharacter => "caractère invalide.",
-				Self::NumericCodeIsTooLong => "code numérique trop long.",
+				| Self::InputStream => "erreur d'analyse.",
+				| Self::InvalidCharacter => "caractère invalide.",
+				| Self::NumericCodeIsTooLong => "code numérique trop long.",
 			}
 		)
 	}

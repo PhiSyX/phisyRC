@@ -60,7 +60,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixHostError> {
 
 	loop {
 		match state {
-			State::Initial => {
+			| State::Initial => {
 				if input.is_empty() {
 					return Err(IrcMessagePrefixHostError::IsEmpty);
 				}
@@ -73,7 +73,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixHostError> {
 				state.switch(State::Hostname);
 			}
 
-			State::Hostname => match stream.consume_next()? {
+			| State::Hostname => match stream.consume_next()? {
 				// Point de code alphabétique.
 				//
 				// Ajouter le point de code alphabétique au nom d'hôte.
@@ -93,7 +93,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixHostError> {
 				}
 			},
 
-			State::HostnameAfterFirstCharacter => {
+			| State::HostnameAfterFirstCharacter => {
 				match stream.consume_next()? {
 					// Point de code alphanumérique.
 					//
@@ -105,7 +105,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixHostError> {
 					// U+002D HYPHEN-MINUS (-)
 					// U+002E FULL STOP (.)
 					// U+002F SOLIDUS (/)
-					codepoint @ (CodePoint::HYPHEN_MINUS
+					| codepoint @ (CodePoint::HYPHEN_MINUS
 					| CodePoint::FULL_STOP
 					| CodePoint::SOLIDUS) => {
 						if stream.peek_next()?.is_eof() {
@@ -149,13 +149,13 @@ impl fmt::Display for IrcMessagePrefixHostError {
 			f,
 			"{}",
 			match self {
-				Self::InputStream => "erreur d'analyse",
-				Self::IsEmpty => "le nom d'hôte / l'IP est vide",
-				Self::InvalidFirstCharacter =>
+				| Self::InputStream => "erreur d'analyse",
+				| Self::IsEmpty => "le nom d'hôte / l'IP est vide",
+				| Self::InvalidFirstCharacter =>
 					"le nom d'hôte / l'IP commence par un caractère invalide",
-				Self::InvalidCharacter =>
+				| Self::InvalidCharacter =>
 					"le nom d'hôte / l'IP contient un caractère invalide",
-				Self::InvalidLastCharacter =>
+				| Self::InvalidLastCharacter =>
 					"le nom d'hôte / l'IP se termine par un caractère invalide",
 			}
 		)

@@ -71,7 +71,7 @@ impl IrcMessageTags {
 
 		loop {
 			match state {
-				State::Initial => match stream.consume_next()? {
+				| State::Initial => match stream.consume_next()? {
 					| CodePoint::COMMERCIAL_AT => {
 						state.switch(State::Key { key: String::new() });
 					}
@@ -81,7 +81,7 @@ impl IrcMessageTags {
 					),
 				},
 
-				State::Key { ref key } => match stream.consume_next()? {
+				| State::Key { ref key } => match stream.consume_next()? {
 					| CodePoint::EQUALS_SIGN if !key.is_empty() => state
 						.switch(State::Value {
 							key: key.to_owned(),
@@ -125,7 +125,7 @@ impl IrcMessageTags {
 					}),
 				},
 
-				State::Value { ref key, ref value } => match stream
+				| State::Value { ref key, ref value } => match stream
 					.consume_next()?
 				{
 					| CodePoint::SEMICOLON => {

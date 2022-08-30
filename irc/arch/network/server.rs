@@ -243,16 +243,23 @@ impl Server {
 
 			// Response output
 			let shared_client2 = client.clone();
-			let replies = if let Ok(response) = output {
-				if let Ok(replies) = response.await {
-					replies
-				} else {
-					continue
-				}
-			} else {
-				// NOTE(phisyx): nous ne voulons casser la boucle en cas de
+			let replies = match output {
+				| Ok(response) => match response.await {
+					| Ok(replies) => replies,
+
+					// NOTE(phisyx): nous ne voulons pas casser la boucle.
+					| Err(err) => {
+						logger::error!("{err}");
+						continue
+					}
+				},
+
+				// NOTE(phisyx): nous ne voulons pas casser la boucle en cas de
 				// caractères invalides.
-				continue;
+				| Err(err) => {
+					logger::error!("Message: {err}");
+					continue
+				},
 			};
 
 			logger::debug!(
@@ -318,8 +325,8 @@ impl Server {
 			// NOTE(phisyx): vérifie que la commande entrante est valide.
 			let command =
 				match IncomingUnregisteredCommand::is_valid(&message.command) {
-					Ok(c) => c,
-					Err(err) => return Ok(vec![err]),
+					| Ok(c) => c,
+					| Err(err) => return Ok(vec![err]),
 				};
 
 			match command {
@@ -352,8 +359,8 @@ impl Server {
 				| Some(EntityType::Client(ref mut client)) => {
 					let command =
 						match IrcClientCommand::is_valid(&message.command) {
-							Ok(c) => c,
-							Err(err) => return Ok(vec![err]),
+							| Ok(c) => c,
+							| Err(err) => return Ok(vec![err]),
 						};
 
 					match command {
@@ -378,8 +385,10 @@ impl Server {
 				| Some(EntityType::Server(ref mut _server)) => {
 					let msg = IrcCommandNumeric::ERR_UNKNOWNCOMMAND {
 						command: match message.command {
-							IrcMessageCommand::Numeric { code, .. } => code,
-							IrcMessageCommand::Text { command, .. } => command,
+							| IrcMessageCommand::Numeric { code, .. } => code,
+							| IrcMessageCommand::Text { command, .. } => {
+								command
+							}
 						},
 					};
 

@@ -86,9 +86,9 @@ impl fmt::Display for IrcMessagePrefixUserError {
 			f,
 			"{}",
 			match self {
-				Self::InputStream => "erreur d'analyse",
-				Self::IsEmpty => "l'identifiant est vide",
-				Self::InvalidCharacter =>
+				| Self::InputStream => "erreur d'analyse",
+				| Self::IsEmpty => "l'identifiant est vide",
+				| Self::InvalidCharacter =>
 					"l'identifiant contient un caractère invalide",
 			}
 		)

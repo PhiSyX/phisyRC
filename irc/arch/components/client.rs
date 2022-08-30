@@ -84,9 +84,9 @@ impl IrcClient {
 				&self.entity.lock().await.server.config.clone().user.password;
 
 			let password = match password_cfg {
-				Some(cfg) => match cfg.algo {
-					IrcdPasswordAlgorithm::Plain => password.to_owned(),
-					IrcdPasswordAlgorithm::Argon2 => {
+				| Some(cfg) => match cfg.algo {
+					| IrcdPasswordAlgorithm::Plain => password.to_owned(),
+					| IrcdPasswordAlgorithm::Argon2 => {
 						let app_secret_key = std::env::var("APP_SECRET_KEY")
 							.expect(
 								"La variable d'environnement `APP_SECRET_KEY`
@@ -108,7 +108,7 @@ impl IrcClient {
 						.expect("Argon2")
 					}
 				},
-				None => password.to_owned(),
+				| None => password.to_owned(),
 			};
 
 			self.password.replace(password);

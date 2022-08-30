@@ -10,9 +10,11 @@ use super::IrcCommandNumeric;
 
 #[derive(Debug)]
 pub enum IrcReplies {
+	#[allow(dead_code)]
 	Ignore,
 	Error(String),
-	Quit(Option<String>),
+	NotifyChangeNick(String),
+	NotifyChangeQuit(Option<String>),
 	Numeric(IrcCommandNumeric),
 }
 

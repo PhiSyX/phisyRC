@@ -86,6 +86,18 @@ impl Entity {
 		};
 	}
 
+	pub(crate) fn old_prefix(&self) -> String {
+		self.ty
+			.as_ref()
+			.and_then(|ty| match ty {
+				| EntityType::Client(_) => {
+					ty.old_prefix().map(|p| format!("{}@{}", p, self.addr))
+				}
+				| EntityType::Server(_) => ty.old_prefix(),
+			})
+			.unwrap_or_else(|| self.server.config.user.name.clone())
+	}
+
 	pub(crate) fn prefix(&self) -> String {
 		self.ty
 			.as_ref()
@@ -248,6 +260,13 @@ impl EntityType {
 		match self {
 			| EntityType::Client(client) => client.is_registered(),
 			| EntityType::Server(server) => server.is_registered(),
+		}
+	}
+
+	fn old_prefix(&self) -> Option<String> {
+		match self {
+			| Self::Client(client) => client.old_prefix(),
+			| Self::Server(server) => server.prefix(),
 		}
 	}
 

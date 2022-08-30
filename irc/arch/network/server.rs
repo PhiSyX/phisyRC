@@ -203,13 +203,13 @@ impl Server {
 	/// connexion/du client courant(e) et les traitent.
 	pub(crate) async fn intercept_messages(
 		&self,
-		client: AtomicEntity,
+		shared_entity: AtomicEntity,
 		mut irc: IrcCodec<TcpStream>,
 	) {
 		let server_config = self.config.clone();
 
 		forever! {{
-			let shared_client1 = client.clone();
+			let shared_entity1 = shared_entity.clone();
 
 			let maybe_line = irc.next().await;
 			if maybe_line.is_none() {
@@ -221,7 +221,7 @@ impl Server {
 			// unwrap avec sûreté.
 			let bytes = match maybe_line.unwrap().as_ref() {
 				| Err(LinesCodecError::MaxLineLengthExceeded) => {
-					let prefix = shared_client1.lock().await.prefix();
+					let prefix = shared_entity1.lock().await.prefix();
 					let out = format!("ERROR :Closing Link: [{prefix}] (Max SendQ Exceeded)\r\n");
 					irc.send(out).await.unwrap();
 					break;
@@ -235,7 +235,7 @@ impl Server {
 				| Ok(line) => {
 					logger::trace!(
 						"Le client « {} » a envoyé le message « {} ».",
-						client.lock().await.addr,
+						shared_entity.lock().await.addr,
 						line
 					);
 					ByteStream::new(line)
@@ -247,11 +247,11 @@ impl Server {
 			let output = IrcMessage::parse(input)
 				.map(move |msg| {
 					logger::debug!("Nouveau message entrant analysé:\n\t{:?}", &msg);
-					Self::handle_message(shared_client1, msg)
+					Self::handle_message(shared_entity1, msg)
 				});
 
 			// Response output
-			let shared_client2 = client.clone();
+			let shared_entity2 = shared_entity.clone();
 			let replies = match output {
 				| Ok(response) => match response.await {
 					| Ok(replies) => replies,
@@ -276,14 +276,23 @@ impl Server {
 					| IrcReplies::Ignore => {}
 
 					| IrcReplies::Error(reason) => {
-						let prefix =  shared_client2.lock().await.prefix();
+						let entity = shared_entity2.lock().await;
+						let prefix = entity.prefix();
 						let out = format!("ERROR :Closing Link: [{prefix}] ({reason})\r\n");
 						irc.send(out).await.unwrap();
 						return;
 					}
 
-					| IrcReplies::Quit(maybe_reason) => {
-						let prefix = shared_client2.lock().await.prefix();
+					| IrcReplies::NotifyChangeNick(new_nick) => {
+						let entity = shared_entity2.lock().await;
+						let prefix = entity.old_prefix();
+						let out = format!(":{prefix} NICK {new_nick}\r\n");
+						irc.send(out).await.unwrap();
+					}
+
+					| IrcReplies::NotifyChangeQuit(maybe_reason) => {
+						let entity = shared_entity2.lock().await;
+						let prefix = entity.prefix();
 
 						let out = if let Some(reason) = maybe_reason {
 							format!(":{prefix} QUIT :{reason}\r\n")
@@ -296,8 +305,8 @@ impl Server {
 					}
 
 					| IrcReplies::Numeric(reply) => {
-						let prefix = shared_client2.lock().await
-							.prefix_based_on_reply(&reply);
+						let entity = shared_entity2.lock().await;
+						let prefix = entity.prefix_based_on_reply(&reply);
 
 						let msg = format!(
 							":{} {} {} {}\r\n",
@@ -351,7 +360,7 @@ impl Server {
 				}
 
 				| IncomingUnregisteredCommand::QUIT { parameters } => {
-					return Ok(vec![IrcReplies::Quit(
+					return Ok(vec![IrcReplies::NotifyChangeQuit(
 						parameters.first().cloned(),
 					)])
 				}
@@ -417,10 +426,9 @@ impl Server {
 						Err(IrcCommandNumeric::ERR_ALREADYREGISTRED)
 					}
 
-					| IrcClientCommand::NICK { .. } => client
-						.handle_nick_command(&command)
-						.await
-						.map(|_| vec![]),
+					| IrcClientCommand::NICK { .. } => {
+						client.handle_nick_command(&command).await
+					}
 				}
 			}
 

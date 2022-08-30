@@ -18,6 +18,7 @@ pub struct IrcClient {
 	entity: AtomicEntity,
 	registered: bool,
 	password: Option<String>,
+	old_nick: String,
 	pub(crate) nick: String,
 	ident: String,
 	mode: String,
@@ -34,6 +35,7 @@ impl IrcClient {
 			entity,
 			registered: false,
 			password: Default::default(),
+			old_nick: Default::default(),
 			nick: Default::default(),
 			ident: Default::default(),
 			mode: Default::default(),
@@ -45,6 +47,14 @@ impl IrcClient {
 impl IrcClient {
 	pub fn is_registered(&self) -> bool {
 		self.registered
+	}
+
+	pub fn old_prefix(&self) -> Option<String> {
+		if self.nick.is_empty() || self.ident.is_empty() {
+			return None;
+		}
+
+		format!("{}!{}", self.old_nick, self.ident).into()
 	}
 
 	pub fn prefix(&self) -> Option<String> {
@@ -133,6 +143,8 @@ impl IrcClient {
 				});
 			}
 
+			// TODO(phisyx): valider le pseudonyme.
+			self.old_nick = nickname.to_owned();
 			self.nick = nickname.to_owned();
 		}
 
@@ -212,5 +224,28 @@ impl IrcClient {
 		replies.push(created_003);
 
 		replies.into_iter().map(IrcReplies::Numeric).collect()
+	}
+
+	pub async fn handle_nick_command(
+		&mut self,
+		command: &IrcClientCommand,
+	) -> Result<Vec<IrcReplies>, IrcCommandNumeric> {
+		assert!(matches!(command, IrcClientCommand::NICK { .. }));
+
+		if let IrcClientCommand::NICK { nickname, .. } = command {
+			let entity = &self.entity.lock().await;
+
+			if entity.server.can_locate_client(nickname).await {
+				return Err(IrcCommandNumeric::ERR_NICKNAMEINUSE {
+					nick: nickname.to_owned(),
+				});
+			}
+
+			self.old_nick = self.nick.clone();
+			// TODO(phisyx): valider le pseudonyme.
+			self.nick = nickname.to_owned();
+		}
+
+		Ok(vec![IrcReplies::NotifyChangeNick(self.nick.to_owned())])
 	}
 }

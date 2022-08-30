@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use core::fmt;
-use std::{net::SocketAddr, sync::Arc, time::SystemTime};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt};
@@ -11,7 +11,6 @@ use lang::stream::prelude::*;
 use tokio::{
 	io::{self},
 	net::TcpStream,
-	sync::MutexGuard,
 };
 use tokio_util::codec::LinesCodecError;
 
@@ -58,8 +57,8 @@ pub struct Server {
 	/// Configuration du serveur.
 	pub config: AtomicServerConfig,
 
-	/// Les clients connectés au serveur.
-	// pub clients: HashMap<String, AtomicClient>,
+	/// Les clients/servers connectés au serveur.
+	pub connections: HashMap<String, AtomicEntity>,
 
 	/// Le nom du serveur.
 	pub label: String,
@@ -143,7 +142,7 @@ impl Server {
 		Ok(Self {
 			network,
 			config: Arc::new(config),
-			// clients: Default::default(),
+			connections: Default::default(),
 			label,
 			socket,
 			created_at: DateTime::from(SystemTime::now()),
@@ -181,12 +180,22 @@ impl Server {
 		Ok(self.socket.accept(listener).await?)
 	}
 
+	pub(crate) async fn can_locate_client(&self, label: &str) -> bool {
+		for conn in self.connections.values() {
+			let maybe = conn.lock().await.label() == label;
+			if maybe {
+				return true;
+			}
+		}
+		false
+	}
+
 	pub(crate) fn new_entity(&mut self, socket: &SocketStream) -> AtomicEntity {
 		let peer_addr = socket.peer_addr();
 		let entity = Entity::new(self.shared(), peer_addr);
 		let peer_addr = peer_addr.to_string();
 		let atomic_entity = entity.shared();
-		// self.clients.insert(peer_addr, atomic_client.clone());
+		self.connections.insert(peer_addr, atomic_entity.clone());
 		atomic_entity
 	}
 
@@ -219,7 +228,7 @@ impl Server {
 				}
 
 				| Err(err) => {
-					logger::error!("{err}");
+					logger::error!("codec Error: {err}");
 					break;
 				}
 
@@ -246,12 +255,7 @@ impl Server {
 			let replies = match output {
 				| Ok(response) => match response.await {
 					| Ok(replies) => replies,
-
-					// NOTE(phisyx): nous ne voulons pas casser la boucle.
-					| Err(err) => {
-						logger::error!("{err}");
-						continue
-					}
+					| Err(err) => vec![err.into()],
 				},
 
 				// NOTE(phisyx): nous ne voulons pas casser la boucle en cas de
@@ -399,14 +403,40 @@ impl Server {
 			};
 		}
 
-		let msg = IrcCommandNumeric::ERR_UNKNOWNCOMMAND {
-			command: match message.command {
-				IrcMessageCommand::Numeric { code, .. } => code,
-				IrcMessageCommand::Text { command, .. } => command,
-			},
-		};
+		match entity.ty {
+			| Some(EntityType::Client(ref mut client)) => {
+				let command = match IrcClientCommand::is_valid(&message.command)
+				{
+					| Ok(c) => c,
+					| Err(err) => return Ok(vec![err]),
+				};
 
-		Ok(vec![IrcReplies::Numeric(msg)])
+				match command {
+					| IrcClientCommand::PASS { .. }
+					| IrcClientCommand::USER { .. } => {
+						Err(IrcCommandNumeric::ERR_ALREADYREGISTRED)
+					}
+
+					| IrcClientCommand::NICK { .. } => client
+						.handle_nick_command(&command)
+						.await
+						.map(|_| vec![]),
+				}
+			}
+
+			| Some(EntityType::Server(ref mut _server)) => {
+				let msg = IrcCommandNumeric::ERR_UNKNOWNCOMMAND {
+					command: match message.command {
+						| IrcMessageCommand::Numeric { code, .. } => code,
+						| IrcMessageCommand::Text { command, .. } => command,
+					},
+				};
+
+				Err(msg)
+			}
+
+			| None => Ok(vec![]),
+		}
 	}
 
 	pub(crate) fn shared(&self) -> AtomicServer {

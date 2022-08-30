@@ -12,6 +12,8 @@ use crate::commands::IrcCommandNumeric;
 #[derive(Clone)]
 pub struct IrcServer {
 	registered: bool,
+
+	pub(crate) label: String,
 }
 
 // -------------- //
@@ -20,7 +22,11 @@ pub struct IrcServer {
 
 impl IrcServer {
 	pub fn new() -> Self {
-		Self { registered: false }
+		Self {
+			registered: false,
+
+			label: Default::default(),
+		}
 	}
 }
 

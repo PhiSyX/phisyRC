@@ -18,7 +18,7 @@ pub struct IrcClient {
 	entity: AtomicEntity,
 	registered: bool,
 	password: Option<String>,
-	nick: String,
+	pub(crate) nick: String,
 	ident: String,
 	mode: String,
 	realname: String,
@@ -60,6 +60,7 @@ impl IrcClient {
 			| IrcCommandNumeric::RPL_WELCOME { .. }
 			| IrcCommandNumeric::RPL_YOURHOST { .. }
 			| IrcCommandNumeric::RPL_CREATED { .. } => self.nick.clone(),
+			| IrcCommandNumeric::ERR_NICKNAMEINUSE { nick } => nick.to_owned(),
 			| _ => unsafe { self.prefix().unwrap_unchecked() },
 		}
 	}
@@ -124,6 +125,14 @@ impl IrcClient {
 		assert!(matches!(command, IrcClientCommand::NICK { .. }));
 
 		if let IrcClientCommand::NICK { nickname, .. } = command {
+			let entity = &self.entity.lock().await;
+
+			if entity.server.can_locate_client(nickname).await {
+				return Err(IrcCommandNumeric::ERR_NICKNAMEINUSE {
+					nick: nickname.to_owned(),
+				});
+			}
+
 			self.nick = nickname.to_owned();
 		}
 

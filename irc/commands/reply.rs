@@ -11,7 +11,6 @@ use super::IrcCommandNumeric;
 #[derive(Debug)]
 pub enum IrcReplies {
 	Ignore,
-
 	Error(String),
 	Quit(Option<String>),
 	Numeric(IrcCommandNumeric),

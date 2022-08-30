@@ -54,6 +54,13 @@ impl Entity {
 		Arc::new(Mutex::new(self.clone()))
 	}
 
+	pub(crate) fn label(&self) -> &str {
+		self.ty
+			.as_ref()
+			.map(|entity| entity.label())
+			.unwrap_or_default()
+	}
+
 	pub(crate) fn is_registered(&self) -> bool {
 		self.ty
 			.as_ref()
@@ -230,6 +237,13 @@ impl Entity {
 }
 
 impl EntityType {
+	fn label(&self) -> &str {
+		match self {
+			| EntityType::Client(client) => client.nick.as_ref(),
+			| EntityType::Server(server) => server.label.as_ref(),
+		}
+	}
+
 	fn is_registered(&self) -> bool {
 		match self {
 			| EntityType::Client(client) => client.is_registered(),

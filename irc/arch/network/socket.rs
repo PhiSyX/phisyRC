@@ -118,6 +118,7 @@ impl SocketStream {
 	}
 
 	/// Adresse de la chaussette.
+	#[allow(dead_code)]
 	pub fn addr(&self) -> SocketAddr {
 		self.1
 	}

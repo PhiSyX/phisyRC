@@ -12,7 +12,6 @@ mod output;
 use std::path::Path;
 
 use self::arch::Network;
-pub(crate) use self::{commands::*, message::*};
 pub use self::{daemon::*, output::*};
 
 // --------- //

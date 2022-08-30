@@ -85,6 +85,7 @@ macro_rules! command {
 
 						let fields: Vec<&str> = vec![$( $(stringify!($field)),*)?];
 
+						#[allow(unused_variables)]
 						let autofill: std::collections::HashMap<_, _> = fields.iter()
 							.zip(parameters.iter())
 							.collect();

@@ -19,13 +19,13 @@ pub use self::{daemon::*, output::*};
 // Structure //
 // --------- //
 
-pub struct IRC;
+pub struct Irc;
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
-impl IRC {
+impl Irc {
 	pub async fn run(config_file: impl AsRef<Path>) -> IrcResult<()> {
 		logger::info!("Lancement de l'IRC...");
 

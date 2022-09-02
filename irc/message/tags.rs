@@ -215,13 +215,14 @@ impl fmt::Display for IrcMessageTagsError {
 			f,
 			"{}",
 			match self {
-				Self::InputStream => "erreur d'analyse".to_owned(),
-				Self::InvalidCharacter { expect, found } =>
-					format!("caractère invalide : attendu {expect}, mais trouvé {found}"),
-				Self::IsNotStartingWithCommercialChar =>
+				| Self::InputStream => "erreur d'analyse".to_owned(),
+				| Self::InvalidCharacter { expect, found } => format!(
+					"caractère invalide : attendu {expect}, mais trouvé {found}"
+				),
+				| Self::IsNotStartingWithCommercialChar =>
 					"ne commence pas par un caractère commercial (@)".to_owned(),
-				Self::KeyIsEmpty => "le nom de la clé est vide".to_owned(),
-				Self::ValueIsEmpty => "la valeur est vide".to_owned(),
+				| Self::KeyIsEmpty => "le nom de la clé est vide".to_owned(),
+				| Self::ValueIsEmpty => "la valeur est vide".to_owned(),
 			}
 		)
 	}

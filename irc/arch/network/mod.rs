@@ -42,7 +42,6 @@ pub struct Network {
 #[derive(Debug)]
 pub enum IrcNetworkError {
 	IO(io::Error),
-
 	Server(IrcServerError),
 }
 

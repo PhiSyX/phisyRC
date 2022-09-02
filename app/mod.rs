@@ -9,7 +9,7 @@ use cli::app::{
 	PasswordAlgorithm, SubCommandServer,
 };
 use env::phisyrc_env;
-use irc::{IrcDaemon, IRC};
+use irc::{Irc, IrcDaemon};
 
 use super::{AppResult, TypeGui, GUI, TUI, UI};
 
@@ -95,7 +95,7 @@ impl App {
 				if server_cli.options.daemon {
 					IrcDaemon::spawn(&server_cli.options.config).await?;
 				} else {
-					IRC::run(&server_cli.options.config).await?;
+					Irc::run(&server_cli.options.config).await?;
 				}
 			}
 		};

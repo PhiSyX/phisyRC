@@ -4,7 +4,7 @@
 
 use std::path::Path;
 
-use super::IRC;
+use super::Irc;
 use crate::output::IrcResult;
 
 // --------- //
@@ -21,6 +21,6 @@ impl IrcDaemon {
 	pub async fn spawn(config_file: impl AsRef<Path>) -> IrcResult<()> {
 		println!("Lance le réseau IRC en tâche de fond.");
 
-		IRC::run(config_file).await
+		Irc::run(config_file).await
 	}
 }

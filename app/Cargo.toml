@@ -1,0 +1,23 @@
+[package]
+name = "phisyrc"
+version = "0.1.0"
+edition = "2021"
+license-file = "../LICENSE"
+publish = false
+
+[[bin]]
+name = "phisyrc"
+path = "./main.rs"
+
+[dependencies]
+cli = { path = "../cli", package = "phisyrcli" }
+env = { path = "../env", package = "phisyrc-env" }
+irc = { path = "../irc", package = "phisyrc-irc" }
+phisyrc = { path = "../macro", package = "phisyrc-macro" }
+logger = { path = "../logger", package = "phisyrc-logger" }
+
+argon2 = { version = "^1.0", package = "rust-argon2" }
+async-trait = "^0.1"
+futures = { version = "^0.3" }
+tokio = { version = "^1.20", features = ["macros", "rt-multi-thread", "time"] }
+tui = { version = "^0.19", default-features = false, features = ["crossterm"] }

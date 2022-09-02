@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use core::fmt;
-use std::{env, io, process::Command, str::FromStr};
+use std::{io, str::FromStr};
 
 // --------- //
 // Structure //
@@ -12,11 +12,11 @@ use std::{env, io, process::Command, str::FromStr};
 #[allow(clippy::upper_case_acronyms)]
 pub struct GUI;
 
+// NOTE(phisyx): on pourrait avoir plusieurs types d'interfaces graphiques.
 #[derive(Debug)]
 #[derive(Default)]
 #[derive(Copy, Clone)]
 pub enum TypeGui {
-	Flutter,
 	#[default]
 	Tauri,
 }
@@ -34,25 +34,11 @@ impl GUI {
 	pub(crate) fn launch(gui: TypeGui) -> io::Result<()> {
 		if cfg!(debug_assertions) {
 			match gui {
-				| TypeGui::Flutter => Self::use_flutter(),
 				| TypeGui::Tauri => Self::use_tauri(),
 			}
 		} else {
 			Ok(())
 		}
-	}
-
-	fn use_flutter() -> io::Result<()> {
-		let flutter_bin =
-			env::var("FLUTTER_BIN").unwrap_or_else(|_| "flutter".to_owned());
-
-		Command::new(flutter_bin)
-			.current_dir("app/ui/graphical")
-			.arg("run")
-			.arg("--device-id")
-			.arg(env::consts::OS)
-			.spawn()
-			.map(|_| ())
 	}
 
 	fn use_tauri() -> io::Result<()> {
@@ -69,7 +55,6 @@ impl FromStr for TypeGui {
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		Ok(match s.to_ascii_lowercase().as_str() {
-			| "flutter" => TypeGui::Flutter,
 			| "tauri" => TypeGui::Tauri,
 			| _ => return Err(Self::Err::Invalid),
 		})

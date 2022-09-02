@@ -19,7 +19,7 @@ pub struct phisyrc_env {
 	#[var(key = "DEBUG", default = "*")]
 	pub debug_filter: String,
 
-	#[var(key = "GUI", default = "flutter")]
+	#[var(key = "GUI", default = "tauri")]
 	pub gui_to_use: String,
 
 	#[var(key = "APP_SECRET_KEY")]

@@ -4,7 +4,7 @@
 
 mod arch;
 mod commands;
-mod config;
+pub mod config;
 mod daemon;
 mod macros;
 mod message;
@@ -12,8 +12,9 @@ mod output;
 
 use std::path::Path;
 
-use self::arch::Network;
-pub use self::{daemon::*, output::*};
+pub use self::{
+	arch::*, commands::*, daemon::*, macros::*, message::*, output::*,
+};
 
 // --------- //
 // Structure //

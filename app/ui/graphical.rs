@@ -31,7 +31,7 @@ pub enum TypeGuiError {
 // -------------- //
 
 impl GUI {
-	pub(crate) async fn launch(gui: TypeGui) -> io::Result<()> {
+	pub(crate) fn launch(gui: TypeGui) -> io::Result<()> {
 		if cfg!(debug_assertions) {
 			match gui {
 				| TypeGui::Flutter => Self::use_flutter(),

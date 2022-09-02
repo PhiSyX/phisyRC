@@ -90,7 +90,7 @@ impl Network {
 
 			forever! {
 				let listener = {
-					server.ping_host().await?;
+					server.ping_host()?;
 					server.try_establish_connection().await?
 				};
 

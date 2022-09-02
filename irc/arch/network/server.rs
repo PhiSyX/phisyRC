@@ -150,7 +150,7 @@ impl Server {
 	}
 
 	/// Vérifie si une connexion vers une adresse est déjà établie.
-	pub(crate) async fn ping_host(&self) -> Result<(), IrcServerError> {
+	pub(crate) fn ping_host(&self) -> Result<(), IrcServerError> {
 		let addr = self.socket.addr;
 
 		logger::trace!(

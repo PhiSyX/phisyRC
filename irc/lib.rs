@@ -6,6 +6,7 @@ mod arch;
 mod commands;
 mod config;
 mod daemon;
+mod macros;
 mod message;
 mod output;
 
@@ -34,28 +35,9 @@ impl IRC {
 		network.try_establish_connections().await?;
 
 		loop {
-			tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+			tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
 		}
 
 		// Ok(())
 	}
-}
-
-#[macro_export]
-macro_rules! forever {
-	(
-		$before:stmt ;
-		loop $code:block
-		return $after:stmt ;
-	) => {
-		tokio::spawn(async move {
-			$before
-			loop $code
-			#[allow(unreachable_code)]
-			$after
-		});
-	};
-	($code:block) => {
-		tokio::spawn(async move { loop $code });
-	};
 }

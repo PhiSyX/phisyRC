@@ -11,6 +11,7 @@ use lang::stream::prelude::*;
 use tokio::{
 	io::{self},
 	net::TcpStream,
+	sync::RwLock,
 };
 use tokio_util::codec::LinesCodecError;
 
@@ -34,7 +35,7 @@ use crate::{
 // ---- //
 
 pub type AtomicServerConfig = Arc<ServerConfig>;
-pub type AtomicServer = Arc<Server>;
+pub type AtomicServer = Arc<RwLock<Server>>;
 
 /// Type de drapeaux utilisateurs.
 type ServerUserFlags = [char; 1];
@@ -180,14 +181,18 @@ impl Server {
 		Ok(self.socket.accept(listener).await?)
 	}
 
-	pub(crate) async fn can_locate_client(&self, label: &str) -> bool {
+	pub(crate) async fn can_locate_client(
+		&self,
+		label: &str,
+	) -> Option<&AtomicEntity> {
 		for conn in self.connections.values() {
 			let maybe = conn.lock().await.label() == label;
 			if maybe {
-				return true;
+				return Some(conn);
 			}
 		}
-		false
+
+		None
 	}
 
 	pub(crate) fn new_entity(&mut self, socket: &SocketStream) -> AtomicEntity {
@@ -219,9 +224,9 @@ impl Server {
 
 			// SAFETY(unwrap): la condition-ci-haut nous permet d'utiliser
 			// unwrap avec sûreté.
-			let bytes = match maybe_line.unwrap().as_ref() {
+			let bytes = match &maybe_line.unwrap() {
 				| Err(LinesCodecError::MaxLineLengthExceeded) => {
-					let prefix = shared_entity1.lock().await.prefix();
+					let prefix = shared_entity1.lock().await.prefix().await;
 					let out = format!("ERROR :Closing Link: [{prefix}] (Max SendQ Exceeded)\r\n");
 					irc.send(out).await.unwrap();
 					break;
@@ -277,7 +282,7 @@ impl Server {
 
 					| IrcReplies::Error(reason) => {
 						let entity = shared_entity2.lock().await;
-						let prefix = entity.prefix();
+						let prefix = entity.prefix().await;
 						let out = format!("ERROR :Closing Link: [{prefix}] ({reason})\r\n");
 						irc.send(out).await.unwrap();
 						return;
@@ -285,14 +290,14 @@ impl Server {
 
 					| IrcReplies::NotifyChangeNick(new_nick) => {
 						let entity = shared_entity2.lock().await;
-						let prefix = entity.old_prefix();
+						let prefix = entity.old_prefix().await;
 						let out = format!(":{prefix} NICK {new_nick}\r\n");
 						irc.send(out).await.unwrap();
 					}
 
 					| IrcReplies::NotifyChangeQuit(maybe_reason) => {
 						let entity = shared_entity2.lock().await;
-						let prefix = entity.prefix();
+						let prefix = entity.prefix().await;
 
 						let out = if let Some(reason) = maybe_reason {
 							format!(":{prefix} QUIT :{reason}\r\n")
@@ -366,7 +371,7 @@ impl Server {
 				}
 			};
 
-			let server_cfg = entity.server.config.clone();
+			let server_cfg = entity.server.read().await.config.clone();
 
 			return match entity.ty {
 				| Some(EntityType::Client(ref mut client)) => {
@@ -448,7 +453,7 @@ impl Server {
 	}
 
 	pub(crate) fn shared(&self) -> AtomicServer {
-		Arc::new(self.clone())
+		Arc::new(RwLock::new(self.clone()))
 	}
 }
 

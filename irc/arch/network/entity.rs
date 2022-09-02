@@ -86,7 +86,8 @@ impl Entity {
 		};
 	}
 
-	pub(crate) fn old_prefix(&self) -> String {
+	pub(crate) async fn old_prefix(&self) -> String {
+		let x = self.server.read().await.config.user.name.clone();
 		self.ty
 			.as_ref()
 			.and_then(|ty| match ty {
@@ -95,10 +96,11 @@ impl Entity {
 				}
 				| EntityType::Server(_) => ty.old_prefix(),
 			})
-			.unwrap_or_else(|| self.server.config.user.name.clone())
+			.unwrap_or(x)
 	}
 
-	pub(crate) fn prefix(&self) -> String {
+	pub(crate) async fn prefix(&self) -> String {
+		let x = self.server.read().await.config.user.name.clone();
 		self.ty
 			.as_ref()
 			.and_then(|ty| match ty {
@@ -107,7 +109,7 @@ impl Entity {
 				}
 				| EntityType::Server(_) => ty.prefix(),
 			})
-			.unwrap_or_else(|| self.server.config.user.name.clone())
+			.unwrap_or(x)
 	}
 
 	pub(crate) fn prefix_based_on_reply(

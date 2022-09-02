@@ -153,6 +153,7 @@ macro_rules! numeric {
                 => $str:literal
         )*
 	) => {
+	#[derive(Clone)]
 	#[derive(Debug)]
 	#[allow(non_camel_case_types)]
 	pub enum $numeric_enum {

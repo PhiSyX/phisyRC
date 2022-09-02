@@ -5,7 +5,7 @@
 use crate::{
 	arch::{AtomicEntity, AtomicServerConfig},
 	commands::{IrcClientCommand, IrcCommandNumeric, IrcReplies},
-	config::IrcdPasswordAlgorithm,
+	if_some_then_err,
 };
 
 // --------- //
@@ -91,38 +91,7 @@ impl IrcClient {
 		}
 
 		if let IrcClientCommand::PASS { password, .. } = command {
-			let password_cfg =
-				&self.entity.lock().await.server.config.clone().user.password;
-
-			let password = match password_cfg {
-				| Some(cfg) => match cfg.algo {
-					| IrcdPasswordAlgorithm::Plain => password.to_owned(),
-					| IrcdPasswordAlgorithm::Argon2 => {
-						let app_secret_key = std::env::var("APP_SECRET_KEY")
-							.expect(
-								"La variable d'environnement `APP_SECRET_KEY`
-								  est obligatoirement présente car nous
-								  demandons que celle-ci soit obligatoire.",
-							);
-
-						let config = argon2::Config {
-							variant: argon2::Variant::Argon2id,
-							thread_mode: argon2::ThreadMode::Parallel,
-							..argon2::Config::default()
-						};
-
-						argon2::hash_encoded(
-							password.as_bytes(),
-							app_secret_key.as_bytes(),
-							&config,
-						)
-						.expect("Argon2")
-					}
-				},
-				| None => password.to_owned(),
-			};
-
-			self.password.replace(password);
+			self.password.replace(password.to_owned());
 		}
 
 		Ok(())
@@ -137,7 +106,14 @@ impl IrcClient {
 		if let IrcClientCommand::NICK { nickname, .. } = command {
 			let entity = &self.entity.lock().await;
 
-			if entity.server.can_locate_client(nickname).await {
+			if entity
+				.server
+				.read()
+				.await
+				.can_locate_client(nickname)
+				.await
+				.is_some()
+			{
 				return Err(IrcCommandNumeric::ERR_NICKNAMEINUSE {
 					nick: nickname.to_owned(),
 				});
@@ -183,10 +159,14 @@ impl IrcClient {
 
 		let entity = self.entity.lock().await;
 
-		if let (Some(password_cfg), Some(password)) =
-			(&entity.server.config.clone().user.password, &self.password)
-		{
-			if password_cfg.secret.ne(password) {
+		if let (Some(password_cfg), Some(password)) = (
+			&entity.server.read().await.config.clone().user.password,
+			&self.password,
+		) {
+			if let Ok(false) = argon2::verify_encoded(
+				&password_cfg.secret,
+				password.as_bytes(),
+			) {
 				return vec![IrcReplies::Error(
 					"You are not authorized to connect to this server"
 						.to_owned(),
@@ -196,7 +176,7 @@ impl IrcClient {
 
 		self.registered = true;
 
-		let server_cfg = entity.server.config.clone();
+		let server_cfg = entity.server.read().await.config.clone();
 
 		let mut replies = Vec::with_capacity(3);
 
@@ -214,6 +194,8 @@ impl IrcClient {
 		let created_003 = IrcCommandNumeric::RPL_CREATED {
 			date: entity
 				.server
+				.read()
+				.await
 				.created_at
 				.format("%Y-%m-%d %H:%M:%S.%f")
 				.to_string(),
@@ -235,11 +217,12 @@ impl IrcClient {
 		if let IrcClientCommand::NICK { nickname, .. } = command {
 			let entity = &self.entity.lock().await;
 
-			if entity.server.can_locate_client(nickname).await {
-				return Err(IrcCommandNumeric::ERR_NICKNAMEINUSE {
+			if_some_then_err!(
+				entity.server.read().await.can_locate_client(nickname).await,
+				IrcCommandNumeric::ERR_NICKNAMEINUSE {
 					nick: nickname.to_owned(),
-				});
-			}
+				}
+			);
 
 			self.old_nick = self.nick.clone();
 			// TODO(phisyx): valider le pseudonyme.

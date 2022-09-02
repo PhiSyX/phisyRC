@@ -86,7 +86,8 @@ impl SetupAnalyzer {
 		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
 			| syn::NestedMeta::Meta(meta) => match meta {
 				| syn::Meta::Path(path) => {
-					let ident = path.get_ident().expect("L'identifiant");
+					let ident =
+						path.get_ident().expect("Devrait être un identifiant");
 					if Self::LIST_OF_ATTRIBUTES
 						.contains(&ident.to_string().as_str())
 					{
@@ -155,7 +156,7 @@ impl SetupAnalyzer {
 					.with_level(level_filter)
 					.with_timestamp()
 					.build()
-					.expect("Impossible d'initialiser le logger.");
+					.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
 
 				logger::trace!("Le logger a été initialisé.");
 			}
@@ -188,7 +189,7 @@ impl SetupAnalyzer {
 				| syn::FnArg::Typed(typed) => Some((&typed.pat, &typed.ty)),
 				| _ => None,
 			})
-			.expect("Le premier argument");
+			.expect("Devrait être le premier argument");
 
 		if first_arg.is_none() {
 			return Err(SetupAnalyzerError::FirstArgumentInvalid(
@@ -218,7 +219,7 @@ impl SetupAnalyzer {
 				| syn::FnArg::Typed(typed) => Some((&typed.pat, &typed.ty)),
 				| _ => None,
 			})
-			.expect("Le dernier argument");
+			.expect("Devrait être le dernier argument");
 
 		if last_arg.is_none() {
 			return Err(SetupAnalyzerError::SecondArgumentInvalid(

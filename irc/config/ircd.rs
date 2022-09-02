@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use core::fmt;
+use std::net::SocketAddr;
 
 use serde::Deserialize;
 
@@ -90,6 +91,17 @@ pub enum IrcdPasswordAlgorithm {
 // -------------- //
 // Implémentation //
 // -------------- //
+
+impl IrcdListen {
+	/// Converti une chaîne de caractères sous la forme de "ip:port" en une
+	/// adresse socket.
+	pub fn addr(&self) -> SocketAddr {
+		format!("{}:{}", self.ip, self.port).parse().expect(
+			"Devrait être une adresse socket valide à partir d'une \
+			chaîne de caractères 'ip:port'.",
+		)
+	}
+}
 
 impl IrcdConfigPort {
 	const MAX_USER_PORT: u16 = 49151;

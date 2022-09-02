@@ -125,7 +125,9 @@ impl SocketStream {
 
 	/// Adresse pair.
 	pub fn peer_addr(&self) -> SocketAddr {
-		self.0.peer_addr().expect("peer address")
+		self.0
+			.peer_addr()
+			.expect("Devrait être une adresse pair d'une socket")
 	}
 }
 

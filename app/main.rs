@@ -17,7 +17,7 @@ pub use self::{lib::*, output::*, ui::*};
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
 	let app = App::new(cli_args, env_args);
 
-	if let Err(err) = app.handle_command().await {
+	if let Err(err) = app.handle_cli_command().await {
 		panic!("{err}");
 	}
 

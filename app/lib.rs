@@ -35,7 +35,7 @@ impl App {
 	}
 
 	/// Gère les commandes de la CLI.
-	pub(crate) async fn handle_command(&self) -> AppResult<()> {
+	pub(crate) async fn handle_cli_command(&self) -> AppResult<()> {
 		match self.cli.command.as_ref() {
 			| Some(Command::Client(client)) => {
 				self.handle_client_command(Some(client)).await

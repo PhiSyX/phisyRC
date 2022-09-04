@@ -31,17 +31,7 @@ pub enum TypeGuiError {
 // -------------- //
 
 impl GUI {
-	pub(crate) fn launch(gui: TypeGui) -> io::Result<()> {
-		if cfg!(debug_assertions) {
-			match gui {
-				| TypeGui::Tauri => Self::use_tauri(),
-			}
-		} else {
-			Ok(())
-		}
-	}
-
-	fn use_tauri() -> io::Result<()> {
+	pub(crate) fn launch(_gui: TypeGui) -> io::Result<()> {
 		Ok(())
 	}
 }

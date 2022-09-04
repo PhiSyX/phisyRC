@@ -12,8 +12,9 @@ use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
 // ----------- //
 
 #[derive(Debug)]
+#[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub(crate) enum IrcMessagePrefixHostError {
+pub enum IrcMessagePrefixHostError {
 	InputStream,
 	IsEmpty,
 	InvalidFirstCharacter,
@@ -117,13 +118,15 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixHostError> {
 						host.push(codepoint.unit());
 					}
 
-					| CodePoint::EOF if cfg!(test) => break,
+					| CodePoint::EOF => break,
 
 					// Tous les autres points de code.
 					//
 					// Il s'agit d'une erreur d'analyse.
 					| _ => {
-						return Err(IrcMessagePrefixHostError::InvalidCharacter)
+						return Err(
+							IrcMessagePrefixHostError::InvalidCharacter,
+						);
 					}
 				}
 			}

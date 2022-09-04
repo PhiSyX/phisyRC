@@ -10,7 +10,10 @@ use lang::{codepoints::CodePoint, stream::prelude::*};
 // Énumération //
 // ----------- //
 
-pub(crate) enum IrcMessagePrefixUserError {
+#[derive(Debug)]
+#[derive(Copy, Clone)]
+#[derive(PartialEq, Eq)]
+pub enum IrcMessagePrefixUserError {
 	InputStream,
 
 	IsEmpty,
@@ -58,7 +61,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixUserError> {
 				user.push(codepoint.unit());
 			}
 
-			| CodePoint::EOF if cfg!(test) => break,
+			| CodePoint::EOF => break,
 
 			// Tous les autres points de code.
 			//

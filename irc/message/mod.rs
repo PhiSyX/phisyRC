@@ -8,19 +8,11 @@ mod prefix;
 mod tags;
 
 use core::fmt;
-use std::{collections::HashMap, str::Chars};
+use std::str::Chars;
 
 use lang::{codepoints::CodePoint, stream::prelude::*};
 
-pub use self::{codec::*, command::IrcMessageCommand};
-use self::{
-	command::IrcMessageCommandError,
-	prefix::{
-		IrcMessagePrefix, IrcMessagePrefixHostError, IrcMessagePrefixNickError,
-		IrcMessagePrefixUserError,
-	},
-	tags::{IrcMessageTags, IrcMessageTagsError},
-};
+pub use self::{codec::*, command::*, prefix::*, tags::*};
 
 // --------- //
 // Structure //
@@ -28,7 +20,7 @@ use self::{
 
 #[derive(Debug)]
 pub struct IrcMessage {
-	pub tags: HashMap<String, String>,
+	pub tags: IrcMessageTags,
 	pub prefix: Option<IrcMessagePrefix>,
 	pub command: IrcMessageCommand,
 }
@@ -40,11 +32,11 @@ pub struct IrcMessage {
 #[derive(Debug)]
 #[derive(PartialEq, Eq)]
 pub enum IrcMessageError {
-	InvalidTags(String),
-	InvalidPrefix(String),
-	InvalidCommand(String),
-
 	InputStream,
+	IsEmpty,
+	InvalidTags(IrcMessageTagsError),
+	InvalidPrefix(IrcMessagePrefixError),
+	InvalidCommand(IrcMessageCommandError),
 }
 
 // -------------- //
@@ -69,7 +61,7 @@ impl IrcMessage {
 	//     <crlf>       ::= %x0D %x0A ; "carriage return" "linefeed"
 	//
 	// NOTE(phisyx): crlf n'est pas inclus dans notre analyse.
-	pub(super) fn parse(
+	pub fn parse(
 		mut input: InputStream<Chars<'_>, char>,
 	) -> Result<Self, IrcMessageError> {
 		// NOTE(phisyx): analyse des `<tags>` ; cette partie n'est pas
@@ -77,7 +69,7 @@ impl IrcMessage {
 		let tags = if let CodePoint::COMMERCIAL_AT = input.peek_next()? {
 			IrcMessageTags::parse(&mut input)?
 		} else {
-			HashMap::default()
+			IrcMessageTags::default()
 		};
 
 		// NOTE(phisyx): analyse du `<prefix>` ; cette partie n'est
@@ -98,6 +90,14 @@ impl IrcMessage {
 			command,
 		})
 	}
+
+	pub fn parse_from_str(
+		raw: impl Into<String>,
+	) -> Result<Self, IrcMessageError> {
+		let bytestream = ByteStream::new(raw);
+		let inputstream = InputStream::new(bytestream.chars());
+		Self::parse(inputstream)
+	}
 }
 
 // -------------- //
@@ -112,31 +112,19 @@ impl From<InputStreamError> for IrcMessageError {
 
 impl From<IrcMessageTagsError> for IrcMessageError {
 	fn from(err: IrcMessageTagsError) -> Self {
-		Self::InvalidTags(err.to_string())
+		Self::InvalidTags(err)
 	}
 }
 
-impl From<IrcMessagePrefixNickError> for IrcMessageError {
-	fn from(err: IrcMessagePrefixNickError) -> Self {
-		Self::InvalidPrefix(err.to_string())
-	}
-}
-
-impl From<IrcMessagePrefixUserError> for IrcMessageError {
-	fn from(err: IrcMessagePrefixUserError) -> Self {
-		Self::InvalidPrefix(err.to_string())
-	}
-}
-
-impl From<IrcMessagePrefixHostError> for IrcMessageError {
-	fn from(err: IrcMessagePrefixHostError) -> Self {
-		Self::InvalidPrefix(err.to_string())
+impl From<IrcMessagePrefixError> for IrcMessageError {
+	fn from(err: IrcMessagePrefixError) -> Self {
+		Self::InvalidPrefix(err)
 	}
 }
 
 impl From<IrcMessageCommandError> for IrcMessageError {
 	fn from(err: IrcMessageCommandError) -> Self {
-		Self::InvalidCommand(err.to_string())
+		Self::InvalidCommand(err)
 	}
 }
 
@@ -146,9 +134,10 @@ impl fmt::Display for IrcMessageError {
 			f,
 			"{}",
 			match self {
-				| Self::InvalidTags(reason)
-				| Self::InvalidPrefix(reason)
-				| Self::InvalidCommand(reason) => reason.to_owned(),
+				| Self::IsEmpty => "le flux est vide".to_owned(),
+				| Self::InvalidTags(reason) => reason.to_string(),
+				| Self::InvalidPrefix(reason) => reason.to_string(),
+				| Self::InvalidCommand(reason) => reason.to_string(),
 				| Self::InputStream => "erreur d'analyse".to_owned(),
 			}
 		)

@@ -2,10 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use core::fmt;
-use std::str::Chars;
+mod builder;
+mod parameters;
+mod state;
 
-use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
+use core::fmt;
+use std::str::{Chars, FromStr};
+
+use lang::stream::prelude::*;
+
+use self::{
+	builder::ParseCommandBuilder, parameters::IrcMessageCommandParameters,
+};
 
 // --------- //
 // Structure //
@@ -20,7 +28,7 @@ pub enum IrcMessageCommand {
 		/// Code de 3 chiffres.
 		code: String,
 		/// Les informations supplémentaires de la commande numérique.
-		parameters: Vec<String>,
+		parameters: IrcMessageCommandParameters,
 	},
 
 	/// Une commande textuelle est dotée d'une suite de lettre alphabétique.
@@ -35,21 +43,25 @@ pub enum IrcMessageCommand {
 		/// INPUT = "pass mot de passe"
 		///
 		/// parameters = ["mot", "de", "passe"]
-		parameters: Vec<String>,
+		parameters: IrcMessageCommandParameters,
 	},
 }
-
-pub struct IrcMessageCommandParams;
 
 // ----------- //
 // Énumération //
 // ----------- //
 
 #[derive(Debug)]
-pub(super) enum IrcMessageCommandError {
+#[derive(Copy, Clone)]
+#[derive(PartialEq, Eq)]
+pub enum IrcMessageCommandError {
 	InputStream,
-	InvalidCharacter,
+	ParseError,
+	IsEmpty,
+	InvalidCharacter { found: char, help: &'static str },
+	NumericCodeIsTooShort,
 	NumericCodeIsTooLong,
+	UnterminatedLine,
 }
 
 // -------------- //
@@ -63,283 +75,32 @@ impl IrcMessageCommand {
 	pub(super) fn parse(
 		stream: &mut InputStream<Chars<'_>, char>,
 	) -> Result<Self, IrcMessageCommandError> {
-		#[derive(PartialEq, Eq)]
-		enum State {
-			Initial,
-			Numeric { counter: u8 },
-			Text,
-		}
-
-		impl State {
-			fn increment_counter(&mut self) {
-				if let State::Numeric { counter: count } = self {
-					*count += 1;
-				}
-			}
-		}
-
-		impl ParseState for State {
-			fn switch(&mut self, new_state: State) {
-				*self = new_state;
-			}
-		}
-
-		let mut temporary_buffer = String::new();
-		let mut state = State::Initial;
-
-		loop {
-			match state {
-				| State::Initial => match stream.consume_next()? {
-					// Caractère numérique.
-					//
-					// Ajouter le chiffre au tampon temporaire.
-					// Passer à l'état [State::Numeric] avec un compteur de 1.
-					| CodePoint::Unit(ch) if ch.is_numeric() => {
-						temporary_buffer.push(ch);
-						state.switch(State::Numeric { counter: 1 });
-					}
-
-					// Caractère alphabétique.
-					//
-					// Ajouter la version majuscule de la lettre au tampon
-					// temporaire. Passer à l'état [State::Text].
-					| CodePoint::Unit(ch) if ch.is_alphabetic() => {
-						ch.to_uppercase()
-							.for_each(|u| temporary_buffer.push(u));
-						state.switch(State::Text);
-					}
-
-					// Tous les autres points de code.
-					//
-					// Il s'agit d'une erreur d'analyse.
-					| _ => {
-						return Err(IrcMessageCommandError::InvalidCharacter)
-					}
-				},
-
-				| State::Numeric { counter: count } => {
-					match stream.consume_next()? {
-						// Si le compteur est plus grand que 3, il s'agit d'une
-						// erreur.
-						| _ if count > 3 => {
-							return Err(
-								IrcMessageCommandError::NumericCodeIsTooLong,
-							)
-						}
-
-						// Caractère numérique.
-						//
-						// Ajouter le chiffre au tampon temporaire.
-						// Incrémenter le compteur de 1.
-						| CodePoint::Unit(ch) if ch.is_numeric() => {
-							temporary_buffer.push(ch);
-							state.increment_counter();
-						}
-
-						// Espaces blancs.
-						//
-						// Arrêter l'analyse.
-						| codepoint if codepoint.is_whitespace() => {
-							stream.reconsume_current();
-							break;
-						}
-
-						// Tous les autres caractères.
-						//
-						// Il s'agit d'une erreur.
-						| _ => {
-							return Err(
-								IrcMessageCommandError::InvalidCharacter,
-							)
-						}
-					}
-				}
-
-				| State::Text => match stream.consume_next()? {
-					// Caractère alphabétique.
-					//
-					// Ajouter la version majuscule de la lettre au tampon
-					// temporaire. Passer à l'état [State::Text].
-					| CodePoint::Unit(ch) if ch.is_alphabetic() => {
-						ch.to_uppercase()
-							.for_each(|u| temporary_buffer.push(u));
-					}
-
-					// Espaces blancs.
-					// EOF.
-					//
-					// Arrêter l'analyse.
-					| codepoint if codepoint.is_whitespace() => {
-						stream.reconsume_current();
-						break;
-					}
-					| CodePoint::EOF => break,
-
-					// Tous les autres points de code.
-					//
-					// Il s'agit d'une erreur d'analyse.
-					| _ => {
-						return Err(IrcMessageCommandError::InvalidCharacter)
-					}
-				},
-			}
-		}
-
-		assert!(state != State::Initial);
-
-		Ok(match state {
-			| State::Numeric { .. } => IrcMessageCommand::Numeric {
-				code: temporary_buffer,
-				parameters: IrcMessageCommandParams::parse(stream)?,
-			},
-
-			| State::Text => IrcMessageCommand::Text {
-				command: temporary_buffer,
-				parameters: IrcMessageCommandParams::parse(stream)?,
-			},
-
-			| State::Initial => {
-				unreachable!("capturé par l'assertion plus-haut.")
-			}
+		let mut builder = ParseCommandBuilder::initialize(stream);
+		builder.analyze()?;
+		builder.finish().and_then(|mut command| {
+			let parameters = Self::parse_parameters(stream)?;
+			command.set_parameters(parameters);
+			Ok(command)
 		})
+	}
+
+	fn parse_parameters(
+		stream: &mut InputStream<Chars<'_>, char>,
+	) -> Result<IrcMessageCommandParameters, IrcMessageCommandError> {
+		IrcMessageCommandParameters::parse(stream)
 	}
 }
 
-impl IrcMessageCommandParams {
-	pub(super) fn parse(
-		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<Vec<String>, IrcMessageCommandError> {
-		let mut temporary_buffer = String::new();
-
-		loop {
-			match stream.consume_next()? {
-				// Espaces blancs.
-				//
-				// Si le prochain point de code est un U+003A COLON (:),
-				// alors re-consommer le point de code, et arrêter l'analyse.
-				// Dans les autres cas, ajouter le point de code au tampon
-				// temporaire.
-				| codepoint if codepoint.is_whitespace() => {
-					if stream.peek_next()? == CodePoint::COLON {
-						stream.reconsume_current();
-						break;
-					}
-
-					temporary_buffer.push(codepoint.unit());
-				}
-
-				// Saut de ligne.
-				// EOF
-				//
-				// Arrêter l'analyse.
-				| codepoint if codepoint.is_newline() => break,
-				| CodePoint::EOF => break,
-
-				// Tous les autres points de code valide.
-				//
-				// Ajouter le point de code au tampon temporaire.
-				| codepoint if codepoint.is_valid() => {
-					temporary_buffer.push(codepoint.unit());
-				}
-
-				// Tous les autres points de code.
-				//
-				// Il s'agit d'une erreur.
-				| _ => return Err(IrcMessageCommandError::InvalidCharacter),
+impl IrcMessageCommand {
+	fn set_parameters(&mut self, new_parameters: IrcMessageCommandParameters) {
+		match self {
+			| Self::Numeric { parameters, .. } => {
+				*parameters = new_parameters;
+			}
+			| Self::Text { parameters, .. } => {
+				*parameters = new_parameters;
 			}
 		}
-
-		let middle: Vec<String> = temporary_buffer
-			.split_whitespace()
-			.map(|s| s.to_owned())
-			.collect();
-
-		let mut temporary_buffer = String::new();
-
-		enum TrailingState {
-			Initial,
-			AfterColon,
-		}
-
-		impl ParseState for TrailingState {
-			fn switch(&mut self, new_state: Self) {
-				*self = new_state;
-			}
-		}
-
-		let mut state = TrailingState::Initial;
-
-		loop {
-			match state {
-				| TrailingState::Initial => {
-					match stream.consume_next()? {
-						// Espaces blancs.
-						//
-						// Si le prochain point de code est un U+003A COLON (:),
-						// ne rien faire. Sinon il s'agit d'une erreur
-						// d'analyse.
-						| codepoint if codepoint.is_whitespace() => {
-							if stream.peek_next()? == CodePoint::COLON {
-								continue;
-							}
-
-							// NOTE
-							return Err(
-								IrcMessageCommandError::InvalidCharacter,
-							);
-						}
-
-						// U+003A COLON (:).
-						//
-						// Passer à l'état [State::AfterColon].
-						| CodePoint::COLON => {
-							state.switch(TrailingState::AfterColon);
-						}
-
-						| codepoint if codepoint.is_newline() => break,
-						| CodePoint::EOF => break,
-
-						| codepoint if codepoint.is_valid() => {
-							temporary_buffer.push(codepoint.unit());
-						}
-
-						| _ => {
-							return Err(
-								IrcMessageCommandError::InvalidCharacter,
-							)
-						}
-					}
-				}
-
-				| TrailingState::AfterColon => match stream.consume_next()? {
-					// Saut de ligne.
-					//
-					// Arrêter l'analyse.
-					| codepoint if codepoint.is_newline() => break,
-					| CodePoint::EOF => break,
-
-					// Tous les points de code valide.
-					//
-					// Ajouter le point de code au tampon temporaire.
-					| codepoint if codepoint.is_valid() => {
-						temporary_buffer.push(codepoint.unit());
-					}
-
-					// Tous les autres points de code.
-					//
-					// Il s'agit d'une erreur.
-					| _ => {
-						return Err(IrcMessageCommandError::InvalidCharacter)
-					}
-				},
-			}
-		}
-
-		let mut params = middle;
-		params.push(temporary_buffer.trim().to_string());
-		params.retain(|s| !s.is_empty());
-
-		Ok(params)
 	}
 }
 
@@ -359,11 +120,52 @@ impl fmt::Display for IrcMessageCommandError {
 			f,
 			"{}",
 			match self {
-				| Self::InputStream => "erreur d'analyse.",
-				| Self::InvalidCharacter => "caractère invalide.",
-				| Self::NumericCodeIsTooLong => "code numérique trop long.",
+				| Self::InputStream => "erreur d'analyse",
+				| Self::IsEmpty => "la ligne est vide",
+				| Self::ParseError => "erreur d'analyse",
+				| Self::InvalidCharacter { .. } => "caractère invalide",
+				| Self::NumericCodeIsTooShort => "code numérique trop petit",
+				| Self::NumericCodeIsTooLong => "code numérique trop long",
+				| Self::UnterminatedLine => "ligne non terminée",
 			}
 		)
+	}
+}
+
+impl FromStr for IrcMessageCommandError {
+	type Err = &'static str;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		if s.ends_with("la ligne est vide") {
+			return Ok(Self::IsEmpty);
+		} else if s.ends_with("erreur d'analyse") {
+			return Ok(Self::ParseError);
+		} else if s.contains("caractère invalide -> ") {
+			let parts = unsafe {
+				s.split_once(" -> ")
+					.map(|(_, x)| {
+						x.replace("\\s", " ")
+							.replace("\\r", "\r")
+							.replace("\\n", "\n")
+					})
+					.unwrap_unchecked()
+			};
+
+			let found = parts.as_bytes();
+
+			return Ok(Self::InvalidCharacter {
+				found: found[0] as char,
+				help: "Un caractère de commande valide est attendu.",
+			});
+		} else if s.ends_with("code numérique trop court") {
+			return Ok(Self::NumericCodeIsTooShort);
+		} else if s.ends_with("code numérique trop long") {
+			return Ok(Self::NumericCodeIsTooLong);
+		} else if s.ends_with("ligne non terminée") {
+			return Ok(Self::UnterminatedLine);
+		}
+
+		Err("non géré")
 	}
 }
 
@@ -390,11 +192,8 @@ mod tests {
 			output,
 			IrcMessageCommand::Numeric {
 				code: "001".to_owned(),
-				parameters: [
-					"PhiSyX".to_owned(),
-					"Welcome to the Internet Relay Network".to_owned()
-				]
-				.into()
+				parameters: ["PhiSyX", "Welcome to the Internet Relay Network"]
+					.into()
 			}
 		);
 	}
@@ -407,7 +206,7 @@ mod tests {
 			output,
 			IrcMessageCommand::Text {
 				command: "NICK".to_owned(),
-				parameters: ["NAME".to_owned()].to_vec()
+				parameters: ["NAME"].into()
 			}
 		);
 	}

@@ -11,8 +11,9 @@ use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
 // ----------- //
 
 #[derive(Debug)]
+#[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub(crate) enum IrcMessagePrefixNickError {
+pub enum IrcMessagePrefixNickError {
 	InputStream,
 
 	IsEmpty,
@@ -25,12 +26,12 @@ pub(crate) enum IrcMessagePrefixNickError {
 // ------- //
 
 /// Analyse d'un pseudonyme.
-///
-/// BNF: <nick>   ::= ( letter / special ) *8( letter / digit / special / "-" )
-///      <letter>  ::= %x41-5A / %x61-7A        ; A-Z / a-z
-///      <number>  ::= %x30-39                  ; 0-9
-///      <special> ::= %x5B-60 / %x7B-7D        ; "[", "]", "\", "`", "_", "^",
-///                                               "{", "|", "}"
+//
+// BNF: <nick>   ::= ( letter / special ) *8( letter / digit / special / "-" )
+//      <letter>  ::= %x41-5A / %x61-7A        ; A-Z / a-z
+//      <number>  ::= %x30-39                  ; 0-9
+//      <special> ::= %x5B-60 / %x7B-7D        ; "[", "]", "\", "`", "_", "^",
+//                                               "{", "|", "}"
 pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 	let bytes: ByteStream = ByteStream::from(input);
 	let mut stream = InputStream::new(bytes.chars());
@@ -137,7 +138,7 @@ pub(super) fn parse(input: &str) -> Result<String, IrcMessagePrefixNickError> {
 					nick.push(codepoint.unit());
 				}
 
-				| CodePoint::EOF if cfg!(test) => break,
+				| CodePoint::EOF => break,
 
 				// Tous les autres points de code.
 				//

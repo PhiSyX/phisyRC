@@ -102,11 +102,11 @@ macro_rules! command {
 						}
 						)*)?
 
-						let mut rest_of_parameters = parameters.clone();
+						let mut rest_of_parameters = parameters.0.clone();
 						rest_of_parameters.drain(0..size);
 
 						Ok(Self::$command {
-							parameters: rest_of_parameters,
+							parameters: rest_of_parameters.to_vec(),
 							$($($field: autofill[&stringify!($field)].to_owned()),*)?
 						})
 						},)*

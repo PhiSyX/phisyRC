@@ -221,7 +221,6 @@ impl Server {
 				continue;
 			}
 
-
 			// SAFETY(unwrap): la condition-ci-haut nous permet d'utiliser
 			// unwrap avec sûreté.
 			let bytes = match &maybe_line.unwrap() {
@@ -243,7 +242,10 @@ impl Server {
 						shared_entity.lock().await.addr,
 						line
 					);
-					ByteStream::new(line)
+
+					// NOTE(phisyx): nous voulons rajouter ces caractères de fin
+					// de ligne.
+					ByteStream::new(format!("{line}\r\n"))
 				},
 			};
 			let input = InputStream::new(bytes.chars());
@@ -266,7 +268,7 @@ impl Server {
 				// NOTE(phisyx): nous ne voulons pas casser la boucle en cas de
 				// caractères invalides.
 				| Err(err) => {
-					logger::error!("Message: {err}");
+					logger::error!("Le message erroné, raison: {err}");
 					continue
 				},
 			};

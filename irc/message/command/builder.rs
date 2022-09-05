@@ -212,7 +212,9 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 						}
 						| CodePoint::EOF if cfg!(test) => return Ok(()),
 						| CodePoint::EOF => {
-							return Err(IrcMessageCommandError::UnterminatedLine);
+							return Err(
+								IrcMessageCommandError::UnterminatedLine,
+							);
 						}
 
 						| codepoint if codepoint.is_whitespace() => {
@@ -237,6 +239,14 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 
 				| ParseCommandParametersFirstStepState::HasParameters => {
 					match self.stream.consume_next()? {
+						// Saut de ligne.
+						//
+						// Re-consommer le point de code. Arrêter l'analyse.
+						| codepoint if codepoint.is_newline() => {
+							self.stream.reconsume_current();
+							break;
+						}
+
 						// Espaces blancs.
 						//
 						// Si le prochain point de code est un U+003A COLON (:),
@@ -254,19 +264,10 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 							);
 						}
 
-						// Saut de ligne.
-						// EOF dans les cas des tests ;
-						//
-						// Arrêter l'analyse.
-						| codepoint if codepoint.is_newline() => break,
 						| CodePoint::EOF if cfg!(test) => break,
 
 						// EOF
-						//
-						// Il s'agit d'une erreur d'analyse.
-						| CodePoint::EOF => {
-							return Err(IrcMessageCommandError::UnterminatedLine);
-						}
+						| CodePoint::EOF => return Ok(()),
 
 						// Tous les autres points de code valide.
 						//
@@ -296,6 +297,8 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 			match self.second_step_state {
 				| ParseCommandParametersSecondStepState::Initial => {
 					match self.stream.consume_next()? {
+						| codepoint if codepoint.is_newline() => break,
+
 						// Espaces blancs.
 						//
 						// Si le prochain point de code est un U+003A COLON (:),
@@ -325,7 +328,9 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 						| CodePoint::EOF if cfg!(test) => break,
 
 						| CodePoint::EOF => {
-							return Err(IrcMessageCommandError::UnterminatedLine);
+							return Err(
+								IrcMessageCommandError::UnterminatedLine,
+							);
 						}
 
 						| codepoint if codepoint.is_valid() => {
@@ -350,7 +355,9 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 
 						| CodePoint::EOF if cfg!(test) => break,
 						| CodePoint::EOF => {
-							return Err(IrcMessageCommandError::UnterminatedLine);
+							return Err(
+								IrcMessageCommandError::UnterminatedLine,
+							);
 						}
 
 						// Tous les points de code valide.

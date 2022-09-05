@@ -20,6 +20,7 @@ Fonctionnalité: Analyse d'un message
 			| "0001\r\n"                                                   | invalide(commande): code numérique trop long  |
 			| "A\r\n"                                                      | valide                                        |
 			| "JOIN\r\n"                                                   | valide                                        |
+			| "CAP LS 302\r\n"                                             | valide                                        |
 			| "AWAY\r\n"                                                   | valide                                        |
 			| "4WAY\r\n"                                                   | invalide(commande): caractère invalide -> W   |
 			| "AWAY :test\r\n"                                             | valide                                        |
@@ -60,3 +61,12 @@ Fonctionnalité: Analyse d'un message
 			| ":irc.local.host PRIVMSG nick_1 :Hi ?\r\n"     | vraie          | irc.local.host     |
 			| ":localhost PRIVMSG nick_1 :Hi ?\r\n"          | vraie          | localhost          |
 			| ":127.0.0.1 PRIVMSG nick_1 :Hi ?\r\n"          | vraie          | 127.0.0.1          |
+
+	Plan du scénario: les paramètres d'une commande IRC
+		Lorsque on analyse un message IRC valide : <ligne>
+		Alors la commande du message est "<commande>"
+		Et les paramètres de la commande sont: `<paramètres>`
+
+		Exemples:
+			| ligne             | commande | paramètres  |
+			| "PASS test\r\n"   | PASS     | ["test"]    |

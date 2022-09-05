@@ -120,13 +120,18 @@ impl fmt::Display for IrcMessageCommandError {
 			f,
 			"{}",
 			match self {
-				| Self::InputStream => "erreur d'analyse",
-				| Self::IsEmpty => "la ligne est vide",
-				| Self::ParseError => "erreur d'analyse",
-				| Self::InvalidCharacter { .. } => "caractère invalide",
-				| Self::NumericCodeIsTooShort => "code numérique trop petit",
-				| Self::NumericCodeIsTooLong => "code numérique trop long",
-				| Self::UnterminatedLine => "ligne non terminée",
+				| Self::InputStream => "erreur d'analyse".to_owned(),
+				| Self::IsEmpty => "la ligne est vide".to_owned(),
+				| Self::ParseError => "erreur d'analyse".to_owned(),
+				| Self::InvalidCharacter { found, .. } => format!(
+					"le caractère « {found} » est invalide pour la commande."
+				),
+				| Self::NumericCodeIsTooShort =>
+					"le code numérique est trop petit".to_owned(),
+				| Self::NumericCodeIsTooLong =>
+					"le code numérique est trop long".to_owned(),
+				| Self::UnterminatedLine =>
+					"la ligne n'est pas terminée".to_owned(),
 			}
 		)
 	}

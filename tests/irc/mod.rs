@@ -28,7 +28,8 @@ impl World for IrcWorld {
 	type Error = Infallible;
 
 	async fn new() -> Result<Self, Self::Error> {
-		Ok(Self { // Just for the test
+		Ok(Self {
+			// Just for the test
 			current_message: Err(IrcMessageError::InputStream),
 		})
 	}

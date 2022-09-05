@@ -6,8 +6,8 @@ use std::str::FromStr;
 
 use cucumber::{then, when};
 use irc::{
-	IrcMessage, IrcMessageCommandError, IrcMessageError, IrcMessagePrefix,
-	IrcMessagePrefixError, IrcMessageTagsError,
+	IrcMessage, IrcMessageCommand, IrcMessageCommandError, IrcMessageError,
+	IrcMessagePrefix, IrcMessagePrefixError, IrcMessageTagsError,
 };
 
 use super::IrcWorld;
@@ -134,5 +134,35 @@ fn prefix_is(w: &mut IrcWorld, expected_prefix: String) {
 			.unwrap();
 			assert!(expected_prefix.eq(prefix));
 		}
+	}
+}
+
+#[then(regex = r#"la commande du message est "([^"]*)"$"#)]
+fn command_is(w: &mut IrcWorld, expected_command: String) {
+	let msg = w.current_message.as_ref().unwrap();
+
+	if let IrcMessageCommand::Numeric { code, .. } = &msg.command {
+		assert!(expected_command.eq(code));
+	}
+
+	if let IrcMessageCommand::Text { command, .. } = &msg.command {
+		assert!(expected_command.eq(command));
+	}
+}
+
+#[then(regex = r#"les paramètres de la commande sont: `([^`]*)`$"#)]
+fn parameters_of_command_is(
+	w: &mut IrcWorld,
+	expected_parameters: serde_json::Value,
+) {
+	let msg = w.current_message.as_ref().unwrap();
+
+	if let IrcMessageCommand::Text { parameters, .. } = &msg.command {
+		let parameters_json = parameters.json();
+		assert!(
+			parameters_json == expected_parameters,
+			"Données réelles des paramètres en JSON: {}",
+			parameters_json
+		);
 	}
 }

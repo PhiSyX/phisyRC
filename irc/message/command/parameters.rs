@@ -33,6 +33,10 @@ impl IrcMessageCommandParameters {
 		builder.analyze()?;
 		builder.finish()
 	}
+
+	pub fn json(&self) -> serde_json::Value {
+		serde_json::json!(self.0)
+	}
 }
 
 // -------------- //
@@ -58,7 +62,7 @@ impl ops::Deref for IrcMessageCommandParameters {
 }
 
 impl ops::DerefMut for IrcMessageCommandParameters {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
+	fn deref_mut(&mut self) -> &mut Self::Target {
+		&mut self.0
+	}
 }

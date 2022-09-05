@@ -369,7 +369,7 @@ impl fmt::Display for IrcMessagePrefixError {
 					"erreur dans le flux d'entrée".to_owned(),
 				| Self::ParseError => "erreur d'analyse".to_owned(),
 				| Self::InvalidCharacter { found, .. } => format!(
-					"le caractère {found} est invalide pour un préfixe."
+					"le caractère « {found} » est invalide pour un préfixe."
 				),
 				| Self::InvalidNick(err) =>
 					format!("pseudonyme invalide: {err}"),

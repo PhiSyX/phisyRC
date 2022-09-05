@@ -6,8 +6,8 @@ use std::str::FromStr;
 
 use cucumber::{then, when};
 use irc::{
-	IrcMessage, IrcMessageCommandError, IrcMessageError, IrcMessagePrefixError,
-	IrcMessageTagsError,
+	IrcMessage, IrcMessageCommandError, IrcMessageError, IrcMessagePrefix,
+	IrcMessagePrefixError, IrcMessageTagsError,
 };
 
 use super::IrcWorld;
@@ -82,13 +82,31 @@ fn current_line_must_be_considered_as(
 		},
 	};
 
-	assert_eq!(expected_state, state)
+	assert_eq!(expected_state, state);
 }
 
 #[then(regex = r#"la présence de métadonnées est "([^"]+)"$"#)]
 fn presence_of_metadata_is(w: &mut IrcWorld, conditional: Bool) {
 	let msg = w.current_message.as_ref().unwrap();
-	assert!(!msg.tags.is_empty() == conditional)
+	assert!(!msg.tags.is_empty() == conditional);
+}
+
+#[allow(clippy::nonminimal_bool)]
+#[then(regex = r#"la présence d'un préfixe est "([^"]+)"$"#)]
+fn presence_of_prefix_is(w: &mut IrcWorld, conditional: Bool) {
+	let maybe_msg = w.current_message.as_ref();
+
+	if false == conditional {
+		if let Ok(msg) = maybe_msg {
+			assert!(msg.prefix.is_none())
+		} else {
+			assert!(maybe_msg.is_err());
+		}
+		return;
+	}
+
+	let msg = maybe_msg.unwrap();
+	assert!(msg.prefix.is_some() == conditional);
 }
 
 #[then(regex = r#"les métadonnées du message sont `([^`]+)`$"#)]
@@ -99,5 +117,22 @@ fn metadata_is(w: &mut IrcWorld, expected_metadata: serde_json::Value) {
 		json_tags == expected_metadata,
 		"Données réelles des tags en JSON: {}",
 		json_tags
-	)
+	);
+}
+
+// NOTE(phisyx): en admettant que des tests plus haut ont déjà fait une
+// vérification pour ce que ce test puissent fonctionner correctement.
+#[then(regex = r#"le préfixe du message est "([^"]*)"$"#)]
+fn prefix_is(w: &mut IrcWorld, expected_prefix: String) {
+	let maybe_msg = w.current_message.as_ref();
+	if let Ok(msg) = maybe_msg {
+		if let Some(prefix) = &msg.prefix {
+			let expected_prefix = IrcMessagePrefix::parse_from_str(format!(
+				"{} ",
+				expected_prefix
+			))
+			.unwrap();
+			assert!(expected_prefix.eq(prefix));
+		}
+	}
 }

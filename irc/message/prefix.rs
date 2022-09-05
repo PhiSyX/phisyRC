@@ -89,13 +89,17 @@ impl IrcMessagePrefix {
 
 					// Espaces blancs
 					//
-					// Un préfixe NE PEUT PAS contenir d'espaces blancs.
-					// Il s'agit d'une erreur d'analyse.
+					// Arrêter l'analyse si le tampon temporaire vaut
+					// "localhost". Autrement, un préfixe NE PEUT PAS contenir
+					// d'espaces blancs. Il s'agira d'une erreur d'analyse.
 					| codepoint if codepoint.is_whitespace() => {
+						if builder.temporary_buffer == "localhost" {
+							break;
+						}
 						return Err(IrcMessagePrefixError::InvalidCharacter {
 							found: codepoint.unit(),
 							help: "Un point de code valide est attendu",
-						})
+						});
 					}
 
 					// U+0021 EXCLAMATION MARK (!)
@@ -182,6 +186,14 @@ impl IrcMessagePrefix {
 		}
 
 		builder.build()
+	}
+
+	pub fn parse_from_str(
+		raw: impl Into<String>,
+	) -> Result<Self, IrcMessagePrefixError> {
+		let bytestream = ByteStream::new(raw);
+		let mut inputstream = InputStream::new(bytestream.chars());
+		Self::parse(&mut inputstream)
 	}
 }
 

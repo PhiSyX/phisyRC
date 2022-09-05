@@ -53,6 +53,10 @@ impl IrcMessageTags {
 		builder.analyze()?;
 		builder.finish()
 	}
+
+	pub fn json(&self) -> serde_json::Value {
+		serde_json::json!(self.0)
+	}
 }
 
 // -------------- //

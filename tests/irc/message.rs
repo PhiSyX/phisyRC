@@ -11,6 +11,7 @@ use irc::{
 };
 
 use super::IrcWorld;
+use crate::Bool;
 
 // ----------- //
 // Énumération //
@@ -50,7 +51,9 @@ impl FromStr for IrcMessageState {
 // Test //
 // ---- //
 
-#[when(regex = r#"^on analyse la ligne : "([^"]*)"$"#)]
+#[when(
+	regex = r#"^on analyse (?:la ligne|un message)(?:\sIRC valide)? : "([^"]*)"$"#
+)]
 fn analyse_irc_line(w: &mut IrcWorld, line: String) {
 	let line = line.replace("\\r", "\r").replace("\\n", "\n");
 	let irc_msg = IrcMessage::parse_from_str(line);
@@ -80,4 +83,21 @@ fn current_line_must_be_considered_as(
 	};
 
 	assert_eq!(expected_state, state)
+}
+
+#[then(regex = r#"la présence de métadonnées est "([^"]+)"$"#)]
+fn presence_of_metadata_is(w: &mut IrcWorld, conditional: Bool) {
+	let msg = w.current_message.as_ref().unwrap();
+	assert!(!msg.tags.is_empty() == conditional)
+}
+
+#[then(regex = r#"les métadonnées du message sont `([^`]+)`$"#)]
+fn metadata_is(w: &mut IrcWorld, expected_metadata: serde_json::Value) {
+	let msg = w.current_message.as_ref().unwrap();
+	let json_tags = msg.tags.json();
+	assert!(
+		json_tags == expected_metadata,
+		"Données réelles des tags en JSON: {}",
+		json_tags
+	)
 }

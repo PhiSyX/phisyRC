@@ -130,6 +130,7 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 										CodePoint::SEMICOLON,
 									);
 								}
+
 								| CodePoint::REVERSE_SOLIDUS => {
 									self.stream.consume_next()?;
 									self.add_codepoint_to_current_value(

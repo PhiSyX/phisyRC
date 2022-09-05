@@ -36,3 +36,12 @@ Fonctionnalité: Analyse d'un message
 		| ":xx.x7.xx3.x2 PRIVMSG nick_1 :Hi ?\r\n"                     | valide                                        |
 		| "@admin=42 :xx.x7.xx3.x2 PRIVMSG nick_1 :Hi ?\r\n"           | valide                                        |
 
+	Plan du scénario: les métadonnées d'un message
+		Lorsque on analyse un message IRC valide : <ligne>
+		Alors la présence de métadonnées est "<conditionnelle>"
+		Et les métadonnées du message sont `<métadonnées>`
+
+	Exemples:
+		| ligne                                                                                | conditionnelle | métadonnées                                                 |
+		| "@id=1;name=Mike\sPhiSyX;age=21;admin :nick!user@host.org PRIVMSG nick_1 :Hi ?\r\n"  | vraie          | {"id":"1","name":"Mike PhiSyX","age":"21","admin":"true"}   |
+		| ":nick!user@host.org PRIVMSG nick_1 :Hi ?\r\n"                                       | fausse         | {}                                                          |

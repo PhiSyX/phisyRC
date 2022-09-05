@@ -4,6 +4,8 @@
 
 mod irc;
 
+use std::str::FromStr;
+
 use cucumber::WorldInit;
 
 use self::irc::IrcWorld;
@@ -11,4 +13,32 @@ use self::irc::IrcWorld;
 #[tokio::main]
 async fn main() {
 	IrcWorld::run("./irc").await;
+}
+
+#[derive(Debug)]
+#[repr(C)]
+pub enum Bool {
+	True = 1,
+	False = 0,
+}
+
+impl FromStr for Bool {
+	type Err = &'static str;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			| "true" | "vrai" | "vraie" | "ok" | "oui" => Self::True,
+			| "false" | "faux" | "fausse" | "ko" | "non" => Self::False,
+			| _ => return Err("Valeur booléenne invalide"),
+		})
+	}
+}
+
+impl PartialEq<Bool> for bool {
+	fn eq(&self, other: &Bool) -> bool {
+		match self {
+			| true => matches!(other, Bool::True),
+			| false => matches!(other, Bool::False),
+		}
+	}
 }

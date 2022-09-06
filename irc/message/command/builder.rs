@@ -8,10 +8,7 @@ use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
 
 use super::{
 	parameters::IrcMessageCommandParameters,
-	state::{
-		ParseCommandParametersFirstStepState,
-		ParseCommandParametersSecondStepState, ParseCommandState,
-	},
+	state::{ParseCommandParametersStepState, ParseCommandState},
 };
 use crate::{IrcMessageCommand, IrcMessageCommandError};
 
@@ -27,8 +24,7 @@ pub(super) struct ParseCommandBuilder<'a, 'b> {
 
 pub(super) struct ParseCommandParametersBuilder<'a, 'b> {
 	stream: &'a mut InputStream<Chars<'b>, char>,
-	first_step_state: ParseCommandParametersFirstStepState,
-	second_step_state: ParseCommandParametersSecondStepState,
+	step_state: ParseCommandParametersStepState,
 	temporary_buffer: String,
 	parameters_buffer: Vec<String>,
 }
@@ -50,12 +46,17 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
+	/// Analyse d'une commande.
 	pub(super) fn analyze(&mut self) -> Result<(), IrcMessageCommandError> {
 		loop {
 			match self.state {
 				| ParseCommandState::Initial => {
 					match self.stream.consume_next()? {
-						// Caractère de 0 à 9
+						// Point de code de 0 à 9
+						//
+						// Re-consommer le point de code actuel.
+						// Passer à l'état [ParseCommandState::Numeric]
+						// en initialisant un compteur de 0.
 						| CodePoint::Unit(ch) if ch.is_numeric() => {
 							self.stream.reconsume_current();
 							self.state.switch(ParseCommandState::Numeric {
@@ -63,21 +64,18 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 							})
 						}
 
-						// Caractère alphabétique
+						// Point de code alphabétique
+						//
+						// Re-consommer le point de code actuel.
+						// Passer à l'état [ParseCommandState::Text].
 						| CodePoint::Unit(ch) if ch.is_alphabetic() => {
 							self.stream.reconsume_current();
 							self.state.switch(ParseCommandState::Text)
 						}
 
-						| CodePoint::Unit(ch) => {
-							return Err(
-								IrcMessageCommandError::InvalidCharacter {
-									found: ch,
-									help: "Un caractère de commande valide est attendu."
-								},
-							);
-						}
-
+						// Tous les points de code valide.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| codepoint if codepoint.is_valid() => return Err(
 							IrcMessageCommandError::InvalidCharacter {
 								found: codepoint.unit(),
@@ -85,29 +83,54 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 							},
 						),
 
+						// Tous les autres cas.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
 
+				// La commande est une commande numérique, autrement dit une
+				// commande qui commence par un point de code numérique.
 				| ParseCommandState::Numeric { counter } => {
 					match self.stream.consume_next()? {
+						// Peu importe le point de code qui a été capturé,
+						// si le compteur va au de-là de 3 chiffre, il s'agit
+						// d'une erreur d'analyse, conformément à la
+						// spécification IRC.
 						| _ if counter > 3 => {
 							return Err(
 								IrcMessageCommandError::NumericCodeIsTooLong,
 							)
 						}
 
+						// Point de code numérique
+						//
+						// Ajouter le point de code au tampon temporaire.
+						// Incrémenter le compteur.
 						| CodePoint::Unit(ch) if ch.is_numeric() => {
 							self.add_character_to_temporary_buffer(ch);
 							self.state.increment_counter();
 						}
 
+						// Espace blanc.
+						//
+						// Re-consommer le point de code actuel.
+						// Arrêter l'analyse : passer à l'état d'analyse
+						// des paramètres.
 						| CodePoint::Whitespace(_) => {
 							self.stream.reconsume_current();
 							break;
 						}
-						| CodePoint::Newline(_) => break,
 
+						// Saut de ligne
+						//
+						// Arrêter complètement l'analyse.
+						| CodePoint::Newline(_) => return Ok(()),
+
+						// Tous les points de code valide.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| codepoint if codepoint.is_valid() => {
 							return Err(
 								IrcMessageCommandError::InvalidCharacter {
@@ -117,22 +140,42 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 							)
 						}
 
+						// Tous les autres points de code
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
 
+				// La commande est une commande normale, autrement dit une
+				// commande qui commence par un point de code alphabétique.
 				| ParseCommandState::Text => {
 					match self.stream.consume_next()? {
+						// NOTE(phisyx): La spécification IRC n'autorise pas
+						// de chiffres pour les commandes type "text".
+						//
+						// phisyRC ne va pas suivre cette règle spécifique pour
+						// cette fois. Parce que nous somme des guedin's.
 						| CodePoint::Unit(ch) if ch.is_alphanumeric() => {
 							self.add_character_to_temporary_buffer(ch);
 						}
 
+						// Espace blancs
+						//
+						// Arrêter l'analyse.
 						| CodePoint::Whitespace(_) => {
 							self.stream.reconsume_current();
 							break
 						}
-						| CodePoint::Newline(_) => break,
 
+						// Saut de ligne
+						//
+						// Arrêter complètement l'analyse.
+						| CodePoint::Newline(_) => return Ok(()),
+
+						// Tous les points de code valide.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| codepoint if codepoint.is_valid() => {
 							return Err(
 								IrcMessageCommandError::InvalidCharacter {
@@ -142,6 +185,9 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 							)
 						}
 
+						//  Tous les autres points de code.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
@@ -157,15 +203,20 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
+	/// Méthode de construction de la structure [IrcMessageCommand]
 	pub(super) fn finish(
 		self,
 	) -> Result<IrcMessageCommand, IrcMessageCommandError> {
-		assert!(self.state != ParseCommandState::Initial);
-
 		match self.state {
+			// Être dans état est impossible.
+			//
+			// Il s'agit d'une erreur d'analyse.
 			| ParseCommandState::Initial => {
+				assert!(self.state != ParseCommandState::Initial);
 				Err(IrcMessageCommandError::ParseError)
 			}
+
+			// Construction d'une commande numérique.
 			| ParseCommandState::Numeric { counter } => {
 				// NOTE(phisyx): la condition > 3 est vérifié lors de l'analyse
 				// plus-haut.
@@ -178,6 +229,8 @@ impl<'a, 'b> ParseCommandBuilder<'a, 'b> {
 					parameters: IrcMessageCommandParameters::default(),
 				})
 			}
+
+			// Construction d'une commande normale.
 			| ParseCommandState::Text => Ok(IrcMessageCommand::Text {
 				command: self.temporary_buffer,
 				parameters: IrcMessageCommandParameters::default(),
@@ -192,8 +245,7 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 	) -> Self {
 		Self {
 			stream,
-			first_step_state: Default::default(),
-			second_step_state: Default::default(),
+			step_state: Default::default(),
 			temporary_buffer: Default::default(),
 			parameters_buffer: Default::default(),
 		}
@@ -202,14 +254,16 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 
 impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 	pub(super) fn analyze(&mut self) -> Result<(), IrcMessageCommandError> {
-		// Première étape
 		loop {
-			match self.first_step_state {
-				| ParseCommandParametersFirstStepState::Initial => {
+			match self.step_state {
+				| ParseCommandParametersStepState::Initial => {
 					match self.stream.consume_next()? {
-						| codepoint if codepoint.is_newline() => {
-							return Ok(());
-						}
+						// EOF
+						//
+						// NOTE(phisyx): lorsque le code est exécuté pendant les
+						// tests. Arrêter complètement l'analyse.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| CodePoint::EOF if cfg!(test) => return Ok(()),
 						| CodePoint::EOF => {
 							return Err(
@@ -217,13 +271,21 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 							);
 						}
 
+						// Espace blanc
+						//
+						// Re-consommer le point de code actuel.
+						// Passer à l'état
+						// [ParseCommandParametersFirstStepState::HasParameters]
 						| codepoint if codepoint.is_whitespace() => {
 							self.stream.reconsume_current();
-							self.first_step_state.switch(
-								ParseCommandParametersFirstStepState::HasParameters,
-							)
+							self.step_state.switch(
+								ParseCommandParametersStepState::FirstStep,
+							);
 						}
 
+						// Tous les points de code valide.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| codepoint if codepoint.is_valid() => {
 							return Err(
 								IrcMessageCommandError::InvalidCharacter {
@@ -233,18 +295,21 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 							)
 						}
 
+						// Tous les autres points de code.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
 
-				| ParseCommandParametersFirstStepState::HasParameters => {
+				| ParseCommandParametersStepState::FirstStep => {
 					match self.stream.consume_next()? {
 						// Saut de ligne.
 						//
 						// Re-consommer le point de code. Arrêter l'analyse.
 						| codepoint if codepoint.is_newline() => {
 							self.stream.reconsume_current();
-							break;
+							self.step_state.switch(ParseCommandParametersStepState::PrepareSecondStep);
 						}
 
 						// Espaces blancs.
@@ -256,7 +321,7 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 						| codepoint if codepoint.is_whitespace() => {
 							if self.stream.peek_next()? == CodePoint::COLON {
 								self.stream.reconsume_current();
-								break;
+								self.step_state.switch(ParseCommandParametersStepState::PrepareSecondStep);
 							}
 
 							self.add_character_to_temporary_buffer(
@@ -264,9 +329,15 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 							);
 						}
 
-						| CodePoint::EOF if cfg!(test) => break,
-
 						// EOF
+						//
+						// NOTE(phisyx): dans le cas des tests, on veut arrêter
+						// l'analyse.
+						//
+						// Arrêter complètement l'analyse.
+						| CodePoint::EOF if cfg!(test) => {
+							self.step_state.switch(ParseCommandParametersStepState::PrepareSecondStep);
+						}
 						| CodePoint::EOF => return Ok(()),
 
 						// Tous les autres points de code valide.
@@ -278,26 +349,40 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 							);
 						}
 
+						// Tous les autres points de code.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
-			}
-		}
 
-		let middle: Vec<String> = self
-			.temporary_buffer
-			.split_whitespace()
-			.map(|s| s.to_owned())
-			.collect();
+				// NOTE(phisyx): pour la commande "CAP LS 302: LOL"
+				// le tampon temporaire contiendra "LS 302". L'étape
+				// suivante se contente de récupérer la suite.
+				| ParseCommandParametersStepState::PrepareSecondStep => {
+					let middle: Vec<String> = self
+						.temporary_buffer
+						.split_whitespace() // ["LS", "302"]
+						.map(|s| s.to_owned())
+						.collect();
+					self.parameters_buffer = middle;
+					self.temporary_buffer.clear();
+					self.step_state
+						.switch(ParseCommandParametersStepState::SecondStep);
+				}
 
-		self.temporary_buffer.clear();
-
-		// Seconde étape
-		loop {
-			match self.second_step_state {
-				| ParseCommandParametersSecondStepState::Initial => {
+				| ParseCommandParametersStepState::SecondStep => {
 					match self.stream.consume_next()? {
-						| codepoint if codepoint.is_newline() => break,
+						// Saut de ligne.
+						//
+						// Re-consommer le point de code actuel.
+						// Arrêter l'analyse.
+						| codepoint if codepoint.is_newline() => {
+							self.stream.reconsume_current();
+							self.step_state.switch(
+								ParseCommandParametersStepState::Finish,
+							);
+						}
 
 						// Espaces blancs.
 						//
@@ -315,45 +400,69 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 						// U+003A COLON (:).
 						//
 						// Passer à l'état
-						// [ParseCommandParametersSecondStepState::AfterColon].
+						// [ParseCommandParametersStepState::AfterColon].
 						| CodePoint::COLON => {
-							self.second_step_state
-								.switch(ParseCommandParametersSecondStepState::AfterColon);
+							self.step_state.switch(
+								ParseCommandParametersStepState::AfterColon,
+							);
 						}
 
-						| codepoint if codepoint.is_newline() => {
-							self.stream.reconsume_current();
-							break;
+						// EOF
+						//
+						// NOTE(phisyx): dans le cas des tests, nous voulons
+						// arrêter l'analyse.
+						//
+						// Il s'agit d'une erreur d'analyse.
+						| CodePoint::EOF if cfg!(test) => {
+							self.step_state.switch(
+								ParseCommandParametersStepState::Finish,
+							);
 						}
-						| CodePoint::EOF if cfg!(test) => break,
-
 						| CodePoint::EOF => {
 							return Err(
 								IrcMessageCommandError::UnterminatedLine,
 							);
 						}
 
+						// Tous les points de code valide.
+						//
+						// Ajouter le point de code au tampon temporaire.
 						| codepoint if codepoint.is_valid() => {
 							self.add_character_to_temporary_buffer(
 								codepoint.unit(),
 							);
 						}
 
+						// Tous les autres points de code.
+						//
+						// Il s'agit d'une erreur d'analyse.
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
 
-				| ParseCommandParametersSecondStepState::AfterColon => {
+				| ParseCommandParametersStepState::AfterColon => {
 					match self.stream.consume_next()? {
 						// Saut de ligne.
 						//
 						// Arrêter l'analyse.
 						| codepoint if codepoint.is_newline() => {
 							self.stream.reconsume_current();
-							break;
+							self.step_state.switch(
+								ParseCommandParametersStepState::Finish,
+							);
 						}
 
-						| CodePoint::EOF if cfg!(test) => break,
+						// EOF
+						//
+						// NOTE(phisyx): dans le cas des tests, nous voulons
+						// arrêter l'analyse.
+						//
+						// Il s'agit d'une erreur d'analyse.
+						| CodePoint::EOF if cfg!(test) => {
+							self.step_state.switch(
+								ParseCommandParametersStepState::Finish,
+							);
+						}
 						| CodePoint::EOF => {
 							return Err(
 								IrcMessageCommandError::UnterminatedLine,
@@ -375,14 +484,15 @@ impl<'a, 'b> ParseCommandParametersBuilder<'a, 'b> {
 						| _ => return Err(IrcMessageCommandError::ParseError),
 					}
 				}
+
+				| ParseCommandParametersStepState::Finish => {
+					self.parameters_buffer
+						.push(self.temporary_buffer.trim().to_string());
+					self.parameters_buffer.retain(|s| !s.is_empty());
+					break;
+				}
 			}
 		}
-
-		let mut parameters = middle;
-		parameters.push(self.temporary_buffer.trim().to_string());
-		parameters.retain(|s| !s.is_empty());
-
-		self.parameters_buffer = parameters;
 
 		Ok(())
 	}

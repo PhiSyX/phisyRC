@@ -155,3 +155,24 @@ Les variables d'environnement suivantes sont acceptées dans l'application:
   - [ ] Environnement de prod : `.env`
   - [x] Environnement de dev : `.env.local`
   - [ ] Environnement de test : `.env.test.local`
+
+## A propos du code, de la technique
+
+1) Tout n'est pas parfait dans le code actuel. Le créateur en est conscient.
+
+2) Dans certaines parties du code, les commentaires qui expliquent ce que font
+certains bloc de code ne sont là qu'à titre informatifs et/ou de mémorisations.
+Le créateur en est conscient que les commentaires NE DOIVENT PAS être là pour
+expliquer ce qui se passe dans les blocs de codes qui suivent les commentaires.
+Tout n'est pas commenté ou documenté ; en effet, il peut arriver qu'il ait
+des noms de fonctions, de variables, etc. qui sont assez explicites pour
+comprendre ce qu'il va se passer. Et parfois, c'est par oubli, ou parfois
+par fainéantise. Évidemment, le créateur écrira les documentations de code
+manquantes au fur et à mesure.
+
+3) **phisyRC** n'a pas été pensé avec une architecture particulière.
+Pas de MVC, Clean Architecture, et que sais-je encore. Le créateur en est
+conscient qu'on PEUT tirer des bénéfices sur certains points de ces concepts,
+mais n'en tiendra pas rigueur pour le moment. Néanmoins, le projet dans sa
+globalité essaie de garder la même structure, d'être le plus cohérent possible
+avec le reste ou l'intégralité du projet.

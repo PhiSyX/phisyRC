@@ -15,7 +15,6 @@ use crate::{
 // Structure //
 // --------- //
 
-#[derive(Clone)]
 #[derive(Debug)]
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
@@ -44,6 +43,7 @@ impl IrcMessageCommandParameters {
 // Implémentation // -> Interface
 // -------------- //
 
+#[cfg(test)] // NOTE(phisyx): code utilisé que lors des tests.
 impl<const N: usize, T> From<[T; N]> for IrcMessageCommandParameters
 where
 	T: Into<String>,

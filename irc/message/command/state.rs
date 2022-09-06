@@ -11,32 +11,40 @@ use lang::lexer::ParseState;
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
 pub(super) enum ParseCommandState {
+	/// L'état initiale de l'analyse de commande.
 	#[default]
 	Initial,
 
+	/// Analyse d'une commande numérique.
+	///
+	/// Les clients ne PEUVENT PAS envoyer ce genre de commande.
 	Numeric {
+		/// Le compteur ne DOIT pas dépasser le chiffre 3. Autrement il s'agit
+		/// d'une command incorrect.
 		counter: u8,
 	},
 
+	/// Analyse d'une commande normale ou textuelle.
 	Text,
 }
 
+/// Les états sont organisés par ordre par lesquelles l'analyseur doit passer.
 #[derive(Default)]
-#[derive(PartialEq, Eq)]
-pub(super) enum ParseCommandParametersFirstStepState {
+pub(super) enum ParseCommandParametersStepState {
+	/// État initiale de l'analyse de paramètres.
 	#[default]
 	Initial,
 
-	HasParameters,
-}
+	/// Analyse des paramètres. Ces paramètres séparés par des espaces.
+	FirstStep,
 
-#[derive(Default)]
-#[derive(PartialEq, Eq)]
-pub(super) enum ParseCommandParametersSecondStepState {
-	#[default]
-	Initial,
-
+	PrepareSecondStep,
+	/// Analyse des restes des paramètres. Ces paramètres peuvent contenir
+	/// des espaces.
+	SecondStep,
 	AfterColon,
+
+	Finish,
 }
 
 // -------------- //
@@ -45,8 +53,8 @@ pub(super) enum ParseCommandParametersSecondStepState {
 
 impl ParseCommandState {
 	pub(super) fn increment_counter(&mut self) {
-		if let ParseCommandState::Numeric { counter: count } = self {
-			*count += 1;
+		if let ParseCommandState::Numeric { counter } = self {
+			*counter += 1;
 		}
 	}
 }
@@ -61,13 +69,7 @@ impl ParseState for ParseCommandState {
 	}
 }
 
-impl ParseState for ParseCommandParametersFirstStepState {
-	fn switch(&mut self, new_state: Self) {
-		*self = new_state;
-	}
-}
-
-impl ParseState for ParseCommandParametersSecondStepState {
+impl ParseState for ParseCommandParametersStepState {
 	fn switch(&mut self, new_state: Self) {
 		*self = new_state;
 	}

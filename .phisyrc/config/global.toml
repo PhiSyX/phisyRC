@@ -1,0 +1,3 @@
+[next]
+config_client = ".phisyrc/config/client/load.toml"
+config_server = ".phisyrc/config/server/load.toml"

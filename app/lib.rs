@@ -12,6 +12,7 @@ use env::phisyrc_env;
 use irc::{Irc, IrcDaemon};
 
 use super::{AppResult, TypeGui, GUI, TUI, UI};
+use crate::{GlobalConfig, ServerConfig};
 
 // --------- //
 // Structure //
@@ -20,6 +21,7 @@ use super::{AppResult, TypeGui, GUI, TUI, UI};
 pub struct App {
 	pub cli: phisyrc_cli,
 	pub env: phisyrc_env,
+	pub global_config: GlobalConfig,
 }
 
 // -------------- //
@@ -27,11 +29,20 @@ pub struct App {
 // -------------- //
 
 impl App {
-	pub fn new(cli_args: phisyrc_cli, env_args: phisyrc_env) -> Self {
-		Self {
+	pub fn new(
+		cli_args: phisyrc_cli,
+		env_args: phisyrc_env,
+	) -> AppResult<Self> {
+		let global_config =
+			fs::TOMLFileLoader::<GlobalConfig>::load_with_next_key(
+				&cli_args.options.config,
+			)?;
+
+		Ok(Self {
 			cli: cli_args,
 			env: env_args,
-		}
+			global_config,
+		})
 	}
 
 	/// Gère les commandes de la CLI.
@@ -88,10 +99,19 @@ impl App {
 			},
 
 			| None => {
+				let server_cfg: ServerConfig =
+					fs::TOMLFileLoader::load_with_next_key(
+						server_cli
+							.options
+							.config
+							.as_ref()
+							.unwrap_or(&self.global_config.config_server),
+					)?;
+
 				if server_cli.options.daemon {
-					IrcDaemon::spawn(&server_cli.options.config).await?;
+					IrcDaemon::spawn(server_cfg.config_irc).await?;
 				} else {
-					Irc::run(&server_cli.options.config).await?;
+					Irc::run(server_cfg.config_irc).await?;
 				}
 			}
 		};

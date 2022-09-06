@@ -6,17 +6,39 @@
 **I**nternet **R**elay **C**hat (**IRC**) comme moyen de communication.
 
 L'**I**nterface **U**tilisateur de l'application de Chat **phisyRC** est
-développée sous plusieurs formes:
+développée sous plusieurs formes :
 
-1. **T**extuel (**TUI**) pour le terminal.
+1. [ ] **T**extuel (**TUI**) pour le terminal.
 
-   L'interface est minimaliste.
+   - L'interface va sûrement être minimaliste. Nous allons probablement
+	 utiliser `tui-rs` pour créer cette interface.
 
-2. **G**raphique (**GUI**) pour le bureau.
+2. [ ] **G**raphique (**GUI**) pour le bureau.
 
-3. **W**eb pour les navigateurs modernes.
+   Nous n'avons pas encore décidé la technologie à utiliser pour construire une
+   interface graphique avec Rust. L'écosystème de Rust n'est sensiblement pas
+   encore assez développé pour créer de **belles** interfaces graphiques, du
+   moins comme le créateur les aiment !
 
-4. **M**obile pour les appareils mobiles.
+	Quelques pistes:
+	- Créer notre propre GUI avec Rust. Pas impossible, mais cela nous
+      prendrait un temps monstre.
+    - Avec Rust, `tauri` peut correspondre à notre besoin, cependant la
+	  compilation du projet devient trop longue. Ce qui est un enfer
+	  lorsque nous développons avec.
+    - Créer une application de bureau avec `flutter`? Pourquoi pas.
+    - Créer une application de bureau avec `C#`? Pourquoi pas.
+
+3. [ ] **W**eb pour les navigateurs modernes.
+
+	Quelques pistes:
+    - Créer une application web avec `vue` ou `react`?
+    - Créer une application web avec `yew` (Rust w/ WASM)?
+
+4. [ ] **M**obile pour les appareils mobiles.
+
+   - Android
+   - iOS
 
 ## Administration
 
@@ -83,75 +105,82 @@ sont pas dans le protocole IRC ;-).
   lesquels.\
   La valeur par défaut est `*`. Autrement dit qui correspond à **TOUS** les
   caractères.\
-  Cela signifie que **TOUS les logs** seront affichés par défaut. — [env:
-  `DEBUG=`] [default: "`*`"]
+  Cela signifie que **TOUS les logs** seront affichés par défaut. — [env:`DEBUG=`] [default: "`*`"]
 
 ### Commandes
 
 | COMMAND            | DESCRIPTION                                          |
-| ------------------ | ---------------------------------------------------- |
+|--------------------|------------------------------------------------------|
 | 1. `client`        | Donne accès aux sous-commandes/options du client     |
 | 2. `server`        | Donne accès aux sous-commandes/options du serveur    |
 | 3. `make:password` | Génère un mot de passe avec un algorithme de hachage |
 
 1. Commande `client`:
 
-   Les options de la commande `client` sont:
+   Les options de la commande `client` sont :
 
-   | OPTION  | DESCRIPTION                                   |
-   | ------- | --------------------------------------------- |
-   | `--tui` | Lance l'application de Chat en mode textuel   |
-   | `--gui` | Lance l'application de Chat en mode graphique |
+	| OPTION     | DESCRIPTION                                   |
+	|------------|-----------------------------------------------|
+	| `--tui`    | Lance l'application de Chat en mode textuel   |
+	| `--gui`    | Lance l'application de Chat en mode graphique |
+	| `--config` | configuration du client.                      |
 
 2. Commande `server`
 
-   Les options de la commande `server` sont:
+   Les options de la commande `server` sont :
 
-   | OPTION            | DESCRIPTION                                            | TYPE     | DEFAULT                       |
-   | ----------------- | ------------------------------------------------------ | -------- | ----------------------------- |
-   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `bool`   | `false`                       |
-   | `--config`        | Fichier de configuration IRC                           | `string` | `".phisyrc/config/ircd.toml"` |
+	| OPTION            | DESCRIPTION                                            | TYPE     | DEFAULT                                            |
+	|-------------------|--------------------------------------------------------|----------|----------------------------------------------------|
+	| `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `bool`   | `false`                                            |
+	| `--config`        | Fichier de configuration du serveur                    | `string` | Voir dans le fichier `.phisyrc/config/global.toml` |
 
 3. Commande `make:password`:
 
-   La commande prend un argument obligatoire, qui est le mot de passe à encoder.
-   Le mot de passe est encodé en fonction de la valeur de la variable
-   d'environnement `APP_SECRET_KEY`.
+   La commande prend un argument obligatoire, qui est le mot de passe
+   à encoder. Le mot de passe est encodé en fonction de la valeur de la
+   variable d'environnement `APP_SECRET_KEY`.
 
-   Les options de la commande sont:
+   Les options de la commande sont :
 
-   | OPTION   | DESCRIPTION                      | TYPE                  | DEFAULT    |
-   | -------- | -------------------------------- | --------------------- | ---------- |
-   | `--algo` | Algorithme de hachage à utiliser | `"plain"`, `"argon2"` | `"argon2"` |
+	| OPTION   | DESCRIPTION                      | TYPE                  | DEFAULT    |
+	|----------|----------------------------------|-----------------------|------------|
+	| `--algo` | Algorithme de hachage à utiliser | `"plain"`, `"argon2"` | `"argon2"` |
 
    Exemple
 
    ```sh
    $ phisyrc make:password test
 
-   Le mot de passe 'test' généré par Argon2: $argon2id$v=19$m=4096,t=3,p=1$bWQ5b2prMXBJY0UyNGRSc29wODZIZGk5ODduZkRLaTU$QwsRN6Ds44/mZb5abqBq8/Lzgb1Y33qRUcpUKXO6GF0
+   Le mot de passe 'test' généré par Argon2:
+   $argon2id$v=19$m=4096,t=3,p=1$bWQ5b2prMXBJY0UyNGRSc29wODZIZGk5ODduZkRLaTU$QwsRN6Ds44/mZb5abqBq8/Lzgb1Y33qRUcpUKXO6GF0
    ```
 
 ### Drapeaux
 
 | DRAPEAU            | DESCRIPTION                                |
-| ------------------ | ------------------------------------------ |
+|--------------------|--------------------------------------------|
 | `-h` / `--help`    | Affiche l'aide (strict minimum / complète) |
 | `-V` / `--version` | Affiche la version du programme            |
 
+### Options
+
+| OPTION            | DESCRIPTION                            | DEFAULT                        |
+|-------------------|----------------------------------------|--------------------------------|
+| `-c` / `--config` | Configuration globale de l'application | `.phisyrc/config/global.toml`  |
+
 ## Variables d'environnement
 
-Les variables d'environnement suivantes sont acceptées dans l'application:
+Les variables d'environnement suivant sont acceptées dans l'application :
 
 | VARIABLE         | DESCRIPTION                           |
-| ---------------- | ------------------------------------- |
+|------------------|---------------------------------------|
 | `APP_SECRET_KEY` | Clé secrète de l'application (requis) |
 | `DEBUG`          | Voir plus haut.                       |
 
 ### TODO
 
 - [ ] Pouvoir définir les variables dans un fichier en fonction du mode
-      d'execution.
+      d'exécution.
   - [ ] Environnement de prod : `.env`
   - [x] Environnement de dev : `.env.local`
   - [ ] Environnement de test : `.env.test.local`
@@ -161,18 +190,20 @@ Les variables d'environnement suivantes sont acceptées dans l'application:
 1) Tout n'est pas parfait dans le code actuel. Le créateur en est conscient.
 
 2) Dans certaines parties du code, les commentaires qui expliquent ce que font
-certains bloc de code ne sont là qu'à titre informatifs et/ou de mémorisations.
-Le créateur en est conscient que les commentaires NE DOIVENT PAS être là pour
-expliquer ce qui se passe dans les blocs de codes qui suivent les commentaires.
-Tout n'est pas commenté ou documenté ; en effet, il peut arriver qu'il ait
-des noms de fonctions, de variables, etc. qui sont assez explicites pour
-comprendre ce qu'il va se passer. Et parfois, c'est par oubli, ou parfois
-par fainéantise. Évidemment, le créateur écrira les documentations de code
-manquantes au fur et à mesure.
+   certains blocs de code ne sont là qu'à titre informatif et/ou de
+   mémorisations. \
+   Le créateur est conscient que les commentaires NE DOIVENT PAS être là
+   pour expliquer ce qui se passe sur chaque ligne d'un bloc de code qui
+   suit les commentaires. \
+   Tout n'est pas commenté ou documenté ; en effet, il PEUT arriver qu'il y ait
+   des noms de fonctions, de variables, etc. qui sont assez explicites pour
+   comprendre ce qu'il va se passer. Et parfois, c'est juste par oubli, ou
+   parfois par fainéantise. \
+   Évidemment, les documentations manquantes seront écrites au fur et à mesure.
 
-3) **phisyRC** n'a pas été pensé avec une architecture particulière.
-Pas de MVC, Clean Architecture, et que sais-je encore. Le créateur en est
-conscient qu'on PEUT tirer des bénéfices sur certains points de ces concepts,
-mais n'en tiendra pas rigueur pour le moment. Néanmoins, le projet dans sa
-globalité essaie de garder la même structure, d'être le plus cohérent possible
-avec le reste ou l'intégralité du projet.
+3) **phisyRC** n'a pas été pensé avec une architecture particulière. \
+   Pas de MVC, Clean Architecture, et que sais-je encore. \
+   Le créateur est conscient qu'on PEUT tirer des bénéfices sur certains
+   points dans ces concepts, mais n'en tiendra pas rigueur pour le moment. \
+   Néanmoins, le projet dans sa globalité essaie de garder la même structure,
+   d'être le plus cohérent possible avec le reste ou l'intégralité du projet.

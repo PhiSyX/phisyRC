@@ -1,10 +1,11 @@
 [info]
-admin = ["Mike 'PhiSyX' S. <admin@phisy.rc>", "John Doe <john@doe.org>"]
+admin = ["Mike 'PhiSyX' S.", "PhiSyX", "admin@phisy.rc"]
 description = "Serveur phisyRC"
 name = "irc.phisy.rc"
 network_name = "phisyRC"
 
 [[listen]]
+name = "irc.phisy.rc"
 ip = "127.0.0.1"
 port = 6667
 #
@@ -18,5 +19,11 @@ port = 6667
 #
 # Ce qui veut dire que le mot de passe en clair vaut "test".
 #
-password.secret = "$argon2id$v=19$m=4096,t=3,p=1$bjFwSWNFMjZIaTU5b2prbWQ4NzRkUnNvcGRpOWZESzg$cGLifK56EgDfkjyVkFcMM9/EsCxYBX+XRHQ71vxmhsE"
 password.algo = "argon2"
+password.secret = "$argon2id$v=19$m=4096,t=3,p=1$bWQ5b2prMXBJY0UyNGRSc29wODZIZGk5ODduZkRLaTU$QwsRN6Ds44/mZb5abqBq8/Lzgb1Y33qRUcpUKXO6GF0"
+
+[[listen]]
+name = "localhost"
+ip = "127.0.0.1"
+port = 6668
+

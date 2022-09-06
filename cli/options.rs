@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use core::fmt;
+use std::path::PathBuf;
 
 // --------- //
 // Structure //
@@ -15,6 +16,10 @@ pub struct EmptyOptions {}
 #[derive(Debug)]
 #[derive(clap::Parser)]
 pub struct Options {
+	/// Fichier de configuration à charger
+	#[clap(short, long, default_value = ".phisyrc/config/global.toml")]
+	pub config: PathBuf,
+
 	/// Dans quel mode le programme doit être lancé.
 	///
 	/// Les modes sont utilisés pour:

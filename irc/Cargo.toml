@@ -12,6 +12,7 @@ path = "./lib.rs"
 json = ["serde_json"]
 
 [dependencies]
+fs = { path = "../fs", package = "phisyrc-fs" }
 logger = { path = "../logger", package = "phisyrc-logger" }
 
 lang = { git = "https://github.com/PhiSyX/lang", rev = "d3c302f60ac046dde9e3fcede910292950956147" }

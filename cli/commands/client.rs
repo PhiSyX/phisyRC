@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use std::path::PathBuf;
+
 use crate::{
 	app::{EmptyCommand, EmptyFlags},
 	CLI,
@@ -23,4 +25,8 @@ pub struct CommandClientOptions {
 	/// Lance l'application de Chat en mode textuel.
 	#[clap(long, conflicts_with = "gui")]
 	pub tui: bool,
+
+	/// Fichier de configuration client.
+	#[clap(long, parse(from_os_str))]
+	pub config: Option<PathBuf>,
 }

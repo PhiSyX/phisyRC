@@ -4,6 +4,7 @@
 
 #![doc = include_str!("../README.md")]
 
+mod config;
 mod lib;
 mod output;
 mod ui;
@@ -11,11 +12,11 @@ mod ui;
 use cli::app::phisyrc_cli;
 use env::phisyrc_env;
 
-pub use self::{lib::*, output::*, ui::*};
+pub use self::{config::*, lib::*, output::*, ui::*};
 
 #[phisyrc::setup(logger)]
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
-	let app = App::new(cli_args, env_args);
+	let app = App::new(cli_args, env_args)?;
 
 	if let Err(err) = app.handle_cli_command().await {
 		panic!("{err}");

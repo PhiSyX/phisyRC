@@ -12,6 +12,7 @@ path = "./main.rs"
 [dependencies]
 cli = { path = "../cli", package = "phisyrcli" }
 env = { path = "../env", package = "phisyrc-env" }
+fs = { path = "../fs", package = "phisyrc-fs" }
 irc = { path = "../irc", package = "phisyrc-irc" }
 phisyrc = { path = "../macro", package = "phisyrc-macro" }
 logger = { path = "../logger", package = "phisyrc-logger" }
@@ -19,5 +20,6 @@ logger = { path = "../logger", package = "phisyrc-logger" }
 argon2 = { version = "^1.0", package = "rust-argon2" }
 async-trait = "^0.1"
 futures = { version = "^0.3" }
+serde = { version = "^1.0", features = ["derive"] }
 tokio = { version = "^1.20", features = ["macros", "rt-multi-thread", "time"] }
 tui = { version = "^0.19", default-features = false, features = ["crossterm"] }

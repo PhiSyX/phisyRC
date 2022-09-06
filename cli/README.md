@@ -24,8 +24,7 @@
   lesquels.\
   La valeur par défaut est `*`. Autrement dit qui correspond à **TOUS** les
   caractères.\
-  Cela signifie que **TOUS les logs** seront affichés par défaut. — [env:
-  `DEBUG=`] [default: "`*`"]
+  Cela signifie que **TOUS les logs** seront affichés par défaut. — [env:`DEBUG=`] [default: "`*`"]
 
 ## Commandes
 
@@ -39,28 +38,30 @@
 
    Les options de la commande `client` sont:
 
-   | OPTION  | DESCRIPTION                                   |
-   | ------- | --------------------------------------------- |
-   | `--tui` | Lance l'application de Chat en mode textuel   |
-   | `--gui` | Lance l'application de Chat en mode graphique |
+	| OPTION     | DESCRIPTION                                   |
+	|------------|-----------------------------------------------|
+	| `--tui`    | Lance l'application de Chat en mode textuel   |
+	| `--gui`    | Lance l'application de Chat en mode graphique |
+	| `--config` | configuration du client.                      |
 
 2. Commande `server`
 
    Les options de la commande `server` sont:
 
-   | OPTION            | DESCRIPTION                                            | TYPE     | DEFAULT                       |
-   | ----------------- | ------------------------------------------------------ | -------- | ----------------------------- |
-   | `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `bool`   | `false`                       |
-   | `--config`        | Fichier de configuration IRC                           | `string` | `".phisyrc/config/ircd.toml"` |
+	| OPTION            | DESCRIPTION                                            | TYPE     | DEFAULT                                            |
+	|-------------------|--------------------------------------------------------|----------|----------------------------------------------------|
+	| `-d` / `--daemon` | Ouvre les connexions aux serveurs IRC en tâche de fond | `bool`   | `false`                                            |
+	| `--config`        | Fichier de configuration du serveur                    | `string` | Voir dans le fichier `.phisyrc/config/global.toml` |
+
 
 3. Commande `make:password`:
 
    La commande prend un argument obligatoire, qui est le mot de passe à encoder.
 
-   Les options de la commande sont:
+   Les options de la commande sont :
 
    | OPTION   | DESCRIPTION                      | TYPE                  | DEFAULT    |
-   | -------- | -------------------------------- | --------------------- | ---------- |
+   |----------|----------------------------------|-----------------------|------------|
    | `--algo` | Algorithme de hachage à utiliser | `"plain"`, `"argon2"` | `"argon2"` |
 
 ## Drapeaux
@@ -69,3 +70,9 @@
 | ------------------ | ------------------------------------------ |
 | `-h` / `--help`    | Affiche l'aide (strict minimum / complète) |
 | `-V` / `--version` | Affiche la version du programme            |
+
+### Options
+
+| OPTION            | DESCRIPTION                            | DEFAULT                        |
+|-------------------|----------------------------------------|--------------------------------|
+| `-c` / `--config` | Configuration globale de l'application | `.phisyrc/config/global.toml`  |

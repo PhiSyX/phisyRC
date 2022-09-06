@@ -1,0 +1,2 @@
+[next]
+config_irc = ".phisyrc/config/server/ircd.toml"

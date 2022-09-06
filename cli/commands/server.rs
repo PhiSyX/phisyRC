@@ -16,17 +16,13 @@ pub type CommandServer =
 #[derive(Debug)]
 #[derive(clap::Parser)]
 pub struct CommandServerOptions {
-	/// Ouvre les connexions aux serveurs IRC en tâche de fond.
+	/// Ouvre les connexions aux serveurs (TCP/UDP, WS, IRC) en tâche de fond.
 	#[clap(short, long)]
 	pub daemon: bool,
 
-	/// Fichier de configuration IRC.
-	#[clap(
-		long,
-		parse(from_os_str),
-		default_value = ".phisyrc/config/ircd.toml"
-	)]
-	pub config: PathBuf,
+	/// Fichier de configuration server.
+	#[clap(long, parse(from_os_str))]
+	pub config: Option<PathBuf>,
 }
 
 // ----------- //

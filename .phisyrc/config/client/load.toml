@@ -1,0 +1,2 @@
+[next]
+config_ui = ".phisyrc/config/client/ui.toml"

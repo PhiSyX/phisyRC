@@ -30,7 +30,12 @@ impl Irc {
 	pub async fn run(config_file: impl AsRef<Path>) -> IrcResult<()> {
 		logger::info!("Lancement de l'IRC...");
 
-		let config = config::load(config_file)?;
+		let config = fs::TOMLFileLoader::load(config_file)?;
+
+		logger::debug!(
+			"Sortie de dé-sérialisation du fichier de configuration \n {0:#?}",
+			&config
+		);
 
 		let network = Network::new(&config)?;
 		network.try_establish_connections().await?;

@@ -34,6 +34,7 @@ impl IrcMessageCommandParameters {
 		builder.finish()
 	}
 
+	#[cfg(feature = "json")]
 	pub fn json(&self) -> serde_json::Value {
 		serde_json::json!(self.0)
 	}

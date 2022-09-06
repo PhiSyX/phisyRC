@@ -68,5 +68,7 @@ Fonctionnalité: Analyse d'un message
 		Et les paramètres de la commande sont: `<paramètres>`
 
 		Exemples:
-			| ligne             | commande | paramètres  |
-			| "PASS test\r\n"   | PASS     | ["test"]    |
+			| ligne                                                                            | commande | paramètres                                                        |
+			| "PASS test\r\n"                                                                  | PASS     | ["test"]                                                          |
+			| ":irc.phisy.rc 003 PhiSyX :This server was created Fri Jun 17 13:34:29 2022\r\n" | 003      | ["PhiSyX", "This server was created Fri Jun 17 13:34:29 2022"]    |
+			| ":irc.phisy.rc 005 PhiSyX A B=C D=E:4,F :are supported by this server\r\n"       | 005      | ["PhiSyX", "A", "B=C", "D=E:4,F", "are supported by this server"] |

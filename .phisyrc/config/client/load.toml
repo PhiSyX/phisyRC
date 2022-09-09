@@ -1,2 +1,3 @@
 [next]
 config_ui = ".phisyrc/config/client/ui.toml"
+config_web = ".phisyrc/config/client/web.toml"

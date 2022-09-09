@@ -2,10 +2,11 @@
 !.cargo/*.example.toml
 
 .idea/*
-
-.phisyrc/phisyrc*
-
 .vscode/*
+
+.phisyrc/*.rlib
+.phisyrc/*.dll
+.phisyrc/phisyrc*
 
 target/
 

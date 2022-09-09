@@ -17,6 +17,28 @@ pub struct GlobalConfig {
 
 #[derive(Debug)]
 #[derive(serde::Deserialize)]
+pub struct ClientConfig {
+	pub config_ui: PathBuf,
+	pub config_web: PathBuf,
+}
+
+#[derive(Debug)]
+#[derive(serde::Deserialize)]
+pub struct ClientWebConfig {
+	pub public_dir: String,
+	pub server: ClientWebServerConfig,
+}
+
+#[derive(Debug)]
+#[derive(serde::Deserialize)]
+pub struct ClientWebServerConfig {
+	pub host: String,
+	pub port: u16,
+	pub proxy: Option<String>,
+}
+
+#[derive(Debug)]
+#[derive(serde::Deserialize)]
 pub struct ServerConfig {
 	pub config_irc: PathBuf,
 }

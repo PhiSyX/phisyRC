@@ -4,15 +4,7 @@
 
 #![doc = include_str!("../README.md")]
 
-mod config;
-mod lib;
-mod output;
-mod ui;
-
-use cli::app::phisyrc_cli;
-use env::phisyrc_env;
-
-pub use self::{config::*, lib::*, output::*, ui::*};
+use phisyrc_app::{phisyrc_cli, phisyrc_env, App, AppResult};
 
 #[phisyrc::setup(logger)]
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {

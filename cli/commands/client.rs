@@ -26,6 +26,9 @@ pub struct CommandClientOptions {
 	#[clap(long, conflicts_with = "gui")]
 	pub tui: bool,
 
+	#[clap(long, conflicts_with = "gui", conflicts_with = "tui")]
+	pub web: bool,
+
 	/// Fichier de configuration client.
 	#[clap(long, parse(from_os_str))]
 	pub config: Option<PathBuf>,

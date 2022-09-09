@@ -4,11 +4,9 @@
 
 mod graphical;
 mod textual;
+mod web;
 
-pub use self::{
-	graphical::{TypeGui, TypeGuiError, GUI},
-	textual::TUI,
-};
+pub use self::{graphical::*, textual::*, web::*};
 
 // ----------- //
 // Énumération //
@@ -21,4 +19,7 @@ pub enum UI {
 
 	/// Interface utilisateur textuel
 	Textual,
+
+	/// Interface utilisateur pour le web
+	Web,
 }

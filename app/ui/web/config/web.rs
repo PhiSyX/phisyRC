@@ -14,6 +14,7 @@ use serde::Deserialize;
 #[derive(serde::Deserialize)]
 pub struct ClientWebConfig {
 	pub public_dir: String,
+	pub public_url: String,
 	pub server: ClientWebServerConfig,
 }
 

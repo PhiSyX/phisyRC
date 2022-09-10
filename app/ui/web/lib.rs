@@ -79,7 +79,7 @@ impl WEB {
 				.app_data(web::Data::new(VIEWS.clone()))
 				.service(
 					fs::ActixFileLoader::load(
-						"/public",
+						&client_web_cfg.public_url,
 						&client_web_cfg.public_dir,
 					)
 					.use_last_modified(true),

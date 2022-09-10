@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod config;
 mod routes;
 
 use std::path::PathBuf;
@@ -14,10 +15,9 @@ use actix_web::{
 use awc::Client;
 use lazy_static::lazy_static;
 use tera::Tera;
-use tokio::io;
 use url::Url;
 
-use crate::ClientWebConfig;
+use self::config::ClientWebConfig;
 
 // ------ //
 // Static //
@@ -46,14 +46,24 @@ pub struct WEB;
 
 impl WEB {
 	// Crée un serveur WEB.
-	pub async fn launch(config_filename: impl Into<PathBuf>) -> io::Result<()> {
+	pub async fn launch(
+		config_filename: impl Into<PathBuf>,
+	) -> std::io::Result<()> {
 		let client_web_cfg =
 			Data::new(fs::TOMLFileLoader::<ClientWebConfig>::load(
 				config_filename.into(),
 			)?);
 
 		let cfg_w1 = client_web_cfg.clone();
-		let cfg_w2 = client_web_cfg.clone();
+
+		let addr = format!(
+			"{}:{}",
+			client_web_cfg.server.host, client_web_cfg.server.port
+		);
+		println!();
+		println!("\thttp://{}", &addr);
+		println!();
+
 		HttpServer::new(move || {
 			let mut app = App::new();
 
@@ -76,7 +86,7 @@ impl WEB {
 				)
 				.service(routes::index_view)
 		})
-		.bind(format!("{}:{}", cfg_w2.server.host, cfg_w2.server.port))?
+		.bind(addr)?
 		.run()
 		.await
 	}
@@ -107,13 +117,6 @@ impl WEB {
 			.map_err(error::ErrorInternalServerError)?;
 
 		let mut client_resp = HttpResponse::build(res.status());
-
-		// if url.as_str().ends_with(".mjs") {
-		// 	client_resp.insert_header((
-		// 		HeaderName::from_static("content-type"),
-		// 		HeaderValue::from_static("application/javascript"),
-		// 	));
-		// }
 
 		for (hname, hvalue) in res
 			.headers()

@@ -116,7 +116,7 @@ impl<W: Write> TUI<W> {
 }
 
 impl TUI<io::Stdout> {
-	pub(crate) async fn launch() -> io::Result<()> {
+	pub async fn launch() -> io::Result<()> {
 		let view = View::default();
 		let stdout = io::stdout();
 		let mut tui = Self::new(stdout)?;

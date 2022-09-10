@@ -20,14 +20,10 @@ irc = { path = "../irc", package = "phisyrc-irc" }
 phisyrc = { path = "../macro", package = "phisyrc-macro" }
 logger = { path = "../logger", package = "phisyrc-logger" }
 
-actix-web = { version = "^4.1" }
-awc = "^3.0"                                                                    # proxy
+gui = { path = "ui/graphical", package = "phisyrc-gui" }
+tui = { path = "ui/textual", package = "phisyrc-tui" }
+web = { path = "ui/web", package = "phisyrc-web" }
+
 argon2 = { version = "^1.0", package = "rust-argon2" }
-async-trait = "^0.1"
-futures = { version = "^0.3" }
-lazy_static = "^1.4"
 serde = { version = "^1.0", features = ["derive"] }
-tokio = { version = "^1.20", features = ["macros", "rt-multi-thread", "time"] }
-tera = "^1.17"
-tui = { version = "^0.19", default-features = false, features = ["crossterm"] }
-url = "^2.3"
+tokio = { version = "^1.20", features = ["macros", "rt-multi-thread"] }

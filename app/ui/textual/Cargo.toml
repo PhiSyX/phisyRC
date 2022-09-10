@@ -1,0 +1,17 @@
+[package]
+name = "phisyrc-tui"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../../LICENSE"
+publish = false
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]
+cli = { path = "../../../cli", package = "phisyrcli" }
+
+async-trait = "^0.1"
+futures = { version = "^0.3" }
+tokio = { version = "^1.20", features = ["time"] }
+tui = { version = "^0.19", default-features = false, features = ["crossterm"] }

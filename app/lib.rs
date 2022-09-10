@@ -14,7 +14,10 @@ use cli::app::{
 	PasswordAlgorithm, SubCommandServer,
 };
 pub use env::phisyrc_env;
+use gui::{TypeGui, GUI};
 use irc::{Irc, IrcDaemon};
+use tui::TUI;
+use web::WEB;
 
 pub use self::{config::*, output::*, ui::*};
 

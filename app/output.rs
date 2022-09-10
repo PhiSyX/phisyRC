@@ -5,8 +5,7 @@
 use core::fmt;
 
 use env::EnvError;
-
-use super::TypeGuiError;
+use gui::TypeGuiError;
 
 pub type AppResult<T> = Result<T, AppError>;
 

@@ -31,7 +31,7 @@ pub enum TypeGuiError {
 // -------------- //
 
 impl GUI {
-	pub(crate) fn launch(_gui: TypeGui) -> io::Result<()> {
+	pub fn launch(_gui: TypeGui) -> io::Result<()> {
 		Ok(())
 	}
 }

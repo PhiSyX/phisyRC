@@ -20,7 +20,7 @@ pub struct ClientWebConfig {
 #[derive(Debug)]
 #[derive(serde::Deserialize)]
 pub struct ClientWebServerConfig {
-	pub host: String,
+	pub ip: String,
 	#[serde(deserialize_with = "ClientWebServerPortConfig::validate")]
 	pub port: ClientWebServerPortConfig,
 	pub proxy: Option<String>,

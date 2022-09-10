@@ -58,7 +58,7 @@ impl WEB {
 
 		let addr = format!(
 			"{}:{}",
-			client_web_cfg.server.host, client_web_cfg.server.port
+			client_web_cfg.server.ip, client_web_cfg.server.port
 		);
 		println!();
 		println!("\thttp://{}", &addr);

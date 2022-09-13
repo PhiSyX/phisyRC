@@ -2,20 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+mod art;
 mod commands;
+mod export;
 mod flags;
 pub mod layout;
 mod options;
 
 use clap::{Args, Parser, Subcommand};
-pub use crossterm::*;
-
-/// Nom du projet : ART.
-pub const PROJECT_NAME: &str = "
-    / ' _   _ _
- /)/)/_) (// (
-/        /    `
-";
+pub use export::*;
 
 pub mod app {
 	use clap::Parser;

@@ -3,23 +3,23 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 mod config;
+mod export;
 mod output;
 mod ui;
 
 use std::io;
 
-pub use cli::app::phisyrc_cli;
 use cli::app::{
 	Command, CommandClient, CommandMakePassword, CommandServer,
 	PasswordAlgorithm, SubCommandServer,
 };
-pub use env::phisyrc_env;
 use gui::{TypeGui, GUI};
 use irc::{Irc, IrcDaemon};
 use tui::TUI;
 use web::WEB;
 
-pub use self::{config::*, output::*, ui::*};
+pub use self::export::*;
+use crate::{config::*, ui::*};
 
 // --------- //
 // Structure //
@@ -164,8 +164,7 @@ impl App {
 }
 
 impl App {
-	/// Lance l'application en mode [graphique](Ui::Graphical) ou
-	/// [textuel](Ui::Textual).
+	/// Lance l'application en mode graphique ou textuel.
 	pub async fn launch(&self, ui: UI) -> io::Result<()> {
 		let client_cfg =
 			fs::TOMLFileLoader::<ClientConfig>::load_with_next_key(

@@ -3,10 +3,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 mod client;
-mod passwd;
+mod password;
 mod server;
 
-pub use self::{client::*, passwd::*, server::*};
+pub use self::{client::*, password::*, server::*};
 
 // ----------- //
 // Énumération //

@@ -1,0 +1,11 @@
+[package]
+name = "phisyrc-ws"
+version = "0.1.0"
+edition = "2021"
+license-file = "../LICENSE"
+publish = false
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]

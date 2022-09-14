@@ -5,7 +5,7 @@
 mod config;
 mod routes;
 
-use std::path::PathBuf;
+use std::path::Path;
 
 use actix_web::{
 	error,
@@ -47,12 +47,11 @@ pub struct WEB;
 impl WEB {
 	// Crée un serveur WEB.
 	pub async fn launch(
-		config_filename: impl Into<PathBuf>,
+		config_filename: impl AsRef<Path>,
 	) -> std::io::Result<()> {
-		let client_web_cfg =
-			Data::new(fs::TOMLFileLoader::<ClientWebConfig>::load(
-				config_filename.into(),
-			)?);
+		let client_web_cfg = Data::new(
+			fs::TOMLFileLoader::<ClientWebConfig>::load(config_filename)?,
+		);
 
 		let cfg_w1 = client_web_cfg.clone();
 

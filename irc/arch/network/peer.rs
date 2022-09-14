@@ -160,7 +160,7 @@ impl Peer {
 	///
 	/// Un client n'est censé envoyer qu'un (1) seul argument pour la commande.
 	/// Quant à un serveur, il DOIT obligatoirement envoyer sept (7) arguments
-	/// pour la commande.
+	/// pour la commande `NICK`.
 	pub(crate) fn handle_nick_command(
 		&mut self,
 		command: &IncomingUnregisteredCommand,

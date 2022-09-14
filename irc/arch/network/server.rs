@@ -15,10 +15,10 @@ use tokio::{
 };
 use tokio_util::codec::LinesCodecError;
 
-use super::entity::{AtomicEntity, Entity};
+use super::peer::{AtomicPeer, Peer};
 use crate::{
 	arch::{
-		network::entity::EntityType, AtomicNetwork, Listener, ListenerError,
+		network::peer::EntityType, AtomicNetwork, Listener, ListenerError,
 		Socket, SocketStream,
 	},
 	commands::{
@@ -59,7 +59,7 @@ pub struct Server {
 	pub config: AtomicServerConfig,
 
 	/// Les clients/servers connectés au serveur.
-	pub connections: HashMap<String, AtomicEntity>,
+	pub connections: HashMap<String, AtomicPeer>,
 
 	/// Le nom du serveur.
 	pub label: String,
@@ -184,7 +184,7 @@ impl Server {
 	pub(crate) async fn can_locate_client(
 		&self,
 		label: &str,
-	) -> Option<&AtomicEntity> {
+	) -> Option<&AtomicPeer> {
 		for conn in self.connections.values() {
 			let maybe = conn.lock().await.label() == label;
 			if maybe {
@@ -195,9 +195,9 @@ impl Server {
 		None
 	}
 
-	pub(crate) fn new_entity(&mut self, socket: &SocketStream) -> AtomicEntity {
+	pub(crate) fn new_entity(&mut self, socket: &SocketStream) -> AtomicPeer {
 		let peer_addr = socket.peer_addr();
-		let entity = Entity::new(self.shared(), peer_addr);
+		let entity = Peer::new(self.shared(), peer_addr);
 		let peer_addr = peer_addr.to_string();
 		let atomic_entity = entity.shared();
 		self.connections.insert(peer_addr, atomic_entity.clone());
@@ -208,7 +208,7 @@ impl Server {
 	/// connexion/du client courant(e) et les traitent.
 	pub(crate) async fn intercept_messages(
 		&self,
-		shared_entity: AtomicEntity,
+		shared_entity: AtomicPeer,
 		mut irc: IrcCodec<TcpStream>,
 	) {
 		let server_config = self.config.clone();
@@ -336,7 +336,7 @@ impl Server {
 	// envoyées par un client (IRC-CLIENT) ou par un service ou un serveur
 	// (IRC-SERVER).
 	async fn handle_message(
-		shared_entity: AtomicEntity,
+		shared_entity: AtomicPeer,
 		message: IrcMessage,
 	) -> Result<Vec<IrcReplies>, IrcCommandNumeric> {
 		let mut entity = shared_entity.lock().await;

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-mod entity;
+mod peer;
 mod server;
 mod socket;
 
@@ -12,7 +12,7 @@ use tokio::io;
 
 pub use self::server::{IrcServerError, Server};
 pub(crate) use self::{
-	entity::AtomicEntity, server::AtomicServerConfig, socket::*,
+	peer::AtomicPeer, server::AtomicServerConfig, socket::*,
 };
 use crate::{config::IrcdConfig, forever};
 
@@ -95,8 +95,8 @@ impl Network {
 
 				loop {
 					let socket: SocketStream = server.accept(&listener).await?;
-					let entity: AtomicEntity = server.new_entity(&socket);
-					server.intercept_messages(entity, socket.codec()).await;
+					let peer: AtomicPeer = server.new_entity(&socket);
+					server.intercept_messages(peer, socket.codec()).await;
 				}
 
 				return Ok::<(), IrcNetworkError>(());

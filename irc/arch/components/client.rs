@@ -3,9 +3,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use crate::{
-	arch::{AtomicEntity, AtomicServerConfig},
-	commands::{IrcClientCommand, IrcCommandNumeric, IrcReplies},
-	if_some_then_err,
+    arch::{AtomicPeer, AtomicServerConfig},
+    commands::{IrcClientCommand, IrcCommandNumeric, IrcReplies},
+    if_some_then_err,
 };
 
 // --------- //
@@ -15,7 +15,7 @@ use crate::{
 #[derive(Debug)]
 #[derive(Clone)]
 pub struct IrcClient {
-	entity: AtomicEntity,
+	entity: AtomicPeer,
 	registered: bool,
 	password: Option<String>,
 	old_nick: String,
@@ -30,7 +30,7 @@ pub struct IrcClient {
 // -------------- //
 
 impl IrcClient {
-	pub fn new(entity: AtomicEntity) -> Self {
+	pub fn new(entity: AtomicPeer) -> Self {
 		Self {
 			entity,
 			registered: false,

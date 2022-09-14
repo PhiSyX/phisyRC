@@ -3,25 +3,30 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 mod error;
+mod export;
 mod interface;
 mod parser;
 
-pub use self::{error::EnvError, interface::EnvInterface};
+pub use self::export::*;
 
-// --------- //
-// Structure //
-// --------- //
+pub mod app {
+	use super::{EnvError, EnvInterface, EnvParser};
 
-#[derive(Debug)]
-#[derive(phisyrc::Env)]
-#[allow(non_camel_case_types)]
-pub struct phisyrc_env {
-	#[var(key = "DEBUG", default = "*")]
-	pub debug_filter: String,
+	// --------- //
+	// Structure //
+	// --------- //
 
-	#[var(key = "GUI", default = "tauri")]
-	pub gui_to_use: String,
+	#[derive(Debug)]
+	#[derive(phisyrc::Env)]
+	#[allow(non_camel_case_types)]
+	pub struct phisyrc_env {
+		#[var(key = "DEBUG", default = "*")]
+		pub debug_filter: String,
 
-	#[var(key = "APP_SECRET_KEY")]
-	pub app_secret_key: String,
+		#[var(key = "GUI", default = "tauri")]
+		pub gui_to_use: String,
+
+		#[var(key = "APP_SECRET_KEY")]
+		pub app_secret_key: String,
+	}
 }

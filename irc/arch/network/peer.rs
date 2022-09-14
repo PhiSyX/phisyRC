@@ -16,7 +16,7 @@ use crate::{
 // Type //
 // ---- //
 
-pub type AtomicEntity = Arc<Mutex<Entity>>;
+pub type AtomicPeer = Arc<Mutex<Peer>>;
 
 // --------- //
 // Structure //
@@ -24,7 +24,7 @@ pub type AtomicEntity = Arc<Mutex<Entity>>;
 
 #[derive(Debug)]
 #[derive(Clone)]
-pub struct Entity {
+pub struct Peer {
 	pub addr: SocketAddr,
 	pub server: AtomicServer,
 	pub ty: Option<EntityType>,
@@ -41,7 +41,7 @@ pub enum EntityType {
 // Implémentation //
 // -------------- //
 
-impl Entity {
+impl Peer {
 	pub(crate) fn new(server: AtomicServer, addr: SocketAddr) -> Self {
 		Self {
 			addr,
@@ -123,7 +123,7 @@ impl Entity {
 	}
 }
 
-impl Entity {
+impl Peer {
 	/// Gestion de la commande PASS.
 	///
 	/// Un client n'est censé envoyer qu'un (1) seul argument pour la commande.

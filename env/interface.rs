@@ -2,66 +2,57 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use std::{collections::HashMap, env, path::Path, str::FromStr};
+use core::str::FromStr;
+use std::{env, path::Path};
 
-use crate::error::EnvError;
+use crate::error::Error;
 
-pub trait EnvInterface {
-	type Err;
-
-	fn setup(file: impl AsRef<Path>) -> Result<Self, Self::Err>
+pub trait Interface {
+	fn setup(file: impl AsRef<Path>) -> Result<Self, Error>
 	where
 		Self: Sized;
 
 	/// Retourne la valeur d'une variable d'environnement.
-	fn get_var<T: FromStr>(
-		key: &'static str,
-		map: Option<&HashMap<String, String>>,
-	) -> Result<T, EnvError> {
-		match map {
-			| Some(map) => map.get(key).map(|v| v.to_string()),
-			| None => env::var(key).ok(),
-		}
-		.ok_or(EnvError::Missing(key))
-		.and_then(|v| v.parse::<T>().map_err(|_| EnvError::BadFormat(key)))
+	fn get_var<T>(key: &'static str) -> Result<T, Error>
+	where
+		T: FromStr,
+	{
+		env::var(key)
+			.map_err(|_| Error::Missing(key))
+			.and_then(|value| {
+				value.parse::<T>().map_err(|_| Error::BadFormat(key))
+			})
 	}
 
 	/// Retourne la valeur d'une variable d'environnement. En cas d'échec une
 	/// valeur par défaut est retournée.
-	fn get_default_var<T: FromStr>(
+	fn get_default_var<T>(
 		key: &'static str,
-		map: Option<&HashMap<String, String>>,
 		default: &'static str,
-	) -> Result<T, EnvError> {
-		let maybe_var = match map {
-			| Some(map) => map.get(key).map(|val| val.to_string()),
-			| None => env::var(key).ok(),
+	) -> Result<T, Error>
+	where
+		T: FromStr,
+	{
+		let maybe_value = env::var(key);
+
+		let value = match maybe_value {
+			| Ok(ref value) => value,
+			| Err(_) => default,
 		};
 
-		let val = match maybe_var {
-			| Some(ref value) => value,
-			| None => default,
-		};
-
-		val.parse::<T>().map_err(|_| EnvError::BadFormat(key))
+		value.parse::<T>().map_err(|_| Error::BadFormat(key))
 	}
 
 	/// Retourne la valeur d'une variable d'environnement sous forme de
 	/// [Option]. En cas d'échec [None] est retourné.
-	fn get_optional_var<T: FromStr>(
-		key: &'static str,
-		map: Option<&HashMap<String, String>>,
-	) -> Result<Option<T>, EnvError> {
-		let maybe_var = match map {
-			| Some(map) => map.get(key).map(|val| val.to_string()),
-			| None => env::var(key).ok(),
-		};
-
-		match maybe_var {
-			| Some(v) => v
-				.parse::<T>()
-				.map(Some)
-				.map_err(|_| EnvError::BadFormat(key)),
+	fn get_optional_var<T>(key: &'static str) -> Result<Option<T>, Error>
+	where
+		T: FromStr,
+	{
+		match env::var(key).ok() {
+			| Some(v) => {
+				v.parse::<T>().map(Some).map_err(|_| Error::BadFormat(key))
+			}
 			| None => Ok(None),
 		}
 	}

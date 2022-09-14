@@ -1,55 +1,69 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
+
 use std::{
 	fs::File,
 	io::{self, Read},
-	str::FromStr,
+	path::Path,
 };
+
+// ---- //
+// Type //
+// ---- //
+
+type LValue<'a> = &'a str;
+type RValue<'a> = &'a str;
 
 // --------- //
 // Structure //
 // --------- //
 
 #[derive(Debug)]
-pub(crate) struct EnvParser(String, String);
+pub struct Parser;
+
+#[derive(Debug)]
+struct DeclarationStatement<'a>(LValue<'a>, RValue<'a>);
 
 // ----------- //
 // Énumération //
 // ----------- //
 
 #[derive(Debug)]
-pub(crate) enum EnvParseError {
-	InvalidKeyValue,
+enum DeclarationStatementError {
+	ParseError,
 }
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
-impl EnvParser {
+impl Parser {
 	/// Analyse un fichier d'environnement.
-	pub fn file(
-		filename: impl AsRef<std::path::Path>,
-	) -> Result<(), io::Error> {
+	pub fn file(filename: impl AsRef<Path>) -> io::Result<()> {
 		let mut file = File::open(filename)?;
 
 		let mut content = String::new();
 		file.read_to_string(&mut content)?;
 
-		let parsed_file = Self::parse(&content);
-		parsed_file.for_each(|env| env.set());
+		let decls = Self::parse(&content);
+		decls.for_each(|decl| decl.set_env());
 
 		Ok(())
 	}
 
 	/// Analyse une chaîne de caractères.
-	fn parse(input: &str) -> impl Iterator<Item = EnvParser> + '_ {
-		input.lines().filter_map(|line| line.parse().ok())
+	fn parse(input: &str) -> impl Iterator<Item = DeclarationStatement> + '_ {
+		input
+			.lines()
+			.filter_map(|line| DeclarationStatement::parse(line).ok())
 	}
 }
 
-impl EnvParser {
+impl<'a> DeclarationStatement<'a> {
 	/// Définie une variable d'environnement.
-	fn set(&self) {
-		let EnvParser(key, value) = self;
+	fn set_env(&self) {
+		let Self(key, value) = self;
 		std::env::set_var(key, value);
 	}
 }
@@ -58,12 +72,13 @@ impl EnvParser {
 // Implémentation // -> Interface
 // -------------- //
 
-impl FromStr for EnvParser {
-	type Err = EnvParseError;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		s.split_once('=')
-			.map(|(name, value)| Self(name.to_owned(), value.to_owned()))
-			.ok_or(Self::Err::InvalidKeyValue)
+impl<'a> DeclarationStatement<'a> {
+	fn parse<'b: 'a>(
+		input: &'b str,
+	) -> Result<Self, DeclarationStatementError> {
+		input
+			.split_once('=')
+			.map(|(key, value)| Self(key, value))
+			.ok_or(DeclarationStatementError::ParseError)
 	}
 }

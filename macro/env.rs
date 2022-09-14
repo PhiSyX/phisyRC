@@ -101,7 +101,7 @@ impl EnvAnalyzer {
 					let struct_ident = &self.struct_input.ident;
 
 					return Ok(quote! {
-						#field_ident: #struct_ident::get_optional_var(#token_stream, None)?
+						#field_ident: #struct_ident::get_optional_var(#token_stream)?
 					});
 				}
 			}
@@ -110,11 +110,11 @@ impl EnvAnalyzer {
 		let struct_ident = &self.struct_input.ident;
 		if let Some(default) = maybe_lit {
 			Ok(quote! {
-				#field_ident: #struct_ident::get_default_var(#token_stream, None, #default)?
+				#field_ident: #struct_ident::get_default_var(#token_stream, #default)?
 			})
 		} else {
 			Ok(quote! {
-				#field_ident: #struct_ident::get_var(#token_stream, None)?
+				#field_ident: #struct_ident::get_var(#token_stream)?
 			})
 		}
 	}
@@ -140,10 +140,8 @@ impl EnvAnalyzer {
 		let struct_ident = &self.struct_input.ident;
 		let output = quote! {
 			impl EnvInterface for #struct_ident {
-				type Err = EnvError;
-
-				fn setup(filename: impl AsRef<::std::path::Path>) -> ::std::result::Result<Self, Self::Err> {
-					parser::EnvParser::file(filename)
+				fn setup(filename: impl AsRef<::std::path::Path>) -> Result<Self, EnvError> {
+					EnvParser::file(filename)
 						.expect("Impossible d'analyser le fichier d'environnement");
 					let config = Self { #(#fields,)* };
 					Ok(config)

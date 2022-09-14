@@ -185,6 +185,7 @@ Les variables d'environnement suivant sont acceptées dans l'application :
   - [x] Environnement de dev : `.env.local`
   - [ ] Environnement de test : `.env.test.local`
 
+
 ## A propos du code, de la technique
 
 1) Tout n'est pas parfait dans le code actuel. Le créateur en est conscient.

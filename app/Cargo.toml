@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license-file = "../LICENSE"
 publish = false
+default-run = "phisyrc"
 
 [[bin]]
 name = "phisyrc"

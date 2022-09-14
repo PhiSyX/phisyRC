@@ -1,0 +1,10 @@
+[package]
+name = "generate-readme"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+publish = false
+
+[[bin]]
+name = "generate-readme"
+path = "./generate.rs"

@@ -8,11 +8,7 @@ use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::SystemTime};
 use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt};
 use lang::stream::prelude::*;
-use tokio::{
-	io::{self},
-	net::TcpStream,
-	sync::RwLock,
-};
+use tokio::{io, net::TcpStream, sync::RwLock};
 use tokio_util::codec::LinesCodecError;
 
 use super::peer::{AtomicPeer, Peer};

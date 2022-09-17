@@ -11,6 +11,7 @@ name = "phisyrc"
 path = "./main.rs"
 
 [lib]
+name = "app"
 path = "./lib.rs"
 
 [dependencies]

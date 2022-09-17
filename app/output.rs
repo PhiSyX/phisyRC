@@ -2,12 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use core::fmt;
+use core::{fmt, result::Result as ResultResult};
 
-use env::EnvError;
-use gui::TypeGuiError;
+// ---- //
+// Type //
+// ---- //
 
-pub type AppResult<T> = Result<T, AppError>;
+pub type Result<T> = ResultResult<T, Error>;
 
 // ------------------------ //
 // Erreurs de l'application //
@@ -15,45 +16,42 @@ pub type AppResult<T> = Result<T, AppError>;
 
 #[derive(Debug)]
 #[allow(clippy::upper_case_acronyms)]
-pub enum AppError {
+pub enum Error {
 	IO(std::io::Error),
-
-	Env(EnvError),
-
-	Gui(TypeGuiError),
-
-	IRC(irc::IrcError),
+	Env(env::Error),
+	GUI(gui::Error),
+	IRC(irc::Error),
 }
 
 // -------------- //
 // Implémentation // -> Gestion des erreurs (`?`)
 // -------------- //
 
-impl From<std::io::Error> for AppError {
+impl From<std::io::Error> for Error {
 	fn from(err: std::io::Error) -> Self {
 		Self::IO(err)
 	}
 }
 
-impl From<EnvError> for AppError {
-	fn from(err: EnvError) -> Self {
+impl From<env::Error> for Error {
+	fn from(err: env::Error) -> Self {
 		Self::Env(err)
 	}
 }
 
-impl From<TypeGuiError> for AppError {
-	fn from(err: TypeGuiError) -> Self {
-		Self::Gui(err)
+impl From<gui::Error> for Error {
+	fn from(err: gui::Error) -> Self {
+		Self::GUI(err)
 	}
 }
 
-impl From<irc::IrcError> for AppError {
-	fn from(err: irc::IrcError) -> Self {
+impl From<irc::Error> for Error {
+	fn from(err: irc::Error) -> Self {
 		Self::IRC(err)
 	}
 }
 
-impl fmt::Display for AppError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
@@ -63,9 +61,9 @@ impl fmt::Display for AppError {
 					format!("IO: {io_err}")
 				}
 				| Self::Env(env_err) => {
-					format!("variables d'environnement: {env_err}")
+					format!("variable d'environnement: {env_err}")
 				}
-				| Self::Gui(gui_err) => {
+				| Self::GUI(gui_err) => {
 					format!("de l'Interface Utilisateur Graphique: {gui_err}")
 				}
 				| Self::IRC(irc_err) => {

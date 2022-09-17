@@ -10,7 +10,7 @@ mod parser;
 pub use self::export::*;
 
 pub mod app {
-	use super::{EnvError, EnvInterface, EnvParser};
+	use super::{Error as EnvError, EnvInterface, EnvParser};
 
 	// --------- //
 	// Structure //
@@ -22,9 +22,6 @@ pub mod app {
 	pub struct phisyrc_env {
 		#[var(key = "DEBUG", default = "*")]
 		pub debug_filter: String,
-
-		#[var(key = "GUI", default = "tauri")]
-		pub gui_to_use: String,
 
 		#[var(key = "APP_SECRET_KEY")]
 		pub app_secret_key: String,

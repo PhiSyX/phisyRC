@@ -4,11 +4,11 @@
 
 #![doc = include_str!("../README.md")]
 
-use phisyrc_app::{phisyrc_cli, phisyrc_env, App, AppResult};
+use app::{phisyrc_cli, phisyrc_env, App};
 
 #[phisyrc::setup(logger)]
-async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> AppResult<()> {
 	let app = App::new(cli_args, env_args)?;
+async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> app::Result<()> {
 
 	if let Err(err) = app.handle_cli_command().await {
 		panic!("{err}");

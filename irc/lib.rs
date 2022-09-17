@@ -6,15 +6,15 @@ mod arch;
 mod commands;
 pub mod config;
 mod daemon;
+mod export;
 mod macros;
 mod message;
 mod output;
 
 use std::path::Path;
 
-pub use self::{
-	arch::*, commands::*, daemon::*, macros::*, message::*, output::*,
-};
+pub(crate) use self::arch::*;
+pub use self::export::*;
 
 // --------- //
 // Structure //
@@ -27,7 +27,7 @@ pub struct Irc;
 // -------------- //
 
 impl Irc {
-	pub async fn run(config_file: impl AsRef<Path>) -> IrcResult<()> {
+	pub async fn run(config_file: impl AsRef<Path>) -> Result<()> {
 		logger::info!("Lancement de l'IRC...");
 
 		let config = fs::TOMLFileLoader::load(config_file)?;

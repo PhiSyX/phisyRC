@@ -7,13 +7,11 @@ mod export;
 mod output;
 mod ui;
 
-use std::io;
-
 use cli::app::{
 	Command, CommandClient, CommandMakePassword, CommandServer,
 	PasswordAlgorithm, SubCommandServer,
 };
-use gui::{TypeGui, GUI};
+use gui::GUI;
 use irc::{Irc, IrcDaemon};
 use tui::TUI;
 use web::WEB;
@@ -39,7 +37,7 @@ impl App {
 	pub fn new(
 		cli_args: phisyrc_cli,
 		env_args: phisyrc_env,
-	) -> AppResult<Self> {
+	) -> Result<Self> {
 		let global_config =
 			fs::TOMLFileLoader::<GlobalConfig>::load_with_next_key(
 				&cli_args.options.config,
@@ -53,7 +51,7 @@ impl App {
 	}
 
 	/// Gère les commandes de la CLI.
-	pub async fn handle_cli_command(&self) -> AppResult<()> {
+	pub async fn handle_cli_command(&self) -> Result<()> {
 		match self.cli.command.as_ref() {
 			| Some(Command::Client(client)) => {
 				self.handle_client_command(Some(client)).await
@@ -76,11 +74,9 @@ impl App {
 	async fn handle_client_command(
 		&self,
 		maybe_client_cli: Option<&CommandClient>,
-	) -> AppResult<()> {
-		let type_gui = self.env.gui_to_use.parse::<TypeGui>()?;
-
+	) -> Result<()> {
 		if maybe_client_cli.is_none() {
-			return Ok(self.launch(UI::Graphical(type_gui)).await?);
+			return self.launch(UI::Graphical).await;
 		}
 
 		let client_cli = maybe_client_cli.unwrap();
@@ -90,17 +86,17 @@ impl App {
 		} else if client_cli.options.web {
 			UI::Web
 		} else {
-			UI::Graphical(type_gui)
+			UI::Graphical
 		};
 
-		Ok(self.launch(ui).await?)
+		self.launch(ui).await
 	}
 
 	/// Commande `server`.
 	async fn handle_server_command(
 		&self,
 		server_cli: &CommandServer,
-	) -> AppResult<()> {
+	) -> Result<()> {
 		match server_cli.command.as_ref() {
 			| Some(cmd) => match cmd {
 				| SubCommandServer::Restart { .. } => {}
@@ -132,7 +128,7 @@ impl App {
 	fn handle_make_password_command(
 		&self,
 		password_cli: &CommandMakePassword,
-	) -> AppResult<()> {
+	) -> Result<()> {
 		let raw_password = &password_cli.flags.password;
 		let algo = &password_cli.options.algo;
 		let generated_password = match algo {
@@ -165,16 +161,16 @@ impl App {
 
 impl App {
 	/// Lance l'application en mode graphique ou textuel.
-	pub async fn launch(&self, ui: UI) -> io::Result<()> {
+	pub async fn launch(&self, ui: UI) -> Result<()> {
 		let client_cfg =
 			fs::TOMLFileLoader::<ClientConfig>::load_with_next_key(
 				&self.global_config.config_client,
 			)?;
 
 		match ui {
-			| UI::Graphical(gui) => GUI::launch(gui),
-			| UI::Textual => TUI::launch().await,
-			| UI::Web => WEB::launch(client_cfg.config_web).await,
+			| UI::Graphical => Ok(GUI::launch()?),
+			| UI::Textual => Ok(TUI::launch().await?),
+			| UI::Web => Ok(WEB::launch(client_cfg.config_web).await?),
 		}
 	}
 }

@@ -2,7 +2,4 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-pub use crate::{
-	error::Error, interface::Interface as EnvInterface,
-	parser::Parser as EnvParser,
-};
+pub use crate::error::Error;

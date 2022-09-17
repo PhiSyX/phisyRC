@@ -6,7 +6,7 @@ mod irc;
 
 use std::str::FromStr;
 
-use cucumber::WorldInit;
+use cucumber::World;
 
 use self::irc::IrcWorld;
 

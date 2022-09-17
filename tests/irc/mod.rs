@@ -4,17 +4,13 @@
 
 mod message;
 
-use std::convert::Infallible;
-
-use async_trait::async_trait;
-use cucumber::{World, WorldInit};
 use irc::{IrcMessage, IrcMessageError};
 
 // --------- //
 // Structure //
 // --------- //
 
-#[derive(Debug, WorldInit)]
+#[derive(Debug, cucumber::World)]
 pub struct IrcWorld {
 	current_message: Result<IrcMessage, IrcMessageError>,
 }
@@ -23,14 +19,10 @@ pub struct IrcWorld {
 // Implémentation // -> Interface
 // -------------- //
 
-#[async_trait(?Send)]
-impl World for IrcWorld {
-	type Error = Infallible;
-
-	async fn new() -> Result<Self, Self::Error> {
-		Ok(Self {
-			// Just for the test
+impl Default for IrcWorld {
+	fn default() -> Self {
+		Self {
 			current_message: Err(IrcMessageError::InputStream),
-		})
+		}
 	}
 }

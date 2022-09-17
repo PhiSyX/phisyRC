@@ -25,7 +25,6 @@ enum IrcMessageState {
 	InvalidCommand(IrcMessageCommandError),
 
 	EmptyMessage,
-	ParseError,
 
 	Valid,
 }

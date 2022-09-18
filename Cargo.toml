@@ -12,6 +12,7 @@ members = [
 	"irc",
 	"logger",
 	"macro",
+	"shared",
 	"tests",
 	"tools/readme",
 	"websocket",

@@ -16,11 +16,13 @@ path = "./lib.rs"
 
 [dependencies]
 cli = { path = "../cli", package = "phisyrcli" }
+database = { path = "../database", package = "phisyrc-database" }
 env = { path = "../env", package = "phisyrc-env" }
 fs = { path = "../fs", package = "phisyrc-fs" }
 irc = { path = "../irc", package = "phisyrc-irc" }
-phisyrc = { path = "../macro", package = "phisyrc-macro" }
 logger = { path = "../logger", package = "phisyrc-logger" }
+phisyrc = { path = "../macro", package = "phisyrc-macro" }
+shared ={ path = "../shared", package = "phisyrc-shared" }
 
 gui = { path = "ui/graphical", package = "phisyrc-gui" }
 tui = { path = "ui/textual", package = "phisyrc-tui" }

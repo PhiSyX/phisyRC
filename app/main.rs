@@ -6,9 +6,9 @@
 
 use app::{phisyrc_cli, phisyrc_env, App};
 
-#[phisyrc::setup(logger)]
-	let app = App::new(cli_args, env_args)?;
+#[phisyrc::setup(logger, database)]
 async fn main(cli_args: phisyrc_cli, env_args: phisyrc_env) -> app::Result<()> {
+	let app = App::new(cli_args, env_args, database?)?;
 
 	if let Err(err) = app.handle_cli_command().await {
 		panic!("{err}");

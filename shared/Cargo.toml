@@ -1,5 +1,5 @@
 [package]
-name = "phisyrc-database"
+name = "phisyrc-shared"
 version = "0.1.0"
 edition = "2021"
 license-file = "../LICENSE"
@@ -9,4 +9,3 @@ publish = false
 path = "./lib.rs"
 
 [dependencies]
-shared ={ path = "../shared", package = "phisyrc-shared" }

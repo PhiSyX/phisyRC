@@ -41,7 +41,7 @@ pub(super) enum SetupAnalyzerError<'a> {
 // -------------- //
 
 impl SetupAnalyzer {
-	const LIST_OF_ATTRIBUTES: [&'static str; 1] = ["logger"];
+	const LIST_OF_ATTRIBUTES: [&'static str; 2] = ["logger", "database"];
 	const TOTAL_ARGS_EXPECTED: usize = 2;
 
 	pub(super) fn new(
@@ -92,8 +92,11 @@ impl SetupAnalyzer {
 						.contains(&ident.to_string().as_str())
 					{
 						Ok(quote! {
-							let x = (&cli_args, &env_args);
-							with::#ident(x);
+							#[allow(unused_variables)]
+							let #ident = {
+								let args = (&cli_args, &env_args);
+								setup::#ident(args)
+							};
 						})
 					} else {
 						Err(SetupAnalyzerError::UnknownAttribute(
@@ -136,9 +139,10 @@ impl SetupAnalyzer {
 			#block
 		}
 
-		mod with {
+		mod setup {
 			use super::*;
 
+			use app::phisyrc_db;
 			use cli::app::ProcessEnv;
 
 			/// Configure et initialise le logger.
@@ -159,6 +163,11 @@ impl SetupAnalyzer {
 					.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
 
 				logger::trace!("Le logger a été initialisé.");
+			}
+
+			/// Configure et initialise une base de donnée.
+			pub(super) fn database(args: (&phisyrc_cli, &phisyrc_env)) -> app::Result<phisyrc_db> {
+				Ok(phisyrc_db::new()?)
 			}
 		}
 		})

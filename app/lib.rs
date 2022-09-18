@@ -4,7 +4,7 @@
 
 mod config;
 mod export;
-mod output;
+mod types;
 mod ui;
 
 use cli::app::{
@@ -26,6 +26,7 @@ use crate::{config::*, ui::*};
 pub struct App {
 	pub cli: phisyrc_cli,
 	pub env: phisyrc_env,
+	pub database: phisyrc_db,
 	pub global_config: GlobalConfig,
 }
 
@@ -37,6 +38,7 @@ impl App {
 	pub fn new(
 		cli_args: phisyrc_cli,
 		env_args: phisyrc_env,
+		database: phisyrc_db,
 	) -> Result<Self> {
 		let global_config =
 			fs::TOMLFileLoader::<GlobalConfig>::load_with_next_key(
@@ -46,6 +48,7 @@ impl App {
 		Ok(Self {
 			cli: cli_args,
 			env: env_args,
+			database,
 			global_config,
 		})
 	}

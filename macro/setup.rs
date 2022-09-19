@@ -28,11 +28,10 @@ pub(super) struct SetupAnalyzer {
 
 pub(super) enum SetupAnalyzerError<'a> {
 	IsNotMainFunction(Span),
-
 	FirstArgumentInvalid(Span),
 	SecondArgumentInvalid(Span),
 	TooManyArguments(Span, usize),
-
+	Unexpected(Span),
 	UnknownAttribute(Span, &'a syn::Ident),
 }
 
@@ -105,10 +104,9 @@ impl SetupAnalyzer {
 						))
 					}
 				}
-				| syn::Meta::List(_) => todo!("list"),
-				| syn::Meta::NameValue(_) => todo!("named_value"),
+				| _ => Err(SetupAnalyzerError::Unexpected(meta.span())),
 			},
-			| syn::NestedMeta::Lit(_) => todo!("lit"),
+			| _ => Err(SetupAnalyzerError::Unexpected(meta.span())),
 		});
 
 		let mut setup_by_attrs = Vec::with_capacity(maybe_attrs.len());
@@ -241,8 +239,15 @@ impl SetupAnalyzer {
 		let for_two_args_tokens = quote! {
 			use env::EnvInterface;
 
-			let #last_arg_pat = #last_arg_ty::setup(".env.local") // TODO(phisyx): à changer
-				.expect("Erreur lors de la récupération des variables d'environnements");
+			let #last_arg_pat = #last_arg_ty::setup(
+				if cfg!(debug_assertions) {
+					".env.local"
+				} else {
+					".env"
+				}
+			).expect(
+				"Erreur lors de la récupération des variables d'environnement"
+			);
 		};
 
 		for_one_arg_tokens.extend(for_two_args_tokens);
@@ -257,6 +262,7 @@ impl<'a> SetupAnalyzerError<'a> {
 			| Self::FirstArgumentInvalid(span)
 			| Self::SecondArgumentInvalid(span)
 			| Self::TooManyArguments(span, _)
+			| Self::Unexpected(span)
 			| Self::UnknownAttribute(span, _) => span,
 		}
 	}
@@ -303,6 +309,12 @@ impl fmt::Display for SetupAnalyzerError<'_> {
 						SetupAnalyzer::TOTAL_ARGS_EXPECTED,
 						len
 					)
+				}
+
+				| Self::Unexpected(_) => {
+					"seuls des identifiants sont attendus. \
+					 Un exemple valide: #[phisyrc::setup(ident1, ident2)]"
+						.to_owned()
 				}
 
 				| Self::UnknownAttribute(_, ident) => {

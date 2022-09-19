@@ -23,6 +23,7 @@ use crate::message::tags::builder::ParseTagsBuilder;
 #[derive(Debug)]
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
+#[derive(serde::Serialize)]
 pub struct IrcMessageTags(pub HashMap<String, String>);
 
 // ----------- //

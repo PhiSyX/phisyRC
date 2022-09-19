@@ -21,6 +21,8 @@ use self::{
 
 #[derive(Debug)]
 #[derive(PartialEq, Eq)]
+#[derive(serde::Serialize)]
+#[serde(untagged)]
 pub enum IrcMessageCommand {
 	/// Une commande numérique est dotée de 3 chiffres.
 	/// Cette commande est obligatoirement poursuivie par un paramètre.
@@ -36,6 +38,7 @@ pub enum IrcMessageCommand {
 	/// obligatoire.
 	Text {
 		/// La commande, par exemple: "PASS"
+		#[serde(rename = "name")]
 		command: String,
 
 		/// Les paramètres/arguments de la commande, par exemple:

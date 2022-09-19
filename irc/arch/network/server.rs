@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use core::fmt;
 use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt};
 use lang::stream::prelude::*;
+use shared::err;
 use tokio::{io, net::TcpStream, sync::RwLock};
 use tokio_util::codec::LinesCodecError;
 
@@ -95,13 +95,14 @@ pub struct ServerConfig {
 // Énumération //
 // ----------- //
 
-#[derive(Debug)]
-pub enum IrcServerError {
-	AddrIsAlreadyEstablished(SocketAddr),
-	IO(io::Error),
-	Listener(ListenerError),
-	ParseAddr(std::net::AddrParseError),
+err! {
+	| IO(io::Error) => "{}"
+	| AddrIsAlreadyEstablished(SocketAddr) => "Une connexion vers « {0} » est déjà établie."
+	| Listener(ListenerError) => "{}"
+	| ParseAddr(std::net::AddrParseError) => "{}"
 }
+
+pub type IrcServerError = Error;
 
 // -------------- //
 // Implémentation //
@@ -132,7 +133,7 @@ impl Server {
 	pub(crate) fn new(
 		network: AtomicNetwork,
 		listen: &IrcdListen,
-	) -> Result<Self, IrcServerError> {
+	) -> Result<Self> {
 		let config = ServerConfig::new(listen);
 		let socket = Socket::new(&config.user.ip, config.user.port)?;
 		let label = format!("{}:{}", config.user.ip, config.user.port);
@@ -147,7 +148,7 @@ impl Server {
 	}
 
 	/// Vérifie si une connexion vers une adresse est déjà établie.
-	pub(crate) fn ping_host(&self) -> Result<(), IrcServerError> {
+	pub(crate) fn ping_host(&self) -> Result<()> {
 		let addr = self.socket.addr;
 
 		logger::trace!(
@@ -164,16 +165,14 @@ impl Server {
 	}
 
 	/// Écoute sur la socket du serveur.
-	pub(crate) async fn try_establish_connection(
-		&self,
-	) -> Result<Listener, IrcServerError> {
+	pub(crate) async fn try_establish_connection(&self) -> Result<Listener> {
 		Ok(self.socket.listen().await?)
 	}
 
 	pub(crate) async fn accept(
 		&self,
 		listener: &Listener,
-	) -> Result<SocketStream, IrcServerError> {
+	) -> Result<SocketStream> {
 		Ok(self.socket.accept(listener).await?)
 	}
 
@@ -249,6 +248,7 @@ impl Server {
 			// Output
 			let output = IrcMessage::parse(input)
 				.map(move |msg| {
+					logger::debug!("JSON: {}", msg.json());
 					logger::debug!("Nouveau message entrant analysé:\n\t{:?}", &msg);
 					Self::handle_message(shared_entity1, msg)
 				});
@@ -334,7 +334,7 @@ impl Server {
 	async fn handle_message(
 		shared_entity: AtomicPeer,
 		message: IrcMessage,
-	) -> Result<Vec<IrcReplies>, IrcCommandNumeric> {
+	) -> core::result::Result<Vec<IrcReplies>, IrcCommandNumeric> {
 		let mut entity = shared_entity.lock().await;
 
 		if !entity.is_registered() {
@@ -465,45 +465,5 @@ impl ServerConfig {
 			port_encrypt: Server::PORT_ENCRYPT,
 			user: listen.to_owned(),
 		}
-	}
-}
-
-// -------------- //
-// Implémentation // -> Interface
-// -------------- //
-
-impl From<std::net::AddrParseError> for IrcServerError {
-	fn from(err: std::net::AddrParseError) -> Self {
-		Self::ParseAddr(err)
-	}
-}
-
-impl From<io::Error> for IrcServerError {
-	fn from(err: io::Error) -> Self {
-		Self::IO(err)
-	}
-}
-
-impl From<ListenerError> for IrcServerError {
-	fn from(err: ListenerError) -> Self {
-		Self::Listener(err)
-	}
-}
-
-impl fmt::Display for IrcServerError {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		write!(
-			f,
-			"{}",
-			match self {
-				| Self::AddrIsAlreadyEstablished(addr) => format!(
-					"Une connexion vers « {0} » est déjà établie.",
-					addr
-				),
-				| Self::IO(err) => err.to_string(),
-				| Self::Listener(err) => err.to_string(),
-				| Self::ParseAddr(err) => err.to_string(),
-			}
-		)
 	}
 }

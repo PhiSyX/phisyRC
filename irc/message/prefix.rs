@@ -25,6 +25,8 @@ pub(super) use self::{
 
 #[derive(Debug)]
 #[derive(PartialEq, Eq)]
+#[derive(serde::Serialize)]
+#[serde(untagged)]
 pub enum IrcMessagePrefix {
 	User {
 		nick: String,

@@ -18,6 +18,7 @@ use crate::{
 #[derive(Debug)]
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
+#[derive(serde::Serialize)]
 pub struct IrcMessageCommandParameters(pub Vec<String>);
 
 // -------------- //

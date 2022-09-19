@@ -3,4 +3,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 pub use crate::message::*; //? pour phisyrc-tests
-pub use crate::{daemon::*, output::*}; //? public api
+pub use crate::{daemon::*, types::*}; //? public api

@@ -9,12 +9,20 @@
 #[macro_export]
 macro_rules! err {
 	(
-		$(| $variant:ident ( $err:path ) => $reason:literal)*
+	$(
+		$(#[$attr:meta])*
+		| $variant:ident ( $err:path ) => $reason:literal
+	)*
 	) => {
+pub type Result<T> = core::result::Result<T, Error>;
+
 #[derive(Debug)]
 #[allow(clippy::upper_case_acronyms)]
 pub enum Error {
-	$($variant($err)),*
+	$(
+		$(#[$attr])*
+		$variant($err)
+	),*
 }
 
 $(
@@ -30,8 +38,7 @@ impl core::fmt::Display for Error {
 		let err = match self {
 			$( | Self::$variant(err) => format!($reason, err) ),*
 		};
-
-		write!(f, "Erreur {}", err)
+		write!(f, "{}", err)
 	}
 }
 	};

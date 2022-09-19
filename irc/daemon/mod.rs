@@ -5,7 +5,7 @@
 use std::path::Path;
 
 use super::Irc;
-use crate::output::Result;
+use crate::types::Result;
 
 // --------- //
 // Structure //

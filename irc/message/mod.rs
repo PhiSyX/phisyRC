@@ -19,6 +19,7 @@ pub use self::{codec::*, command::*, prefix::*, tags::*};
 // --------- //
 
 #[derive(Debug)]
+#[derive(serde::Serialize)]
 pub struct IrcMessage {
 	pub tags: IrcMessageTags,
 	pub prefix: Option<IrcMessagePrefix>,
@@ -97,6 +98,11 @@ impl IrcMessage {
 		let bytestream = ByteStream::new(raw);
 		let inputstream = InputStream::new(bytestream.chars());
 		Self::parse(inputstream)
+	}
+
+	#[cfg(feature = "json")]
+	pub fn json(&self) -> serde_json::Value {
+		serde_json::json!(self)
 	}
 }
 

@@ -9,7 +9,7 @@ mod daemon;
 mod export;
 mod macros;
 mod message;
-mod output;
+mod types;
 
 use std::path::Path;
 

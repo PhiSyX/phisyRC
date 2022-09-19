@@ -3,9 +3,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 use crate::{
-    arch::{AtomicPeer, AtomicServerConfig},
-    commands::{IrcClientCommand, IrcCommandNumeric, IrcReplies},
-    if_some_then_err,
+	arch::{AtomicPeer, AtomicServerConfig},
+	commands::{IrcClientCommand, IrcCommandNumeric, IrcReplies},
+	if_some_then_err,
 };
 
 // --------- //

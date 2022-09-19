@@ -14,7 +14,7 @@ use actix_web::{
 };
 use awc::Client;
 use lazy_static::lazy_static;
-use tera::Tera;
+use tera::Tera as Template;
 use url::Url;
 
 use self::config::ClientWebConfig;
@@ -24,13 +24,13 @@ use self::config::ClientWebConfig;
 // ------ //
 
 lazy_static! {
-	pub static ref VIEWS: Tera = {
-		let mut tera = match Tera::new("app/ui/web/views/**/*.html") {
+	pub static ref VIEWS: Template = {
+		let mut template = match Template::new("app/ui/web/views/**/*.html") {
 			| Ok(template) => template,
-			| Err(err) => panic!("Analyse des vues échouée: {}", err),
+			| Err(err) => panic!("Analyse des vues échouée: {err}"),
 		};
-		tera.autoescape_on(vec![".html"]);
-		tera
+		template.autoescape_on(vec![".html"]);
+		template
 	};
 }
 

@@ -10,7 +10,7 @@ mod parser;
 pub use self::export::*;
 
 pub mod app {
-	use super::{Error as EnvError, EnvInterface, EnvParser};
+	use super::{EnvInterface, EnvParser, Error as EnvError};
 
 	// --------- //
 	// Structure //

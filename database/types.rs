@@ -9,5 +9,5 @@ use shared::err;
 // ------------------- //
 
 err! {
-	| IO(std::io::Error) => "IO: {}"
+	| IO(std::io::Error) => "{}"
 }

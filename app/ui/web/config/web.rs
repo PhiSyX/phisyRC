@@ -75,6 +75,12 @@ impl ClientWebServerPortConfig {
 // Implémentation // -> Interface
 // -------------- //
 
+impl From<ClientWebServerPortConfig> for u16 {
+	fn from(port: ClientWebServerPortConfig) -> Self {
+		port.0
+	}
+}
+
 impl fmt::Display for ClientWebServerPortConfig {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(f, "{}", self.0)

@@ -19,7 +19,5 @@ pub async fn index_view(templates: web::Data<tera::Tera>) -> impl Responder {
 			.unwrap();
 	}
 
-	let view = maybe_view.unwrap();
-
-	view
+	maybe_view.unwrap()
 }

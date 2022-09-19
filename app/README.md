@@ -8,30 +8,44 @@ développée sous plusieurs formes :
 
 1. [ ] **T**extuel (**TUI**) pour le terminal.
 
-   - L'interface va sûrement être minimaliste. Nous allons probablement
-	 utiliser `tui-rs` pour créer cette interface.
+	L'interface va sûrement être minimaliste.
+	Nous n'avons pas encore décidé la technologie à utiliser pour construire une
+	interface textuelle.
+
+	Néanmoins voici quelques pistes:
+	- Créer notre propre application textuelle. Pas impossible, mais cela nous
+	  prendrait trop de temps pour le développer.
+	- Créer une application avec `tui-rs`.
 
 2. [ ] **G**raphique (**GUI**) pour le bureau.
 
    Nous n'avons pas encore décidé la technologie à utiliser pour construire une
-   interface graphique avec Rust. L'écosystème de Rust n'est sensiblement pas
-   encore assez développé pour créer de **belles** interfaces graphiques, du
-   moins comme le créateur les aiment !
+   interface graphique. L'écosystème de Rust n'est sensiblement pas encore
+   assez développé pour créer de **belles** interfaces graphiques, du moins
+   comme le créateur les aiment !
 
-	Quelques pistes:
-	- Créer notre propre GUI avec Rust. Pas impossible, mais cela nous
-      prendrait un temps monstre.
-    - Avec Rust, `tauri` peut correspondre à notre besoin, cependant la
-	  compilation du projet devient trop longue. Ce qui est un enfer
-	  lorsque nous développons avec.
-    - Créer une application de bureau avec `flutter`? Pourquoi pas.
-    - Créer une application de bureau avec `C#`? Pourquoi pas.
+	Néanmoins, voici quelques pistes avec Rust:
+	- Créer notre propre application graphique. Pas impossible, mais cela nous
+	  prendrait trop de temps pour le développer
+	- Créer une application graphique avec `druid`.
+    - Créer une application graphique avec `tauri`.
+	  Cela correspondrait parfaitement à nos besoins. Cependant la compilation
+	  du projet avec ce dernier devient trop importante. Ce qui constitue est
+	  un frein pour ce projet.
+
+	Autre pistes:
+    - Créer une application de bureau avec `dart` / `flutter`.
+    - Créer une application de bureau avec `C#`.
 
 3. [ ] **W**eb pour les navigateurs modernes.
 
-	Quelques pistes:
-    - Créer une application web avec `vue` ou `react`?
-    - Créer une application web avec `yew` (Rust w/ WASM)?
+	Nous n'avons pas encore décidé la technologie à utiliser pour construire une
+	interface web.
+
+	Néanmoins, voici quelques pistes:
+	- Créer une application web En JavaScript vanilla.
+    - Créer une application web avec `vue` / `react`.
+    - Créer une application web en utilisant `WASM`.
 
 4. [ ] **M**obile pour les appareils mobiles.
 

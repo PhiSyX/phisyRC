@@ -53,6 +53,9 @@ pub struct IrcdListen {
 
 	/// Le mot de passe du serveur IRC, s'il doit y en avoir un.
 	pub password: Option<IrcdPassword>,
+
+	/// Options WebSocket.
+	pub websocket: Option<IrcdConfigWebSocket>,
 }
 
 #[derive(Debug)]
@@ -88,6 +91,13 @@ pub enum IrcdPasswordAlgorithm {
 	Argon2,
 }
 
+#[derive(Debug)]
+#[derive(Clone)]
+#[derive(serde::Deserialize)]
+pub struct IrcdConfigWebSocket {
+	pub port: IrcdConfigPort,
+}
+
 // -------------- //
 // Implémentation //
 // -------------- //
@@ -100,6 +110,14 @@ impl IrcdListen {
 			"Devrait être une adresse socket valide à partir d'une \
 			chaîne de caractères 'ip:port'.",
 		)
+	}
+
+	/// Converti une chaîne de caractères sous la forme de "ip:port" en une
+	/// adresse socket.
+	pub fn ws_addr(&self) -> Option<SocketAddr> {
+		self.websocket
+			.as_ref()
+			.and_then(|cfg| format!("{}:{}", self.ip, cfg.port).parse().ok())
 	}
 }
 

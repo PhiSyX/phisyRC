@@ -10,10 +10,8 @@
 pub enum UI {
 	/// Interface utilisateur graphique
 	Graphical,
-
 	/// Interface utilisateur textuel
 	Textual,
-
 	/// Interface utilisateur pour le web
 	Web,
 }

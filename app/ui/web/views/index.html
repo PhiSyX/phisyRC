@@ -2,7 +2,115 @@
 {% block title %}Accueil | phisyRC{% endblock title %}
 
 {% block content %}
+	<h2>phisyRC & WebSocket</h2>
 
-<div> Hello World - phisyRC </div>
+	<input id="js-uri" type="text" size="30" value="ws://localhost:8667/">
+	<input id="js-connect" type="button" value="Connecte toi">
+	<br>
+	<output style="display: block; height: 200px; max-height: 200px; width:600px; max-width: 600px; background-color: #000; overflow-y: auto; font-size: 66%"></output>
+	<input id="js-input" type="text" size="30" value="hello world">
+	<button id="js-send" type="button">Envoie du message au salon #IRC</button>
 
+	<script>
+	const NICKNAME = "websocket_" + Math.floor((Math.random() * 1000) + 1).toString();
+	const CHANNEL_NAME = "#irc";
+
+	let /* mut */ ws; // <- WebSocket Object;
+	let $output = document.getElementsByTagName("output")[0];
+
+	document.getElementById("js-connect").addEventListener("click", connect_to_ws);
+	document.getElementById("js-send").addEventListener("click", send)
+
+	function escape_html(s) {
+		let escaped_map = {
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&#039;'
+		};
+		return s.replace(/[&<>"']/g, (m) => escaped_map[m]);
+	}
+
+	function connect_to_ws() {
+		const $input = document.getElementById("js-uri");
+		const ws_uri = $input.value;
+
+		ws = new WebSocket(ws_uri);
+
+		ws.addEventListener("open", handle_open_connection);
+		ws.addEventListener("close", handle_close_connection);
+		ws.addEventListener("message", handle_message);
+		ws.addEventListener("error", handle_error);
+	}
+
+	function handle_open_connection(evt) {
+		write("CONNECTED");
+		send_raw("USER websocket * * :WebSocket User");
+		send_raw(`NICK ${ NICKNAME }`);
+	}
+
+	function handle_close_connection(evt) {
+		write("DISCONNECTED");
+	}
+
+	function handle_message(evt) {
+		let raw = evt.data;
+		if (raw instanceof Blob) {
+			let file_reader = new FileReader();
+			file_reader.addEventListener("loadend", handle_binary_input);
+			file_reader.readAsText(raw);
+		} else {
+			process(raw);
+		}
+	}
+
+	function handle_binary_input(event) {
+		let file_reader = event.target;
+		let raw = file_reader.result;
+		process(raw);
+	}
+
+	function process(raw) {
+		if (!ws) {
+			write(`<span style="color: red;">ERROR:</span> CONNECTE TOI A LA WEBSOCKET D'ABORD`);
+			return;
+		}
+
+		if (raw.indexOf("PING") == 0) {
+			let pong_response = raw.replace("PING", "PONG");
+			write(`<span style="color: orange;">SENDING: ${ escape_html(pong_response) }</span>`);
+			ws.send(pong_response);
+		} else if (raw.indexOf("001") > -1) {
+			send_raw(`JOIN ${ CHANNEL_NAME }`);
+		}
+
+		write(`<span style="color: green;">RCVD: ${ escape_html(raw) }</span>`);
+	}
+
+	function handle_error(evt) {
+		console.error(evt);
+		write(`<span style="color: red;">ERROR:</span> ${ evt.data }`);
+	}
+
+	function send_raw(message) {
+		write(`SENT: ${ escape_html(message) }<br>`);
+		ws.send(`${message}\r\n`);
+	 }
+
+	function write(message) {
+		let $pre = document.createElement("p");
+		$pre.style.wordWrap = "break-word";
+		$pre.innerHTML = message;
+		$output.appendChild($pre);
+		$output.scrollTop = $output.scrollHeight;
+	}
+
+	function send() {
+		let $input = document.getElementById("js-input");
+		let text = $input.value;
+		send_raw(`PRIVMSG ${CHANNEL_NAME} :${text}`);
+		$input.value = "";
+	}
+	</script>
 {% endblock content %}

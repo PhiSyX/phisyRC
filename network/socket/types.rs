@@ -2,6 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-mod export;
+// ----------- //
+// Énumération //
+// ----------- //
 
-pub use self::export::*;
+#[derive(Debug)]
+#[derive(Copy, Clone)]
+#[derive(PartialEq, Eq)]
+pub enum SocketType {
+	Tcp,
+	Ws,
+}

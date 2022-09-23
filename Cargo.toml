@@ -8,12 +8,11 @@ members = [
 	"database",
 	"env",
 	"fs",
-	"http",
 	"irc",
 	"logger",
 	"macro",
+	"network",
 	"shared",
 	"tests",
 	"tools/readme",
-	"websocket",
 ]

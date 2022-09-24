@@ -9,3 +9,4 @@ publish = false
 path = "./lib.rs"
 
 [dependencies]
+serde = { version = "^1.0", features = ["derive"] }

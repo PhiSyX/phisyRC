@@ -4,5 +4,6 @@
 
 mod export;
 mod macros;
+pub mod serde;
 
 pub use self::export::*;

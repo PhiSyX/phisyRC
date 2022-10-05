@@ -132,7 +132,7 @@ impl<E: SessionInterface> SessionActor<E> {
 		loop {
 			tokio::select! {
 				Some(message) = self.message_event.recv() => {
-					self.socket.send(message.clone());
+					self.socket.send(message);
 				}
 				Some(parameters) = self.parameters_event.recv() => {
 					self.session.notice(parameters).await?;
@@ -140,7 +140,7 @@ impl<E: SessionInterface> SessionActor<E> {
 				message = self.socket.recv() => {
 				match message {
 					Some(Ok(message)) => {
-						self.session.text(message).await?
+						self.session.text(message).await?;
 					}
 					Some(Err(err)) => {
 						logger::error!("erreur de connexion: {err} ({})", self.id);

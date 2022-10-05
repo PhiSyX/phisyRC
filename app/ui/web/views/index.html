@@ -4,12 +4,14 @@
 {% block content %}
 	<h2>phisyRC & WebSocket</h2>
 
-	<input id="js-uri" type="text" size="30" value="ws://localhost:8667/">
-	<input id="js-connect" type="button" value="Connecte toi">
-	<br>
-	<output style="display: block; height: 200px; max-height: 200px; width:600px; max-width: 600px; background-color: #000; overflow-y: auto; font-size: 66%"></output>
-	<input id="js-input" type="text" size="30" value="hello world">
-	<button id="js-send" type="button">Envoie du message au salon #IRC</button>
+	<form id="js-form" method="post">
+		<input id="js-uri" type="text" size="30" value="ws://localhost:8667/">
+		<input id="js-connect" type="button" value="Connecte toi">
+		<br>
+		<output style="display: block; height: 200px; max-height: 200px; width:600px; max-width: 600px; background-color: #000; overflow-y: auto; font-size: 66%"></output>
+		<input id="js-input" type="text" size="30" value="hello world">
+		<button id="js-send" type="submit">Envoie du message au salon #IRC</button>
+	</form>
 
 	<script>
 	const NICKNAME = "websocket_" + Math.floor((Math.random() * 1000) + 1).toString();
@@ -20,6 +22,12 @@
 
 	document.getElementById("js-connect").addEventListener("click", connect_to_ws);
 	document.getElementById("js-send").addEventListener("click", send)
+	document.getElementById("js-form").addEventListener("submit", on_submit)
+
+	function on_submit(e) {
+		e.preventDefault();
+		send();
+	}
 
 	function escape_html(s) {
 		let escaped_map = {

@@ -4,7 +4,10 @@
 
 use core::fmt;
 
-use lang::{codepoints::CodePoint, stream::prelude::*};
+use lang::{
+	codepoints::CodePoint,
+	stream::{ByteStream, InputStream, InputStreamError, StreamIterator},
+};
 
 // ----------- //
 // Énumération //

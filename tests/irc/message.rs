@@ -55,7 +55,7 @@ impl FromStr for IrcMessageState {
 )]
 fn analyse_irc_line(w: &mut IrcWorld, line: String) {
 	let line = line.replace("\\r", "\r").replace("\\n", "\n");
-	let irc_msg = IrcMessage::parse_from_str(line);
+	let irc_msg = IrcMessage::parse_from(line);
 	w.current_message = irc_msg;
 }
 

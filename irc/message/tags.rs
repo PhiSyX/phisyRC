@@ -12,7 +12,7 @@ use std::{
 	str::{Chars, FromStr},
 };
 
-use lang::stream::prelude::*;
+use lang::stream::{InputStream, InputStreamError};
 
 use crate::message::tags::builder::ParseTagsBuilder;
 
@@ -140,6 +140,25 @@ impl FromStr for IrcMessageTagsError {
 		}
 
 		Err("non géré")
+	}
+}
+
+impl fmt::Display for IrcMessageTags {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let mut output = String::new();
+
+		if !self.is_empty() {
+			output.push('@');
+		}
+
+		self.iter().for_each(|(k, v)| {
+			output.push_str(k);
+			output.push('=');
+			output.push_str(v);
+			output.push(';');
+		});
+
+		write!(f, "{}", output)
 	}
 }
 

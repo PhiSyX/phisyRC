@@ -4,7 +4,11 @@
 
 use std::str::Chars;
 
-use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
+use lang::{
+	codepoints::CodePoint,
+	lexer::ParseState,
+	stream::{InputStream, StreamIterator},
+};
 
 use super::{
 	parameters::IrcMessageCommandParameters,

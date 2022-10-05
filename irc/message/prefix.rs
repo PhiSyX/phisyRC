@@ -11,7 +11,7 @@ mod user;
 use core::fmt;
 use std::str::{Chars, FromStr};
 
-use lang::stream::prelude::*;
+use lang::stream::{ByteStream, InputStream, InputStreamError};
 
 use self::builder::ParsePrefixBuilder;
 pub(super) use self::{
@@ -167,7 +167,7 @@ impl fmt::Display for IrcMessagePrefixError {
 					"erreur dans le flux d'entrée".to_owned(),
 				| Self::ParseError => "erreur d'analyse".to_owned(),
 				| Self::InvalidCharacter { found, .. } => format!(
-					"le caractère « {found} » est invalide pour un préfixe."
+					"le caractère « {found:?} » est invalide pour un préfixe."
 				),
 				| Self::InvalidNick(err) =>
 					format!("pseudonyme invalide: {err}"),
@@ -217,6 +217,25 @@ impl FromStr for IrcMessagePrefixError {
 		}
 
 		Err("Cas non géré")
+	}
+}
+
+impl fmt::Display for IrcMessagePrefix {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let mut output = String::new();
+
+		match self {
+			| Self::User { nick, user, host } => {
+				output.push_str(nick);
+				output.push('!');
+				output.push_str(user);
+				output.push('@');
+				output.push_str(host);
+			}
+			| Self::Server { origin } => output.push_str(origin),
+		};
+
+		write!(f, "{}", output)
 	}
 }
 

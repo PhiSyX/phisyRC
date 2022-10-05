@@ -4,7 +4,7 @@
 
 use std::{ops, str::Chars};
 
-use lang::stream::prelude::InputStream;
+use lang::stream::InputStream;
 
 use crate::{
 	message::command::builder::ParseCommandParametersBuilder,

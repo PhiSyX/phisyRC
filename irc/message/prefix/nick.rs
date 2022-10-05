@@ -4,7 +4,11 @@
 
 use core::fmt;
 
-use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
+use lang::{
+	codepoints::CodePoint,
+	lexer::ParseState,
+	stream::{ByteStream, InputStream, InputStreamError, StreamIterator},
+};
 
 // ----------- //
 // Énumération //

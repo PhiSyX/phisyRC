@@ -10,7 +10,10 @@ mod tags;
 use core::fmt;
 use std::str::Chars;
 
-use lang::{codepoints::CodePoint, stream::prelude::*};
+use lang::{
+	codepoints::CodePoint,
+	stream::{ByteStream, InputStream, InputStreamError, StreamIterator},
+};
 
 pub use self::{codec::*, command::*, prefix::*, tags::*};
 
@@ -21,6 +24,7 @@ pub use self::{codec::*, command::*, prefix::*, tags::*};
 #[derive(Debug)]
 #[derive(serde::Serialize)]
 pub struct IrcMessage {
+	pub raw: Option<String>,
 	pub tags: IrcMessageTags,
 	pub prefix: Option<IrcMessagePrefix>,
 	pub command: IrcMessageCommand,
@@ -86,18 +90,25 @@ impl IrcMessage {
 		let command = IrcMessageCommand::parse(&mut input)?;
 
 		Ok(Self {
+			raw: None,
 			tags,
 			prefix,
 			command,
 		})
 	}
 
-	pub fn parse_from_str(
-		raw: impl Into<String>,
+	pub fn parse_from(
+		raw: impl Into<ByteStream> + ToString,
 	) -> Result<Self, IrcMessageError> {
-		let bytestream = ByteStream::new(raw);
+		let raw_input = raw.to_string();
+		let bytestream = raw.into();
 		let inputstream = InputStream::new(bytestream.chars());
-		Self::parse(inputstream)
+		Self::parse(inputstream).map(|m| m.define_raw_msg(raw_input))
+	}
+
+	pub fn define_raw_msg(mut self, raw: String) -> Self {
+		self.raw.replace(raw);
+		self
 	}
 
 	#[cfg(feature = "json")]
@@ -147,5 +158,11 @@ impl fmt::Display for IrcMessageError {
 				| Self::InputStream => "erreur d'analyse".to_owned(),
 			}
 		)
+	}
+}
+
+impl fmt::Display for IrcMessage {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "{}", self.raw.clone().unwrap_or_default())
 	}
 }

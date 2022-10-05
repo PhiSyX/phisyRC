@@ -9,7 +9,7 @@ mod state;
 use core::fmt;
 use std::str::{Chars, FromStr};
 
-use lang::stream::prelude::*;
+use lang::stream::{InputStream, InputStreamError};
 
 use self::{
 	builder::ParseCommandBuilder, parameters::IrcMessageCommandParameters,

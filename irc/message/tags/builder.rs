@@ -4,7 +4,11 @@
 
 use std::{collections::HashMap, str::Chars};
 
-use lang::{codepoints::CodePoint, lexer::ParseState, stream::prelude::*};
+use lang::{
+	codepoints::CodePoint,
+	lexer::ParseState,
+	stream::{InputStream, StreamIterator},
+};
 
 use super::state::ParseTagsState;
 use crate::{IrcMessageTags, IrcMessageTagsError};

@@ -6,7 +6,7 @@ use std::{collections::HashMap, net::SocketAddr, sync::Arc, time::SystemTime};
 
 use chrono::{DateTime, Utc};
 use futures::{SinkExt, StreamExt};
-use lang::stream::prelude::*;
+use lang::stream::{ByteStream, InputStream};
 use shared::err;
 use tokio::{io, net::TcpStream, sync::RwLock};
 use tokio_util::codec::LinesCodecError;

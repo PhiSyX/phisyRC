@@ -1,18 +1,2 @@
 [workspace]
-members = [
-	"app",
-	"app/ui/graphical",
-	"app/ui/textual",
-	"app/ui/web",
-	"cli",
-	"database",
-	"env",
-	"fs",
-	"irc",
-	"logger",
-	"macro",
-	"network",
-	"shared",
-	"tests",
-	"tools/readme",
-]
+members = ["apps", "tools/readme"]

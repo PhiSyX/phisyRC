@@ -1,6 +1,7 @@
 .cargo/*
 !.cargo/*.example.toml
 
+.fleet/*
 .idea/*
 .vscode/*
 

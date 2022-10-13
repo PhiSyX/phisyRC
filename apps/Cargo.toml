@@ -5,9 +5,10 @@ authors.workspace = true
 edition.workspace = true
 license-file.workspace = true
 publish.workspace = true
+default-run = "phisyrc-server"
 
 [[bin]]
-name = "phisyrc-chat"
+name = "phisyrc-server"
 path = "./main.rs"
 
 [lib]
@@ -16,4 +17,9 @@ path = "./lib.rs"
 
 [dependencies]
 phisyrc.workspace = true
+cli.workspace = true
 tokio.workspace = true
+clap.workspace = true
+
+argon2 = { version = "^1.0", package = "rust-argon2" }
+dirs = "^4.0"

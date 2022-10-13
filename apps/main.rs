@@ -4,5 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+use app::App;
+
 #[phisyrc::setup]
-async fn main() {}
+async fn main(args: app::cli_app) {
+	let app = App::new(args);
+	if let Err(err) = app.handle_command() {
+		panic!("phisyRC: {err}")
+	}
+}

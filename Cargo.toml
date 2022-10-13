@@ -1,5 +1,5 @@
 [workspace]
-members = ["apps", "macro", "tools/readme"]
+members = ["apps", "core/cli", "macro", "tools/readme"]
 
 [workspace.package]
 version = "1.0.0"
@@ -10,5 +10,7 @@ publish = false
 
 [workspace.dependencies]
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
+cli = { path = "./core/cli", package = "phisyrc-cli" }
 
+clap = { version = "^4.0", features = ["derive", "env", "wrap_help"] }
 tokio = { version = "^1.21", features = ["macros", "rt-multi-thread"] }

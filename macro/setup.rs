@@ -42,14 +42,20 @@ pub(super) struct Analyzer {
 pub(super) enum Error<'a> {
 	/// La macro n'est pas appliquée sur la fonction principale `main`.
 	IsNotMainFunction(Span),
+	/// Le premier argument n'est pas valide.
+	FirstArgumentInvalid(Span),
 	/// La clause where est obligatoire lorsqu'un générique est défini.
 	MissingWhereClause(Span),
 	/// Trop d'arguments passés à la fonction principale.
 	TooManyArguments(usize, Span),
 	/// Le jeton n'est pas attendu.
 	Unexpected(Span),
+	/// L'attribut est manquant dans la liste des attributs supportés :
+	/// [Analyzer::SUPPORT_ATTRIBUTES]
+	UnknownAttribute(&'a syn::Ident, Span),
 }
 
+enum AsyncAttribute {
 	/// Pour l'utilisation de l'attribut tokio::main
 	Tokio,
 }
@@ -73,6 +79,7 @@ impl Analyzer {
 		let inputs = &self.input.sig.inputs;
 		let output = match inputs.len() {
 			| 0 => self.build_main_fn(|this| this.main_fn_with_zeroed_arg()),
+			| 1 => self.build_main_fn(|this| this.main_fn_with_one_arg()),
 			| n => return Err(Error::TooManyArguments(n, self.input.span())),
 		};
 
@@ -95,6 +102,7 @@ impl<'a> Error<'a> {
 // -------------- //
 
 impl Analyzer {
+	const SUPPORT_ATTRIBUTES: [&str; 0] = [];
 	const TOTAL_ARGUMENTS_EXPECTED: usize = 0;
 
 	/// Construit la fonction principale.
@@ -102,6 +110,35 @@ impl Analyzer {
 		&'a self,
 		setup_fn: fn(&'a Self) -> Result<'a, TokenStream2>,
 	) -> Result<'a, TokenStream2> {
+		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
+			| syn::NestedMeta::Meta(meta) => match meta {
+				| syn::Meta::Path(path) => {
+					let ident =
+						path.get_ident().expect("Devrait être un identifiant");
+					if Self::SUPPORT_ATTRIBUTES
+						.contains(&ident.to_string().as_str())
+					{
+						Ok(quote! {
+							#[allow(unused_variables)]
+							let #ident = {
+								let args = (&cli_args, &env_args);
+								setup::#ident(args)
+							};
+						})
+					} else {
+						Err(Error::UnknownAttribute(ident, meta.span()))
+					}
+				}
+				| _ => Err(Error::Unexpected(meta.span())),
+			},
+			| _ => Err(Error::Unexpected(meta.span())),
+		});
+
+		let mut setup_by_attrs = Vec::with_capacity(maybe_attrs.len());
+		for attr in maybe_attrs {
+			setup_by_attrs.push(attr?);
+		}
+
 		let fn_attrs = &self.input.attrs;
 		let maybe_asyncness = self.input.sig.asyncness;
 		let output_type = &self.input.sig.output;
@@ -123,6 +160,7 @@ impl Analyzer {
 			#async_tokens
 			#maybe_asyncness fn main() #output_type {
 				#setup
+				#(#setup_by_attrs)*
 				#block
 			}
 		})
@@ -191,15 +229,43 @@ impl Analyzer {
 	fn main_fn_with_zeroed_arg(&self) -> Result<TokenStream2> {
 		Ok(quote! {})
 	}
+
+	/// Utilisé lorsque la fonction principale compte un seul argument
+	///
+	/// NOTE(phisyx): Le premier argument est la CLI. La CLI DOIT toujours
+	/// contenir la fonction/méthode `arguments`.
+	fn main_fn_with_one_arg(&self) -> Result<TokenStream2> {
+		let inputs = &self.input.sig.inputs;
+
+		let first_argument = inputs
+			.first()
+			.filter(|argument| matches!(argument, FnArg::Typed(_)))
+			.and_then(|argument| match argument {
+				| FnArg::Typed(t) => Some((&t.pat, &t.ty)),
+				| FnArg::Receiver(_) => None,
+			});
+
+		if first_argument.is_none() {
+			return Err(Error::FirstArgumentInvalid(self.input.span()));
+		}
+
+		let (pat, ty) = first_argument.unwrap();
+
+		Ok(quote! {
+			let #pat = #ty::arguments(); // <- voir la NOTE ci-haut.
+		})
+	}
 }
 
 impl<'a> Error<'a> {
 	fn span(self) -> Span {
 		match self {
 			| Self::IsNotMainFunction(span)
+			| Self::FirstArgumentInvalid(span)
 			| Self::MissingWhereClause(span)
 			| Self::TooManyArguments(_, span)
 			| Self::Unexpected(span)
+			| Self::UnknownAttribute(_, span) => span,
 		}
 	}
 }
@@ -225,6 +291,10 @@ impl fmt::Display for Error<'_> {
 				 fn main() {}"
 					.to_owned()
 			}
+			| Self::FirstArgumentInvalid(_) => {
+				"le premier argument de la fonction principale est invalide."
+					.to_owned()
+			}
 			| Self::MissingWhereClause(_) => {
 				"Une clause `where` est attendue.".to_owned()
 			}
@@ -239,6 +309,9 @@ impl fmt::Display for Error<'_> {
 			| Self::Unexpected(_) => "seuls des identifiants sont attendus. \
 				 Un exemple valide: #[phisyrc::setup(ident1, ident2)]"
 				.to_owned(),
+			| Self::UnknownAttribute(attr_ident, _) => {
+				format!("l'attribut `{attr_ident}` n'est pas reconnu.")
+			}
 		};
 		write!(f, "#[phisyrc::setup]: {reason}")
 	}

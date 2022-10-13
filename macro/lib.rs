@@ -18,6 +18,14 @@ use self::setup::Analyzer as SetupAnalyzer;
 // 	#[phisyrc::setup]
 // 	fn main() { ... }
 // ```
+//
+// Premier paramètre
+// ```rust
+// 	#[derive(clap::Parser)] struct app_cli { ... }
+//
+// 	#[phisyrc::setup]
+// 	fn main(args: app_cli) { dbg!(&args); }
+// ```
 // ```
 #[proc_macro_attribute]
 pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {

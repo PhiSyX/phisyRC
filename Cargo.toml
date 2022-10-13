@@ -1,2 +1,14 @@
 [workspace]
-members = ["apps", "tools/readme"]
+members = ["apps", "macro", "tools/readme"]
+
+[workspace.package]
+version = "1.0.0"
+authors = ["Mike 'PhiSyX' S."]
+edition = "2021"
+license-file = "./LICENSE"
+publish = false
+
+[workspace.dependencies]
+phisyrc = { path = "./macro", package = "phisyrc-macro" }
+
+tokio = { version = "^1.21", features = ["macros", "rt-multi-thread"] }

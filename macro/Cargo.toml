@@ -1,19 +1,14 @@
 [package]
-name = "phisyrc-app"
+name = "phisyrc-macro"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license-file.workspace = true
 publish.workspace = true
 
-[[bin]]
-name = "phisyrc-chat"
-path = "./main.rs"
-
 [lib]
-name = "app"
 path = "./lib.rs"
+proc-macro = true
 
 [dependencies]
-phisyrc.workspace = true
-tokio.workspace = true
+syn = { version = "^1.0", features = ["full"] }

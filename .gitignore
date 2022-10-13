@@ -5,9 +5,7 @@
 .idea/*
 .vscode/*
 
-.phisyrc/*.rlib
-.phisyrc/*.dll
-.phisyrc/phisyrc*
+.phisyrc/*
 
 target/
 

@@ -4,12 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+/// Macro derivable `Env`
+mod env;
 /// Macro attribute `setup`
 mod setup;
 
 use proc_macro::TokenStream;
+use syn::__private::{quote::quote, ToTokens, TokenStream2};
 
-use self::setup::Analyzer as SetupAnalyzer;
+use self::{env::Analyzer as EnvAnalyzer, setup::Analyzer as SetupAnalyzer};
 
 /// Attribut `setup`. Déclare la fonction principale `main`.
 // Utilisation de l'attribut.
@@ -26,6 +29,15 @@ use self::setup::Analyzer as SetupAnalyzer;
 // 	#[phisyrc::setup]
 // 	fn main(args: app_cli) { dbg!(&args); }
 // ```
+//
+// Second paramètre
+//
+// ```rust
+// 	#[derive(clap::Parser)] struct app_cli { ... }
+// 	#[derive(Env)] struct app_env { ... }
+//
+// 	#[phisyrc::setup]
+// 	fn main(args: app_cli, env: app_env) { dbg!(&args, &env); }
 // ```
 #[proc_macro_attribute]
 pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {
@@ -36,4 +48,39 @@ pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {
 		| Ok(r) => r,
 		| Err(err) => err.compile_error(),
 	}
+}
+
+/// Derive `Env`. Déclare unne structure de variables d'environnement.
+//
+// ```rust
+// 	#[derive(phisyrc::Env)]
+// 	struct app_env {
+// 		#[var(key="PHISYRC_NICK", default="PhiSyX")]
+// 		nick: String,
+// 	}
+// ```
+#[proc_macro_derive(Env, attributes(var, default))]
+pub fn env_trait_derive(input: TokenStream) -> proc_macro::TokenStream {
+	let struct_input = syn::parse_macro_input!(input as syn::ItemStruct);
+	let analyzer = EnvAnalyzer::new(struct_input);
+	match analyzer.build() {
+		| Ok(ok) => ok,
+		| Err(err) => err.compile_error(),
+	}
+}
+
+pub(crate) fn field_name(field: &syn::Field) -> String {
+	token_to_string(&field.ident)
+}
+
+pub(crate) fn token_to_string<T>(tokens: &T) -> String
+where
+	T: ToTokens,
+{
+	quote!(#tokens).to_string()
+}
+
+pub(crate) fn token_upper(field: &syn::Field) -> TokenStream2 {
+	let field = field.ident.as_ref().unwrap().to_string().to_uppercase();
+	quote! { #field }
 }

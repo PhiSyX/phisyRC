@@ -44,6 +44,8 @@ pub(super) enum Error<'a> {
 	IsNotMainFunction(Span),
 	/// Le premier argument n'est pas valide.
 	FirstArgumentInvalid(Span),
+	/// Le second argument n'est pas valide.
+	SecondArgumentInvalid(Span),
 	/// La clause where est obligatoire lorsqu'un générique est défini.
 	MissingWhereClause(Span),
 	/// Trop d'arguments passés à la fonction principale.
@@ -80,6 +82,7 @@ impl Analyzer {
 		let output = match inputs.len() {
 			| 0 => self.build_main_fn(|this| this.main_fn_with_zeroed_arg()),
 			| 1 => self.build_main_fn(|this| this.main_fn_with_one_arg()),
+			| 2 => self.build_main_fn(|this| this.main_fn_with_two_args()),
 			| n => return Err(Error::TooManyArguments(n, self.input.span())),
 		};
 
@@ -103,7 +106,7 @@ impl<'a> Error<'a> {
 
 impl Analyzer {
 	const SUPPORT_ATTRIBUTES: [&str; 0] = [];
-	const TOTAL_ARGUMENTS_EXPECTED: usize = 0;
+	const TOTAL_ARGUMENTS_EXPECTED: usize = 2;
 
 	/// Construit la fonction principale.
 	fn build_main_fn<'a>(
@@ -255,6 +258,42 @@ impl Analyzer {
 			let #pat = #ty::arguments(); // <- voir la NOTE ci-haut.
 		})
 	}
+
+	/// Utilisé lorsque la fonction principale compte deux arguments
+	///
+	/// NOTE(phisyx): Le second argument a les variables d'environnement.
+	fn main_fn_with_two_args(&self) -> Result<TokenStream2> {
+		// CLI
+		let mut for_one_arg_tokens = self.main_fn_with_one_arg()?;
+
+		// Continue...
+
+		let inputs = &self.input.sig.inputs;
+
+		let (pat, ty) = inputs
+			.last()
+			.filter(|arg| matches!(arg, syn::FnArg::Typed(_)))
+			.and_then(|arg| match arg {
+				| syn::FnArg::Typed(typed) => Some((&typed.pat, &typed.ty)),
+				| _ => None,
+			})
+			.ok_or_else(|| Error::SecondArgumentInvalid(self.input.span()))?;
+
+		let for_two_args_tokens = quote! {
+			use env::Interface;
+
+			let #pat = #ty::setup(if cfg!(debug_assertions) {
+				".env.local"
+			} else {
+				".env"
+			}).expect(
+				"Erreur lors de la récupération des variables d'environnement"
+			);
+		};
+
+		for_one_arg_tokens.extend(for_two_args_tokens);
+		Ok(for_one_arg_tokens)
+	}
 }
 
 impl<'a> Error<'a> {
@@ -262,6 +301,7 @@ impl<'a> Error<'a> {
 		match self {
 			| Self::IsNotMainFunction(span)
 			| Self::FirstArgumentInvalid(span)
+			| Self::SecondArgumentInvalid(span)
 			| Self::MissingWhereClause(span)
 			| Self::TooManyArguments(_, span)
 			| Self::Unexpected(span)
@@ -293,6 +333,10 @@ impl fmt::Display for Error<'_> {
 			}
 			| Self::FirstArgumentInvalid(_) => {
 				"le premier argument de la fonction principale est invalide."
+					.to_owned()
+			}
+			| Self::SecondArgumentInvalid(_) => {
+				"le second argument de la fonction principale est invalide."
 					.to_owned()
 			}
 			| Self::MissingWhereClause(_) => {

@@ -5,11 +5,12 @@
  */
 
 mod cli;
+mod env;
 
 use core::fmt;
 
-pub use self::cli::cli_app;
 use self::cli::CommandMakePassword;
+pub use self::{cli::cli_app, env::env_app};
 
 // ---- //
 // Type //
@@ -23,6 +24,7 @@ type Result<T> = core::result::Result<T, Error>;
 
 pub struct App {
 	args: cli_app,
+	env: env_app,
 }
 
 // ----------- //
@@ -40,8 +42,8 @@ pub enum Error {
 // -------------- //
 
 impl App {
-	pub fn new(args: cli_app) -> Self {
-		Self { args }
+	pub fn new(args: cli_app, env: env_app) -> Self {
+		Self { args, env }
 	}
 
 	pub fn handle_command(&self) -> Result<()> {

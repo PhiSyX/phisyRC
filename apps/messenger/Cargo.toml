@@ -18,6 +18,8 @@ path = "./lib.rs"
 [dependencies]
 phisyrc.workspace = true
 cli.workspace = true
+env.workspace = true
+
 tokio.workspace = true
 clap.workspace = true
 

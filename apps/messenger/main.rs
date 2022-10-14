@@ -7,9 +7,10 @@
 use app::App;
 
 #[phisyrc::setup]
-async fn main(args: app::cli_app) {
-	let app = App::new(args);
+async fn main(args: app::cli_app, env: app::env_app) {
+	let app = App::new(args, env);
 	if let Err(err) = app.handle_command() {
 		panic!("phisyRC: {err}")
 	}
+	// app.run()
 }

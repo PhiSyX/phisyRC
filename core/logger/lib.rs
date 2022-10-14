@@ -7,11 +7,12 @@
 mod builder;
 mod echo;
 mod export;
+mod stdout;
+mod tui;
 
 use std::fmt::Arguments;
 
-use chrono::Local;
-use terminal::{format::Interface, layout::GridLayout};
+use terminal::format::Interface;
 
 pub use self::export::*;
 use self::{builder::Builder, echo::Echo};
@@ -31,7 +32,7 @@ pub struct Logger {
 	colorized: bool,
 	timestamp: bool,
 	level: Option<LevelFilter>,
-
+	ty: LoggerType,
 	format_fn: FormatFn,
 	filters_fn: Vec<FilterFn>,
 }
@@ -39,6 +40,20 @@ pub struct Logger {
 struct NopeLogger;
 
 const NO: NopeLogger = NopeLogger;
+
+// ----------- //
+// Énumération //
+// ----------- //
+
+#[derive(Debug)]
+#[derive(Default)]
+#[derive(Copy, Clone)]
+#[derive(PartialEq, Eq)]
+pub enum LoggerType {
+	#[default]
+	Stdout,
+	Tui,
+}
 
 // -------------- //
 // Implémentation //
@@ -94,34 +109,14 @@ impl Log for Logger {
 				| Level::Debug => "DEBUG".magenta(),
 				| Level::Trace => "TRACE".white(),
 			}
-			.to_string()
 		} else {
 			record.level().to_string()
 		};
 
-		let mut table = GridLayout::default()
-			// .define_max_width(80)
-			.without_boarder();
-
-		let mut echo = Echo {
-			time: if self.timestamp {
-				Some(Local::now())
-			} else {
-				None
-			},
-			delimiter: if self.colorized {
-				"|".red().to_string()
-			} else {
-				"|".to_string()
-			},
-			level,
-			record_level: record.level(),
-			table: &mut table,
-		};
-
-		let text = (self.format_fn)(&mut echo, message, record);
-
-		echo.log(text);
+		match self.ty {
+			| LoggerType::Stdout => self.echo(level, record, message),
+			| LoggerType::Tui => self.tui(level, record, message),
+		}
 	}
 
 	fn flush(&self) {}
@@ -135,4 +130,13 @@ impl Log for NopeLogger {
 	fn log(&self, _: &Record) {}
 
 	fn flush(&self) {}
+}
+
+impl<'a> From<&'a str> for LoggerType {
+	fn from(value: &'a str) -> Self {
+		match value {
+			| "tui" => Self::Tui,
+			| _ => Self::Stdout,
+		}
+	}
 }

@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+pub use tui::*;
+
 use crate::format::Interface;
 
 impl<S> Interface for S where S: AsRef<str> {}

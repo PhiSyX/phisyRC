@@ -13,3 +13,4 @@ path = "./lib.rs"
 lazy_static.workspace = true
 regex = "^1.6"
 unicode-width = "^0.1"
+tui.workspace = true

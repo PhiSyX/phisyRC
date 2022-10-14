@@ -8,14 +8,14 @@ use terminal::{
 	layout::{Alignment, Cell},
 };
 
-use crate::{FilterFn, FormatFn, Logger};
+use crate::{FilterFn, FormatFn, Logger, LoggerType};
 
 #[derive(Default)]
 pub struct Builder {
 	colorized: bool,
 	timestamp: bool,
 	level: Option<LevelFilter>,
-
+	ty: LoggerType,
 	format_fn: Option<FormatFn>,
 	filters_fn: Vec<FilterFn>,
 }
@@ -38,6 +38,11 @@ impl Builder {
 
 	pub fn with_timestamp(mut self) -> Self {
 		self.timestamp = true;
+		self
+	}
+
+	pub fn define_type(mut self, ty: LoggerType) -> Self {
+		self.ty = ty;
 		self
 	}
 
@@ -76,6 +81,7 @@ impl Builder {
 			}),
 			level: self.level,
 			filters_fn: self.filters_fn,
+			ty: self.ty,
 		}
 		.apply()
 	}

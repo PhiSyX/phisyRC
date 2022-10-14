@@ -14,8 +14,8 @@ use syn::{
 	},
 	punctuated::Punctuated,
 	spanned::Spanned,
-	FnArg, GenericParam, Pat, PatReference, PatTuple, Type, TypeParamBound,
-	TypeReference, TypeTuple, WherePredicate,
+	FnArg, GenericParam, Meta, Pat, PatReference, PatTuple, Path, Type,
+	TypeParamBound, TypeReference, TypeTuple, WherePredicate,
 };
 
 // ---- //
@@ -118,36 +118,14 @@ impl Analyzer {
 		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
 			| syn::NestedMeta::Meta(meta) => match meta {
 				| syn::Meta::Path(path) => {
-					let ident =
-						path.get_ident().expect("Devrait être un identifiant");
-					if !Self::SUPPORT_ATTRIBUTES
-						.contains(&ident.to_string().as_str())
-					{
-						return Err(Error::UnknownAttribute(
-							ident,
-							meta.span(),
-						));
-					}
-
-					let args_pat = {
-						let mut list = Punctuated::new();
-						if let Some(i) = self.get_first_arg_pat() {
-							list.push(i);
-						}
-						if let Some(i) = self.get_last_arg_pat() {
-							list.push(i);
-						}
-						PatTuple {
-							attrs: Default::default(),
-							paren_token: syn::token::Paren(meta.span()),
-							elems: list,
-						}
-					};
-					Ok(quote! {
-						#[allow(unused_variables)]
-						let #ident = setup::#ident(#args_pat);
-					})
+					self.handle_path(meta, path, Default::default())
 				}
+				| syn::Meta::NameValue(nv) => match &nv.lit {
+					| syn::Lit::Str(lit_str) => {
+						self.handle_path(meta, &nv.path, lit_str.value())
+					}
+					| _ => Err(Error::Unexpected(meta.span())),
+				},
 				| _ => Err(Error::Unexpected(meta.span())),
 			},
 			| _ => Err(Error::Unexpected(meta.span())),
@@ -200,8 +178,9 @@ impl Analyzer {
 				use super::*;
 
 				use cli::ProcessEnv;
+				use logger::LoggerType;
 
-				pub(super) fn logger(args: #params_ty) {
+				pub(super) fn logger(args: #params_ty, ty: impl Into<LoggerType>) {
 					let (cli_args, ..) = args;
 
 					let level_filter = match &cli_args.options.mode {
@@ -210,16 +189,55 @@ impl Analyzer {
 						| ProcessEnv::TEST => logger::LevelFilter::Trace,
 					};
 
-					logger::Logger::builder()
+					let mut l = logger::Logger::builder()
 						.with_color()
 						.with_level(level_filter)
-						.with_timestamp()
-						.build()
-						.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
+						.with_timestamp();
+
+					if LoggerType::Tui == ty.into() {
+						l = l.define_type(LoggerType::Tui);
+					}
+
+
+					l.build().expect(
+						"Le logger ne DOIT pas s'initialiser plusieurs fois."
+					);
 
 					logger::trace!("Le logger a été initialisé.");
 				}
 			}
+		})
+	}
+
+	fn handle_path<'a>(
+		&self,
+		meta: &'a Meta,
+		path: &'a Path,
+		arg_lit: String,
+	) -> Result<'a, TokenStream2> {
+		let ident = path.get_ident().expect("Devrait être un identifiant");
+		if !Self::SUPPORT_ATTRIBUTES.contains(&ident.to_string().as_str()) {
+			return Err(Error::UnknownAttribute(ident, meta.span()));
+		}
+
+		let args_pat = {
+			let mut list = Punctuated::new();
+			if let Some(i) = self.get_first_arg_pat() {
+				list.push(i);
+			}
+			if let Some(i) = self.get_last_arg_pat() {
+				list.push(i);
+			}
+			PatTuple {
+				attrs: Default::default(),
+				paren_token: syn::token::Paren(meta.span()),
+				elems: list,
+			}
+		};
+
+		Ok(quote! {
+			#[allow(unused_variables)]
+			let #ident = setup::#ident(#args_pat, #arg_lit);
 		})
 	}
 

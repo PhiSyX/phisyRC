@@ -1,0 +1,12 @@
+[package]
+name = "phisyrc-terminal"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]

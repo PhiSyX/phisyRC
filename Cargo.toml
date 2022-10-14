@@ -1,5 +1,12 @@
 [workspace]
-members = ["apps/messenger", "core/cli", "core/env", "macro", "tools/readme"]
+members = [
+	"apps/messenger",
+	"core/cli",
+	"core/env",
+	"core/terminal",
+	"macro",
+	"tools/readme",
+]
 
 [workspace.package]
 version = "1.0.0"
@@ -12,6 +19,7 @@ publish = false
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
 cli = { path = "./core/cli", package = "phisyrc-cli" }
 env = { path = "./core/env", package = "phisyrc-env" }
+terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
 
 clap = { version = "^4.0", features = ["derive", "env", "wrap_help"] }
 tokio = { version = "^1.21", features = ["macros", "rt-multi-thread"] }

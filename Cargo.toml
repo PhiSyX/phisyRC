@@ -22,4 +22,5 @@ env = { path = "./core/env", package = "phisyrc-env" }
 terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
 
 clap = { version = "^4.0", features = ["derive", "env", "wrap_help"] }
+lazy_static = "^1.4"
 tokio = { version = "^1.21", features = ["macros", "rt-multi-thread"] }

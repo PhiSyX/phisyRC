@@ -3,6 +3,7 @@ members = [
 	"apps/messenger",
 	"core/cli",
 	"core/env",
+	"core/logger",
 	"core/terminal",
 	"macro",
 	"tools/readme",
@@ -19,8 +20,10 @@ publish = false
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
 cli = { path = "./core/cli", package = "phisyrc-cli" }
 env = { path = "./core/env", package = "phisyrc-env" }
+logger = { path = "./core/logger", package = "phisyrc-logger" }
 terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
 
+chrono = "^0.4"
 clap = { version = "^4.0", features = ["derive", "env", "wrap_help"] }
 lazy_static = "^1.4"
 tokio = { version = "^1.21", features = ["macros", "rt-multi-thread"] }

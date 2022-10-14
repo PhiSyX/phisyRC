@@ -1,0 +1,17 @@
+[package]
+name = "phisyrc-logger"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]
+terminal.workspace = true
+
+chrono.workspace = true
+
+log = { version = "^0.4", features = ["std"] }

@@ -28,6 +28,9 @@ use self::{env::Analyzer as EnvAnalyzer, setup::Analyzer as SetupAnalyzer};
 //
 // 	#[phisyrc::setup]
 // 	fn main(args: app_cli) { dbg!(&args); }
+//
+// 	#[phisyrc::setup(logger)]
+// 	fn main(args: app_cli) { ... }
 // ```
 //
 // Second paramètre
@@ -50,7 +53,7 @@ pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {
 	}
 }
 
-/// Derive `Env`. Déclare unne structure de variables d'environnement.
+/// Derive `Env`. Déclare une structure de variables d'environnement.
 //
 // ```rust
 // 	#[derive(phisyrc::Env)]

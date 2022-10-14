@@ -6,7 +6,7 @@
 
 use app::App;
 
-#[phisyrc::setup]
+#[phisyrc::setup(logger)]
 async fn main(args: app::cli_app, env: app::env_app) {
 	let app = App::new(args, env);
 	if let Err(err) = app.handle_command() {

@@ -12,8 +12,10 @@ use syn::{
 		quote::{quote, quote_spanned},
 		Span, TokenStream2,
 	},
+	punctuated::Punctuated,
 	spanned::Spanned,
-	FnArg, GenericParam, TypeParamBound, WherePredicate,
+	FnArg, GenericParam, Pat, PatReference, PatTuple, Type, TypeParamBound,
+	TypeReference, TypeTuple, WherePredicate,
 };
 
 // ---- //
@@ -105,7 +107,7 @@ impl<'a> Error<'a> {
 // -------------- //
 
 impl Analyzer {
-	const SUPPORT_ATTRIBUTES: [&str; 0] = [];
+	const SUPPORT_ATTRIBUTES: [&str; 1] = ["logger"];
 	const TOTAL_ARGUMENTS_EXPECTED: usize = 2;
 
 	/// Construit la fonction principale.
@@ -118,19 +120,33 @@ impl Analyzer {
 				| syn::Meta::Path(path) => {
 					let ident =
 						path.get_ident().expect("Devrait être un identifiant");
-					if Self::SUPPORT_ATTRIBUTES
+					if !Self::SUPPORT_ATTRIBUTES
 						.contains(&ident.to_string().as_str())
 					{
-						Ok(quote! {
-							#[allow(unused_variables)]
-							let #ident = {
-								let args = (&cli_args, &env_args);
-								setup::#ident(args)
-							};
-						})
-					} else {
-						Err(Error::UnknownAttribute(ident, meta.span()))
+						return Err(Error::UnknownAttribute(
+							ident,
+							meta.span(),
+						));
 					}
+
+					let args_pat = {
+						let mut list = Punctuated::new();
+						if let Some(i) = self.get_first_arg_pat() {
+							list.push(i);
+						}
+						if let Some(i) = self.get_last_arg_pat() {
+							list.push(i);
+						}
+						PatTuple {
+							attrs: Default::default(),
+							paren_token: syn::token::Paren(meta.span()),
+							elems: list,
+						}
+					};
+					Ok(quote! {
+						#[allow(unused_variables)]
+						let #ident = setup::#ident(#args_pat);
+					})
 				}
 				| _ => Err(Error::Unexpected(meta.span())),
 			},
@@ -158,6 +174,19 @@ impl Analyzer {
 			quote! {}
 		};
 
+		let params_ty = {
+			let mut list = Punctuated::new();
+			if let Some(i) = self.get_first_arg_ty() {
+				list.push(i);
+			}
+			if let Some(i) = self.get_last_arg_ty() {
+				list.push(i);
+			}
+			TypeTuple {
+				paren_token: syn::token::Paren(self.input.span()),
+				elems: list,
+			}
+		};
 		Ok(quote! {
 			#(#fn_attrs)*
 			#async_tokens
@@ -166,6 +195,123 @@ impl Analyzer {
 				#(#setup_by_attrs)*
 				#block
 			}
+
+			mod setup {
+				use super::*;
+
+				use cli::ProcessEnv;
+
+				pub(super) fn logger(args: #params_ty) {
+					let (cli_args, ..) = args;
+
+					let level_filter = match &cli_args.options.mode {
+						| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
+						| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
+						| ProcessEnv::TEST => logger::LevelFilter::Trace,
+					};
+
+					logger::Logger::builder()
+						.with_color()
+						.with_level(level_filter)
+						.with_timestamp()
+						.build()
+						.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
+
+					logger::trace!("Le logger a été initialisé.");
+				}
+			}
+		})
+	}
+
+	fn get_first_arg_pat(&self) -> Option<Pat> {
+		let inputs = &self.input.sig.inputs;
+
+		if inputs.is_empty() {
+			return None;
+		}
+
+		let first_argument = inputs.first().and_then(|arg| match arg {
+			| FnArg::Typed(paty) => Some(paty.pat.clone()),
+			| FnArg::Receiver(_) => None,
+		});
+
+		first_argument.map(|boxed_pat| match &*boxed_pat {
+			| Pat::Ident(_) => Pat::Reference(PatReference {
+				attrs: Default::default(),
+				and_token: syn::token::And(boxed_pat.span()),
+				mutability: Default::default(),
+				pat: boxed_pat,
+			}),
+			| _ => unreachable!("#[phisyrc::setup]: get_first_arg_pat"),
+		})
+	}
+
+	fn get_first_arg_ty(&self) -> Option<Type> {
+		let inputs = &self.input.sig.inputs;
+
+		if inputs.is_empty() {
+			return None;
+		}
+
+		let first_argument = inputs.first().and_then(|arg| match arg {
+			| FnArg::Typed(paty) => Some(paty.ty.clone()),
+			| FnArg::Receiver(_) => None,
+		});
+
+		first_argument.map(|boxed_type| match &*boxed_type {
+			| Type::Path(_) => Type::Reference(TypeReference {
+				and_token: syn::token::And(boxed_type.span()),
+				lifetime: Default::default(),
+				mutability: Default::default(),
+				elem: boxed_type,
+			}),
+			| _ => unreachable!("#[phisyrc::setup]: get_first_arg_ty"),
+		})
+	}
+
+	fn get_last_arg_ty(&self) -> Option<Type> {
+		let inputs = &self.input.sig.inputs;
+
+		if inputs.len() != Self::TOTAL_ARGUMENTS_EXPECTED {
+			return None;
+		}
+
+		let last_argument = inputs.last().and_then(|arg| match arg {
+			| FnArg::Typed(paty) => Some(paty.ty.clone()),
+			| FnArg::Receiver(_) => None,
+		});
+
+		last_argument.map(|boxed_type| match &*boxed_type {
+			| Type::Path(_) => Type::Reference(TypeReference {
+				and_token: syn::token::And(boxed_type.span()),
+				lifetime: Default::default(),
+				mutability: Default::default(),
+				elem: boxed_type,
+			}),
+			| _ => unreachable!("#[phisyrc::setup]: get_last_arg_ty"),
+		})
+	}
+
+	fn get_last_arg_pat(&self) -> Option<Pat> {
+		let inputs = &self.input.sig.inputs;
+
+		if inputs.len() != Self::TOTAL_ARGUMENTS_EXPECTED {
+			return None;
+		}
+
+		let last_argument = inputs.last().and_then(|arg| match arg {
+			| FnArg::Typed(paty) => Some(paty.pat.clone()),
+			| FnArg::Receiver(_) => None,
+		});
+
+		last_argument.map(|boxed_pat| match &*boxed_pat {
+			| Pat::Ident(_) => Pat::Reference(PatReference {
+				attrs: Default::default(),
+				and_token: syn::token::And(boxed_pat.span()),
+				mutability: Default::default(),
+				pat: boxed_pat,
+			}),
+			| _ => unreachable!("#[phisyrc::setup]: get_last_arg_pat"),
 		})
 	}
 

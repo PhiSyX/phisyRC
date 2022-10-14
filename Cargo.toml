@@ -1,5 +1,5 @@
 [workspace]
-members = ["apps", "core/cli", "macro", "tools/readme"]
+members = ["apps/messenger", "core/cli", "macro", "tools/readme"]
 
 [workspace.package]
 version = "1.0.0"

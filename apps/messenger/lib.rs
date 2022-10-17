@@ -9,6 +9,8 @@ mod env;
 
 use core::fmt;
 
+use config::ServerConfig;
+
 use self::cli::CommandMakePassword;
 pub use self::{cli::cli_app, env::env_app};
 
@@ -16,7 +18,7 @@ pub use self::{cli::cli_app, env::env_app};
 // Type //
 // ---- //
 
-type Result<T> = core::result::Result<T, Error>;
+pub type Result<T> = core::result::Result<T, Error>;
 
 // --------- //
 // Structure //
@@ -33,6 +35,7 @@ pub struct App {
 
 #[derive(Debug)]
 pub enum Error {
+	IO(std::io::Error),
 	BadGenerationPassword,
 	SecretKeyNotFound,
 }
@@ -42,10 +45,12 @@ pub enum Error {
 // -------------- //
 
 impl App {
+	/// Initialise la structure de l'application.
 	pub fn new(args: cli_app, env: env_app) -> Self {
 		Self { args, env }
 	}
 
+	/// Gère les commandes de la CLI.
 	pub fn handle_command(&self) -> Result<()> {
 		match self.args.command.as_ref() {
 			| Some(cmd) => match cmd {
@@ -54,6 +59,15 @@ impl App {
 				}
 			},
 			| None => Ok(()),
+		}
+	}
+
+	/// Lance le serveur de Chat.
+	pub async fn launch(&self) -> Result<()> {
+		let cfg = config::prompt_or_load::<ServerConfig>("server.toml")?;
+
+		loop {
+			tokio::time::sleep(tokio::time::Duration::from_secs(1024)).await;
 		}
 	}
 }
@@ -112,14 +126,24 @@ impl From<argon2::Error> for Error {
 	}
 }
 
+impl From<std::io::Error> for Error {
+	fn from(err: std::io::Error) -> Self {
+		Self::IO(err)
+	}
+}
+
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let err_s = match self {
 			| Self::BadGenerationPassword => {
-				"impossible de générer le mot de passe."
+				"impossible de générer le mot de passe.".to_owned()
 			}
 			| Self::SecretKeyNotFound => {
 				"la variable d'environnement APP_SECRET_KEY n'existe pas."
+					.to_owned()
+			}
+			| Self::IO(e) => {
+				format!("IO: {e}")
 			}
 		};
 

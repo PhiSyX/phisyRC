@@ -1,0 +1,149 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+mod common;
+mod export;
+mod server;
+
+use std::{
+	fs, io,
+	path::{Path, PathBuf},
+};
+
+use terminal::io::{confirm, Prompt};
+
+pub use self::export::*;
+
+/// Séparateur de répertoire.
+///
+/// DS = DIRECTORY_SEPARATOR
+/// Suivant l'OS, le caractère peut être différent.
+const DS: &str = if cfg!(windows) { "\\" } else { "/" };
+
+/// Répertoire de configuration.
+///
+/// NOTE(phisyx): en mode debug, le répertoire se situe à la racine du projet:
+/// `./.phisyrc`.
+/// NOTE(phisyx): en mode release, le répertoire va dépendre de l'OS. La valeur
+/// que PEUT prendre ce répertoire est celle de la fonction de retour
+/// [dirs::config_dir].
+pub fn config_dir() -> PathBuf {
+	if cfg!(debug_assertions) {
+		let mut tmp = PathBuf::new();
+		tmp.push(format!(".{DS}.phisyrc{DS}"));
+		tmp
+	} else {
+		dirs::config_dir()
+			.map(|mut cfg| {
+				cfg.push(format!("phisyrc{DS}"));
+				cfg
+			})
+			.expect("devrait retourner le chemin du fichier de configuration")
+	}
+}
+
+/// Charge le fichier de configuration passé par argument et le dé-sérialise en
+/// son type [<T>] (passé par générique).
+pub fn load<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
+where
+	T: serde::de::DeserializeOwned,
+	T: serde::ser::Serialize,
+	T: Default + core::fmt::Debug,
+{
+	let cfg_dir = config_dir();
+
+	if !cfg_dir.exists() {
+		fs::create_dir(&cfg_dir)?;
+		logger::info!(
+			"Création du répertoire de configuration: '{}'",
+			cfg_dir.display()
+		);
+	}
+
+	let mut cfg_path = cfg_dir;
+	cfg_path.push(path);
+
+	if !cfg_path.exists() {
+		let s = toml::to_string(&T::default())
+			.expect("devrait pouvoir sérialiser la structure");
+		fs::write(&cfg_path, &s)?;
+		logger::info!(
+			"Création du fichier de configuration '{}' avec les valeurs par \
+			défaut de la structure '{}'",
+			cfg_path.display(),
+			core::any::type_name::<T>()
+		);
+	}
+
+	let content = fs::read_to_string(&cfg_path)?;
+	let obj = toml::from_str(&content)?;
+	logger::trace!(
+		"Fichier de configuration '{}' dé-sérialisé en type '{}' avec succès.",
+		cfg_path.display(),
+		core::any::type_name::<T>()
+	);
+	logger::debug!("{:?}", &obj);
+	Ok(obj)
+}
+
+pub fn prompt_or_load<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
+where
+	T: serde::de::DeserializeOwned,
+	T: serde::ser::Serialize,
+	T: Default + Prompt + core::fmt::Debug,
+{
+	let cfg_dir = config_dir();
+
+	if !cfg_dir.exists() {
+		fs::create_dir(&cfg_dir)?;
+		logger::info!(
+			"Création du répertoire de configuration: '{}'",
+			cfg_dir.display()
+		);
+	}
+
+	let mut cfg_path = cfg_dir;
+	cfg_path.push(path);
+
+	if !cfg_path.exists() {
+		println!("La configuration du serveur est manquante...");
+		println!();
+
+		let choice = confirm("Voulez-vous créer la configuration du serveur?");
+		let s = if choice {
+			println!("Configuration interactive...");
+			toml::to_string(&T::prompt())
+		} else if confirm(
+			"Voulez-vous utiliser la configuration du serveur par défaut?",
+		) {
+			toml::to_string(&T::default())
+		} else {
+			return Err(io::Error::new(
+				io::ErrorKind::Interrupted,
+				"tant pis...",
+			));
+		}
+		.expect("devrait pouvoir sérialiser la structure");
+
+		fs::write(&cfg_path, &s)?;
+		logger::info!(
+			"Création du fichier de configuration '{}' avec les valeurs par \
+			défaut de la structure '{}'",
+			cfg_path.display(),
+			core::any::type_name::<T>()
+		);
+	}
+
+	let content = fs::read_to_string(&cfg_path)?;
+	let obj = toml::from_str(&content)?;
+	logger::trace!(
+		"Fichier de configuration '{}' dé-sérialisé en type '{}' avec succès.",
+		cfg_path.display(),
+		core::any::type_name::<T>()
+	);
+	logger::debug!("{:?}", &obj);
+	Ok(obj)
+}

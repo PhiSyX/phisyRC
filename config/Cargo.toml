@@ -1,5 +1,5 @@
 [package]
-name = "phisyrc-terminal"
+name = "phisyrc-config"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -10,7 +10,8 @@ publish.workspace = true
 path = "./lib.rs"
 
 [dependencies]
-lazy_static = "^1.4"
-regex = "^1.6"
-unicode-width = "^0.1"
-tui = "^0.19"
+logger.workspace = true
+terminal.workspace = true
+serde.workspace = true
+dirs = "^4.0"
+toml = "^0.5"

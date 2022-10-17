@@ -60,9 +60,10 @@ serveur de Chat.
 
 ## Options
 
-| OPTION            | DESCRIPTION                         | TYPE     | DEFAULT                |
-| ----------------- | ----------------------------------- | -------- | ---------------------- |
-| `-c` / `--config` | Fichier de configuration du serveur | `string` | `$phisyrc`/server.toml |
+| OPTION            | DESCRIPTION                         | TYPE         | DEFAULT                   |
+| ----------------- | ----------------------------------- | ------------ | ------------------------- |
+| `-c` / `--config` | Fichier de configuration du serveur | `string`     | `$phisyrc`/server.toml    |
+| `--mode`          | Mode                                | `ProcessEnv` | `ProcessEnv::DEVELOPMENT` |
 
 La valeur de `$phisyrc` dépend de l'OS.
 

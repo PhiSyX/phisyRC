@@ -17,6 +17,8 @@ use cli::{EmptyCommand, EmptyFlags, ProcessEnv, CLI, PROJECT_NAME};
 #[allow(non_camel_case_types)]
 type CliApp = CLI<EmptyFlags, Options, Command>;
 
+pub type CommandConfig = CLI<EmptyFlags, CommandConfigOptions, EmptyCommand>;
+
 pub type CommandMakePassword =
 	CLI<CommandMakePasswordFlags, CommandMakePasswordOptions, EmptyCommand>;
 
@@ -67,7 +69,18 @@ pub struct CommandMakePasswordFlags {
 }
 
 #[derive(Debug)]
-#[derive(clap::Parser)]
+#[derive(Parser)]
+pub struct CommandConfigOptions {
+	/// Supprimer la configuration du serveur.
+	#[clap(long, default_value = "false", conflicts_with = "show")]
+	pub delete: bool,
+	/// Afficher la configuration du serveur.
+	#[clap(long, default_value = "true", conflicts_with = "delete")]
+	pub show: bool,
+}
+
+#[derive(Debug)]
+#[derive(Parser)]
 pub struct CommandMakePasswordOptions {
 	/// Algorithme à utiliser pour hacher le mot de passe.
 	#[clap(value_enum)]
@@ -85,6 +98,8 @@ pub struct CommandMakePasswordOptions {
 #[derive(Debug)]
 #[derive(Parser)]
 pub enum Command {
+	/// Accès aux options de la commandes `config`.
+	Config(CommandConfig),
 	/// Génération d'un mot de passe avec un algorithme de hachage.
 	#[clap(name = "make:password")]
 	MakePassword(CommandMakePassword),

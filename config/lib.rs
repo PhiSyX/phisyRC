@@ -89,7 +89,11 @@ where
 	Ok(obj)
 }
 
-pub fn prompt_or_load<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
+/// Charge le fichier de configuration passé par argument et le dé-sérialise en
+/// son type [<T>] (passé par générique) ou demande à l'utilisateur de générer
+/// une nouveau fichier de configuration de manière interactive ou utiliser
+/// la configuration par défaut.
+pub fn load_or_prompt<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
 where
 	T: serde::de::DeserializeOwned,
 	T: serde::ser::Serialize,
@@ -146,4 +150,19 @@ where
 	);
 	logger::debug!("{:?}", &obj);
 	Ok(obj)
+}
+
+pub fn delete(path: impl AsRef<Path>) -> io::Result<()> {
+	let mut cfg = config_dir();
+	cfg.push(path);
+
+	if cfg.exists() {
+		logger::info!(
+			"Suppression du fichier de configuration '{}'.",
+			cfg.display(),
+		);
+		return fs::remove_file(cfg);
+	}
+
+	Ok(())
 }

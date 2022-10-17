@@ -10,7 +10,10 @@ use app::App;
 async fn main(args: app::cli_app, env: app::env_app) -> app::Result<()> {
 	let app = App::new(args, env);
 	if let Err(err) = app.handle_command() {
-		panic!("phisyRC: {err}")
+		match err {
+			| app::Error::EXIT_SUCCESS => std::process::exit(0),
+			| _ => panic!("phisyRC: {err}"),
+		}
 	}
 	app.launch().await
 }

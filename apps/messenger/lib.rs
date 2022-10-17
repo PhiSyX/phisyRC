@@ -14,6 +14,12 @@ use config::ServerConfig;
 use self::cli::CommandMakePassword;
 pub use self::{cli::cli_app, env::env_app};
 
+// --------- //
+// Constante //
+// --------- //
+
+const CONFIG_FILENAME: &str = "server.toml";
+
 // ---- //
 // Type //
 // ---- //
@@ -34,10 +40,12 @@ pub struct App {
 // ----------- //
 
 #[derive(Debug)]
+#[allow(non_camel_case_types)]
 pub enum Error {
 	IO(std::io::Error),
 	BadGenerationPassword,
 	SecretKeyNotFound,
+	EXIT_SUCCESS,
 }
 
 // -------------- //
@@ -57,6 +65,17 @@ impl App {
 				| cli::Command::MakePassword(make_password) => {
 					self.handle_make_password_command(make_password)
 				}
+				| cli::Command::Config(config_cli) => {
+					if config_cli.options.delete {
+						config::delete(CONFIG_FILENAME)?;
+					} else if config_cli.options.show {
+						let cfg =
+							config::load::<ServerConfig>(CONFIG_FILENAME)?;
+						println!("{cfg:#?}");
+					}
+
+					Err(Error::EXIT_SUCCESS)
+				}
 			},
 			| None => Ok(()),
 		}
@@ -64,7 +83,7 @@ impl App {
 
 	/// Lance le serveur de Chat.
 	pub async fn launch(&self) -> Result<()> {
-		let cfg = config::prompt_or_load::<ServerConfig>("server.toml")?;
+		let cfg = config::load_or_prompt::<ServerConfig>(CONFIG_FILENAME)?;
 
 		loop {
 			tokio::time::sleep(tokio::time::Duration::from_secs(1024)).await;
@@ -145,6 +164,7 @@ impl fmt::Display for Error {
 			| Self::IO(e) => {
 				format!("IO: {e}")
 			}
+			| Self::EXIT_SUCCESS => "exit success".to_owned(),
 		};
 
 		write!(f, "{err_s}")

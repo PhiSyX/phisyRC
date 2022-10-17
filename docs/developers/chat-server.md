@@ -44,9 +44,19 @@ serveur de Chat.
 
 | COMMAND            | DESCRIPTION                                          |
 | ------------------ | ---------------------------------------------------- |
-| 1. `make:password` | Génère un mot de passe avec un algorithme de hachage |
+| 1. `config`        | Gérer la configuration serveur                       |
+| 2. `make:password` | Génère un mot de passe avec un algorithme de hachage |
 
-1. Commande `make:password`:
+1. Commande `config`
+
+   La commande `config` permet de gérer la configuration du serveur.
+
+   | OPTION     | DESCRIPTION                                    | TYPE   | DEFAULT |
+   | ---------- | ---------------------------------------------- | ------ | ------- |
+   | `--delete` | Supprime le fichier de configuration           | `bool` | `false` |
+   | `--show`   | Affiche le contenu du fichier de configuration | `bool` | `true`  |
+
+2. Commande `make:password`:
 
    La commande prend un argument obligatoire, qui est le mot de passe à\
    encoder. Le mot de passe est encodé en fonction de la valeur de la\

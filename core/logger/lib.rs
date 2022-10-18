@@ -7,39 +7,30 @@
 mod builder;
 mod echo;
 mod export;
-mod stdout;
-mod tui;
+pub mod stdout;
+pub mod tui;
 
-use std::fmt::Arguments;
-
-use terminal::format::Interface;
+use std::str::FromStr;
 
 pub use self::export::*;
-use self::{builder::Builder, echo::Echo};
 
 // ---- //
 // Type //
 // ---- //
 
-type FormatFn = fn(&mut Echo, &Arguments, &Record) -> String;
-type FilterFn = fn(&Metadata) -> bool;
+pub(crate) type FilterFn = fn(&Metadata) -> bool;
+
+// --------- //
+// Constante //
+// --------- //
+
+pub(crate) const NO: NopeLogger = NopeLogger;
 
 // --------- //
 // Structure //
 // --------- //
 
-pub struct Logger {
-	colorized: bool,
-	timestamp: bool,
-	level: Option<LevelFilter>,
-	ty: LoggerType,
-	format_fn: FormatFn,
-	filters_fn: Vec<FilterFn>,
-}
-
-struct NopeLogger;
-
-const NO: NopeLogger = NopeLogger;
+pub(crate) struct NopeLogger;
 
 // ----------- //
 // Énumération //
@@ -56,70 +47,24 @@ pub enum LoggerType {
 }
 
 // -------------- //
-// Implémentation //
+// Implémentation // -> Interface
 // -------------- //
 
-impl Logger {
-	pub fn builder() -> Builder {
-		Builder::default()
-	}
+impl FromStr for LoggerType {
+	type Err = ();
 
-	fn apply(self) -> Result<(), SetLoggerError> {
-		let level = self.level.unwrap_or(LevelFilter::Off);
-		set_max_level(level);
-		if LevelFilter::Off == max_level() {
-			set_logger(&NO)
-		} else {
-			set_boxed_logger(Box::new(self))
-		}
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			| "tui" => Self::Tui,
+			| _ => Self::Stdout,
+		})
 	}
 }
 
-// -------------- //
-// Implémentation // - Interface
-// -------------- //
-
-impl Log for Logger {
-	/// On ne veut pas afficher les logs si le niveau est à
-	/// [LevelFilter::Off].
-	/// Des conditions utilisateurs peuvent être utilisées pour
-	/// filtrer les logs.
-	fn enabled(&self, metadata: &Metadata) -> bool {
-		metadata.level() != LevelFilter::Off
-			&& self.filters_fn.iter().all(|boxed_fn| boxed_fn(metadata))
+impl<'a> From<&'a str> for LoggerType {
+	fn from(s: &'a str) -> Self {
+		s.parse().unwrap_or_default()
 	}
-
-	/// Affiche le log.
-	fn log(&self, record: &Record) {
-		if !self.enabled(record.metadata()) {
-			return;
-		}
-
-		let message = record.args();
-		if message.to_string().trim().is_empty() {
-			println!();
-			return;
-		}
-
-		let level = if self.colorized {
-			match record.level() {
-				| Level::Error => "ERROR".red(),
-				| Level::Warn => " WARN".yellow(),
-				| Level::Info => " INFO".blue(),
-				| Level::Debug => "DEBUG".magenta(),
-				| Level::Trace => "TRACE".white(),
-			}
-		} else {
-			record.level().to_string()
-		};
-
-		match self.ty {
-			| LoggerType::Stdout => self.echo(level, record, message),
-			| LoggerType::Tui => self.tui(level, record, message),
-		}
-	}
-
-	fn flush(&self) {}
 }
 
 impl Log for NopeLogger {
@@ -130,13 +75,4 @@ impl Log for NopeLogger {
 	fn log(&self, _: &Record) {}
 
 	fn flush(&self) {}
-}
-
-impl<'a> From<&'a str> for LoggerType {
-	fn from(value: &'a str) -> Self {
-		match value {
-			| "tui" => Self::Tui,
-			| _ => Self::Stdout,
-		}
-	}
 }

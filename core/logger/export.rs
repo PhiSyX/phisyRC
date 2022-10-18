@@ -5,3 +5,5 @@
  */
 
 pub use log::*;
+
+pub use crate::echo::{LoggerReader, LoggerWriter};

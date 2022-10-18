@@ -10,6 +10,7 @@ mod env;
 use core::fmt;
 
 use config::ServerConfig;
+use tokio::sync::mpsc;
 
 use self::cli::CommandMakePassword;
 pub use self::{cli::cli_app, env::env_app};
@@ -18,11 +19,15 @@ pub use self::{cli::cli_app, env::env_app};
 // Constante //
 // --------- //
 
+/// Nom du fichier de configuration du serveur.
 const CONFIG_FILENAME: &str = "server.toml";
 
 // ---- //
 // Type //
 // ---- //
+
+pub type AppContextWriter = mpsc::Sender<AppContext>;
+pub type AppContextReader = mpsc::Receiver<AppContext>;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -38,6 +43,11 @@ pub struct App {
 // ----------- //
 // Énumération //
 // ----------- //
+
+#[derive(Debug)]
+pub enum AppContext {
+	Quit,
+}
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
@@ -82,11 +92,13 @@ impl App {
 	}
 
 	/// Lance le serveur de Chat.
-	pub async fn launch(&self) -> Result<()> {
-		let cfg = config::load_or_prompt::<ServerConfig>(CONFIG_FILENAME)?;
+	pub async fn launch(self) -> Result<()> {
+		let _cfg = config::load_or_prompt::<ServerConfig>(CONFIG_FILENAME)?;
 
+		// Code pour le fun
 		loop {
-			tokio::time::sleep(tokio::time::Duration::from_secs(1024)).await;
+			tokio::time::sleep(tokio::time::Duration::from_millis(64)).await;
+			logger::info!("test");
 		}
 	}
 }
@@ -138,6 +150,12 @@ impl App {
 // -------------- //
 // Implémentation // -> Interface
 // -------------- //
+
+impl terminal::EventLoop for AppContext {
+	fn quit() -> Self {
+		Self::Quit
+	}
+}
 
 impl From<argon2::Error> for Error {
 	fn from(_: argon2::Error) -> Self {

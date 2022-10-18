@@ -13,5 +13,8 @@ path = "./lib.rs"
 terminal.workspace = true
 
 chrono.workspace = true
+futures.workspace = true
+tokio.workspace = true
 
+async-trait = "^0.1"
 log = { version = "^0.4", features = ["std"] }

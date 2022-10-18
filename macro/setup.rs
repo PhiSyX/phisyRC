@@ -14,7 +14,7 @@ use syn::{
 	},
 	punctuated::Punctuated,
 	spanned::Spanned,
-	FnArg, GenericParam, Meta, Pat, PatReference, PatTuple, Path, Type,
+	FnArg, GenericParam, Ident, Meta, Pat, PatReference, PatTuple, Path, Type,
 	TypeParamBound, TypeReference, TypeTuple, WherePredicate,
 };
 
@@ -139,7 +139,7 @@ impl Analyzer {
 		let fn_attrs = &self.input.attrs;
 		let maybe_asyncness = self.input.sig.asyncness;
 		let output_type = &self.input.sig.output;
-		let block = &self.input.block;
+		let body_block = &self.input.block;
 		let setup = setup_fn(self)?;
 
 		let async_tokens = if let Some(maybe_aa) = self.maybe_asyncness() {
@@ -171,16 +171,20 @@ impl Analyzer {
 			#maybe_asyncness fn main() #output_type {
 				#setup
 				#(#setup_by_attrs)*
-				#block
+				#body_block
 			}
 
 			mod setup {
 				use super::*;
 
 				use cli::ProcessEnv;
-				use logger::LoggerType;
+				use logger::{LoggerType, stdout, tui};
 
-				pub(super) fn logger(args: #params_ty, ty: impl Into<LoggerType>) {
+				pub(super) async fn logger(
+					ctx: app::AppContextWriter,
+					args: #params_ty,
+					ty: impl Into<LoggerType>
+				) -> Option<tokio::task::JoinHandle<std::io::Result<()>>> {
 					let (cli_args, ..) = args;
 
 					let level_filter = match &cli_args.options.mode {
@@ -189,21 +193,23 @@ impl Analyzer {
 						| ProcessEnv::TEST => logger::LevelFilter::Trace,
 					};
 
-					let mut l = logger::Logger::builder()
+					let logger_type = ty.into();
+
+					let logger_builder = stdout::Logger::builder()
 						.with_color()
 						.with_level(level_filter)
 						.with_timestamp();
 
-					if LoggerType::Tui == ty.into() {
-						l = l.define_type(LoggerType::Tui);
+					if LoggerType::Stdout == logger_type || cli_args.command.is_some() {
+						logger_builder.build_stdout()
+						.expect(
+							"Le logger ne DOIT pas s'initialiser plusieurs fois."
+						);
+					} else if LoggerType::Tui == logger_type {
+						return Some(tokio::spawn(logger_builder.build_tui(ctx)));
 					}
 
-
-					l.build().expect(
-						"Le logger ne DOIT pas s'initialiser plusieurs fois."
-					);
-
-					logger::trace!("Le logger a été initialisé.");
+					None
 				}
 			}
 		})
@@ -215,7 +221,9 @@ impl Analyzer {
 		path: &'a Path,
 		arg_lit: String,
 	) -> Result<'a, TokenStream2> {
-		let ident = path.get_ident().expect("Devrait être un identifiant");
+		let ident = path
+			.get_ident()
+			.expect("Devrait être un identifiant valide");
 		if !Self::SUPPORT_ATTRIBUTES.contains(&ident.to_string().as_str()) {
 			return Err(Error::UnknownAttribute(ident, meta.span()));
 		}
@@ -235,9 +243,11 @@ impl Analyzer {
 			}
 		};
 
+		let maybe_ident = Ident::new(&format!("maybe_{ident}"), ident.span());
 		Ok(quote! {
+			let (context_tx, mut context_rx) = tokio::sync::mpsc::channel(32);
 			#[allow(unused_variables)]
-			let #ident = setup::#ident(#args_pat, #arg_lit);
+			let #maybe_ident = setup::#ident(context_tx.clone(), #args_pat, #arg_lit).await;
 		})
 	}
 

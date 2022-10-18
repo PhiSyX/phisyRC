@@ -6,14 +6,21 @@
 
 use app::App;
 
-#[phisyrc::setup(logger)]
+#[phisyrc::setup(logger = "tui")]
 async fn main(args: app::cli_app, env: app::env_app) -> app::Result<()> {
 	let app = App::new(args, env);
+
 	if let Err(err) = app.handle_command() {
 		match err {
-			| app::Error::EXIT_SUCCESS => std::process::exit(0),
+			| app::Error::EXIT_SUCCESS => {
+				if let Some(task) = maybe_logger {
+					task.abort();
+				}
+				std::process::exit(0)
+			}
 			| _ => panic!("phisyRC: {err}"),
 		}
 	}
+
 	app.launch().await
 }

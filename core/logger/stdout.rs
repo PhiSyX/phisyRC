@@ -7,18 +7,90 @@
 use std::fmt::Arguments;
 
 use chrono::Local;
-use log::Record;
+use log::{
+	max_level, set_boxed_logger, set_logger, set_max_level, Level, LevelFilter,
+	Log, Metadata, Record, SetLoggerError,
+};
 use terminal::{format::Interface, layout::GridLayout};
 
-use crate::{echo::Echo, Logger};
+use crate::{builder::Builder, echo::Echo, FilterFn, NO};
+
+// ---- //
+// Type //
+// ---- //
+
+pub(super) type FormatFn = fn(&mut Echo, &Arguments, &Record) -> String;
+
+// --------- //
+// Structure //
+// --------- //
+
+pub struct Logger {
+	pub colorized: bool,
+	pub timestamp: bool,
+	pub level: Option<LevelFilter>,
+	pub format_fn: FormatFn,
+	pub filters_fn: Vec<FilterFn>,
+}
+
+// -------------- //
+// Implémentation // -> API Publique
+// -------------- //
 
 impl Logger {
-	pub(super) fn echo(
-		&self,
-		level: String,
-		record: &Record,
-		message: &Arguments,
-	) {
+	pub fn builder() -> Builder {
+		Builder::default()
+	}
+
+	pub fn apply(self) -> Result<(), SetLoggerError> {
+		let level = self.level.unwrap_or(LevelFilter::Off);
+		set_max_level(level);
+		if LevelFilter::Off == max_level() {
+			set_logger(&NO)
+		} else {
+			set_boxed_logger(Box::new(self))
+		}
+	}
+}
+
+// -------------- //
+// Implémentation // - Interface
+// -------------- //
+
+impl Log for Logger {
+	/// On ne veut pas afficher les logs si le niveau est à
+	/// [LevelFilter::Off].
+	/// Des conditions utilisateurs peuvent être utilisées pour
+	/// filtrer les logs.
+	fn enabled(&self, metadata: &Metadata) -> bool {
+		metadata.level() != LevelFilter::Off
+			&& self.filters_fn.iter().all(|once_fn| once_fn(metadata))
+	}
+
+	/// Affiche le log.
+	fn log(&self, record: &Record) {
+		if !self.enabled(record.metadata()) {
+			return;
+		}
+
+		let message = record.args();
+		if message.to_string().trim().is_empty() {
+			println!();
+			return;
+		}
+
+		let level = if self.colorized {
+			match record.level() {
+				| Level::Error => "ERROR".red(),
+				| Level::Warn => " WARN".yellow(),
+				| Level::Info => " INFO".blue(),
+				| Level::Debug => "DEBUG".magenta(),
+				| Level::Trace => "TRACE".white(),
+			}
+		} else {
+			record.level().to_string()
+		};
+
 		let mut table = GridLayout::default()
 			// .define_max_width(80)
 			.without_boarder();
@@ -43,4 +115,6 @@ impl Logger {
 
 		echo.log(text);
 	}
+
+	fn flush(&self) {}
 }

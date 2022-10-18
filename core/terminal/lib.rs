@@ -8,5 +8,6 @@ mod export;
 pub mod format;
 pub mod io;
 pub mod layout;
+pub mod view;
 
 pub use self::export::*;

@@ -2,20 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
+use std::io;
+
 use log::{LevelFilter, SetLoggerError};
 use terminal::{
 	format::Interface,
 	layout::{Alignment, Cell},
+	EventLoop,
 };
+use tokio::sync::mpsc;
 
-use crate::{FilterFn, FormatFn, Logger, LoggerType};
+use crate::{
+	stdout::{self, FormatFn},
+	tui, FilterFn,
+};
 
 #[derive(Default)]
 pub struct Builder {
 	colorized: bool,
 	timestamp: bool,
 	level: Option<LevelFilter>,
-	ty: LoggerType,
 	format_fn: Option<FormatFn>,
 	filters_fn: Vec<FilterFn>,
 }
@@ -41,13 +47,8 @@ impl Builder {
 		self
 	}
 
-	pub fn define_type(mut self, ty: LoggerType) -> Self {
-		self.ty = ty;
-		self
-	}
-
-	pub fn build(self) -> Result<(), SetLoggerError> {
-		Logger {
+	pub fn build_stdout(self) -> Result<(), SetLoggerError> {
+		stdout::Logger {
 			colorized: self.colorized,
 			timestamp: self.timestamp,
 			format_fn: self.format_fn.unwrap_or(|echo, message, record| {
@@ -81,8 +82,24 @@ impl Builder {
 			}),
 			level: self.level,
 			filters_fn: self.filters_fn,
-			ty: self.ty,
 		}
 		.apply()
+	}
+
+	pub async fn build_tui<Ctx>(self, ctx: mpsc::Sender<Ctx>) -> io::Result<()>
+	where
+		Ctx: EventLoop,
+	{
+		let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
+		tui::Logger {
+			colorized: self.colorized,
+			timestamp: self.timestamp,
+			level: self.level,
+			filters_fn: self.filters_fn,
+			writer: tx,
+		}
+		.apply()
+		.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
+		tui::Tui::launch(ctx, rx).await
 	}
 }

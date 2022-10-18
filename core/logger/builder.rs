@@ -23,10 +23,21 @@ pub struct Builder {
 	timestamp: bool,
 	level: Option<LevelFilter>,
 	format_fn: Option<FormatFn>,
-	filters_fn: Vec<FilterFn>,
+	filters_fn: Vec<Box<FilterFn>>,
 }
 
 impl Builder {
+	pub fn filter<F>(mut self, predicate: F) -> Self
+	where
+		F: 'static,
+		F: Send,
+		F: Sync,
+		F: Fn(&log::Metadata) -> bool,
+	{
+		self.filters_fn.push(Box::new(predicate));
+		self
+	}
+
 	pub fn with_color(mut self) -> Self {
 		self.colorized = true;
 		self

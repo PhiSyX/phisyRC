@@ -50,7 +50,7 @@ pub struct Logger {
 	pub colorized: bool,
 	pub timestamp: bool,
 	pub level: Option<LevelFilter>,
-	pub filters_fn: Vec<FilterFn>,
+	pub filters_fn: Vec<Box<FilterFn>>,
 	pub writer: LoggerWriter,
 }
 

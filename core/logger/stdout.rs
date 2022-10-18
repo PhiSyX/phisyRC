@@ -30,7 +30,7 @@ pub struct Logger {
 	pub timestamp: bool,
 	pub level: Option<LevelFilter>,
 	pub format_fn: FormatFn,
-	pub filters_fn: Vec<FilterFn>,
+	pub filters_fn: Vec<Box<FilterFn>>,
 }
 
 // -------------- //

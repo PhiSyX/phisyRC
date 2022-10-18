@@ -3,6 +3,7 @@ members = [
 	"apps/messenger",
 	"core/cli",
 	"core/env",
+	"core/helpers",
 	"core/logger",
 	"core/terminal",
 	"macro",
@@ -21,6 +22,7 @@ phisyrc = { path = "./macro", package = "phisyrc-macro" }
 cli = { path = "./core/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
 env = { path = "./core/env", package = "phisyrc-env" }
+helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
 logger = { path = "./core/logger", package = "phisyrc-logger" }
 terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
 

@@ -18,7 +18,7 @@ pub use self::export::*;
 // Type //
 // ---- //
 
-pub(crate) type FilterFn = fn(&Metadata) -> bool;
+pub(crate) type FilterFn = dyn Fn(&log::Metadata) -> bool + Send + Sync;
 
 // --------- //
 // Constante //

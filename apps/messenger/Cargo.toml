@@ -20,6 +20,7 @@ phisyrc.workspace = true
 cli.workspace = true
 config.workspace = true
 env.workspace = true
+helpers.workspace = true
 logger.workspace = true
 terminal.workspace = true
 

@@ -178,6 +178,7 @@ impl Analyzer {
 				use super::*;
 
 				use cli::ProcessEnv;
+				use helpers::lang::WildcardMatching;
 				use logger::{LoggerType, stdout, tui};
 
 				pub(super) async fn logger(
@@ -185,7 +186,7 @@ impl Analyzer {
 					args: #params_ty,
 					ty: impl Into<LoggerType>
 				) -> Option<tokio::task::JoinHandle<std::io::Result<()>>> {
-					let (cli_args, ..) = args;
+					let (cli_args, env_args) = args;
 
 					let level_filter = match &cli_args.options.mode {
 						| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
@@ -195,10 +196,14 @@ impl Analyzer {
 
 					let logger_type = ty.into();
 
+					let debug_filter = env_args.debug_filter.clone();
 					let logger_builder = stdout::Logger::builder()
 						.with_color()
 						.with_level(level_filter)
-						.with_timestamp();
+						.with_timestamp()
+						.filter(move |metadata| {
+							metadata.target().iswm(&debug_filter)
+						});
 
 					if LoggerType::Stdout == logger_type || cli_args.command.is_some() {
 						logger_builder.build_stdout()

@@ -20,3 +20,15 @@ pub const DEFAULT_SERVER_IP: &str = "127.0.0.1";
 pub const DEFAULT_SERVER_PORT: u16 = 6667;
 pub const DEFAULT_SERVER_PASSWORD: Option<String> = None;
 
+// --------------- //
+// Base de données //
+// --------------- //
+
+/// Nom du fichier de configuration de la base de données.
+pub const CONFIG_DATABASE: &str = "database.toml";
+
+pub const DEFAULT_DATABASE_IP: &str = "127.0.0.1";
+pub const DEFAULT_DATABASE_PORT: u16 = 5432;
+pub const DEFAULT_DATABASE_PASSWORD: &str = "root";
+pub const DEFAULT_DATABASE_USERNAME: &str = "root";
+pub const DEFAULT_DATABASE_NAME: &str = "phisyrc";

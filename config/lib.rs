@@ -5,6 +5,7 @@
  */
 
 mod common;
+mod database;
 mod export;
 mod server;
 

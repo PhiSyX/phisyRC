@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use terminal::io::{prompt_default, prompt_optional, prompt_required, Prompt};
+use terminal::io::{prompt_default, prompt_optional, Prompt};
 
 use crate::Port;
 
@@ -32,9 +32,19 @@ pub struct ServerConfig {
 
 impl Prompt for ServerConfig {
 	fn prompt() -> Self {
-		let name = prompt_default("Nom du serveur", "localhost");
-		let ip = prompt_required("Adresse IP du serveur");
-		let port = prompt_required::<u16>("Port de communication TCP/IP");
+		let name =
+			prompt_default("Nom du serveur", constants::DEFAULT_SERVER_NAME);
+
+		let ip = prompt_default(
+			"Adresse IP du serveur",
+			constants::DEFAULT_SERVER_IP,
+		);
+
+		let port = prompt_default::<u16>(
+			"Port de communication TCP/IP",
+			constants::DEFAULT_SERVER_PORT,
+		);
+
 		let password = prompt_optional("Mot de passe de connexion au serveur");
 
 		Self {
@@ -49,10 +59,10 @@ impl Prompt for ServerConfig {
 impl Default for ServerConfig {
 	fn default() -> Self {
 		Self {
-			name: "localhost".into(),
-			ip: "127.0.0.1".into(),
-			port: 6667.into(),
-			password: Default::default(),
+			name: constants::DEFAULT_SERVER_NAME.into(),
+			ip: constants::DEFAULT_SERVER_IP.into(),
+			port: constants::DEFAULT_SERVER_PORT.into(),
+			password: constants::DEFAULT_SERVER_PASSWORD,
 		}
 	}
 }

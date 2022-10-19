@@ -15,13 +15,6 @@ use tokio::sync::mpsc;
 use self::cli::CommandMakePassword;
 pub use self::{cli::cli_app, env::env_app};
 
-// --------- //
-// Constante //
-// --------- //
-
-/// Nom du fichier de configuration du serveur.
-const CONFIG_FILENAME: &str = "server.toml";
-
 // ---- //
 // Type //
 // ---- //
@@ -77,10 +70,11 @@ impl App {
 				}
 				| cli::Command::Config(config_cli) => {
 					if config_cli.options.delete {
-						config::delete(CONFIG_FILENAME)?;
+						config::delete(constants::CONFIG_FILENAME)?;
 					} else if config_cli.options.show {
-						let cfg =
-							config::load::<ServerConfig>(CONFIG_FILENAME)?;
+						let cfg = config::load::<ServerConfig>(
+							constants::CONFIG_FILENAME,
+						)?;
 						println!("{cfg:#?}");
 					}
 
@@ -93,7 +87,8 @@ impl App {
 
 	/// Lance le serveur de Chat.
 	pub async fn launch(self) -> Result<()> {
-		let _cfg = config::load_or_prompt::<ServerConfig>(CONFIG_FILENAME)?;
+		let _cfg =
+			config::load_or_prompt::<ServerConfig>(constants::CONFIG_FILENAME)?;
 
 		// Code pour le fun
 		loop {

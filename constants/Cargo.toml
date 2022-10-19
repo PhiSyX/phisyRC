@@ -1,5 +1,5 @@
 [package]
-name = "phisyrc-config"
+name = "phisyrc-constants"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -10,9 +10,3 @@ publish.workspace = true
 path = "./lib.rs"
 
 [dependencies]
-constants.workspace = true
-logger.workspace = true
-terminal.workspace = true
-serde.workspace = true
-dirs = "^4.0"
-toml = "^0.5"

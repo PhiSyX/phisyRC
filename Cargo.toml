@@ -1,6 +1,8 @@
 [workspace]
 members = [
 	"apps/messenger",
+	"config",
+	"constants",
 	"core/cli",
 	"core/env",
 	"core/helpers",
@@ -21,6 +23,7 @@ publish = false
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
 cli = { path = "./core/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
+constants = { path = "./constants", package = "phisyrc-constants" }
 env = { path = "./core/env", package = "phisyrc-env" }
 helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
 logger = { path = "./core/logger", package = "phisyrc-logger" }

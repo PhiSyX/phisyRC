@@ -113,16 +113,15 @@ where
 	cfg_path.push(path);
 
 	if !cfg_path.exists() {
-		println!("La configuration du serveur est manquante...");
+		println!("Une configuration est manquante...");
 		println!();
 
-		let choice = confirm("Voulez-vous créer la configuration du serveur?");
+		let choice = confirm("Voulez-vous créer la configuration ?");
 		let s = if choice {
 			println!("Configuration interactive...");
 			toml::to_string(&T::prompt())
-		} else if confirm(
-			"Voulez-vous utiliser la configuration du serveur par défaut?",
-		) {
+		} else if confirm("Voulez-vous utiliser la configuration par défaut?")
+		{
 			toml::to_string(&T::default())
 		} else {
 			return Err(io::Error::new(

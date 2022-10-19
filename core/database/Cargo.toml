@@ -1,0 +1,19 @@
+[package]
+name = "phisyrc-database"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]
+config.workspace = true
+constants.workspace = true
+logger.workspace = true
+
+tokio-postgres = "^0.7"
+
+tokio.workspace = true

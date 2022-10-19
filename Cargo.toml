@@ -4,6 +4,7 @@ members = [
 	"config",
 	"constants",
 	"core/cli",
+	"core/database",
 	"core/env",
 	"core/helpers",
 	"core/logger",
@@ -24,6 +25,7 @@ phisyrc = { path = "./macro", package = "phisyrc-macro" }
 cli = { path = "./core/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
 constants = { path = "./constants", package = "phisyrc-constants" }
+database = { path = "./core/database", package = "phisyrc-database" }
 env = { path = "./core/env", package = "phisyrc-env" }
 helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
 logger = { path = "./core/logger", package = "phisyrc-logger" }

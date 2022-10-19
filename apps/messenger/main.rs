@@ -6,9 +6,9 @@
 
 use app::App;
 
-#[phisyrc::setup(logger = "tui")]
+#[phisyrc::setup(logger, database)]
 async fn main(args: app::cli_app, env: app::env_app) -> app::Result<()> {
-	let app = App::new(args, env);
+	let app = App::new(args, env, maybe_database?);
 
 	if let Err(err) = app.handle_command() {
 		match err {
@@ -22,5 +22,5 @@ async fn main(args: app::cli_app, env: app::env_app) -> app::Result<()> {
 		}
 	}
 
-	app.launch().await
+	app.launch(crx).await
 }

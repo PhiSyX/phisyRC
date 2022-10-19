@@ -31,6 +31,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub struct App {
 	args: cli_app,
 	env: env_app,
+	database: database::Client,
 }
 
 // ----------- //
@@ -46,6 +47,7 @@ pub enum AppContext {
 #[allow(non_camel_case_types)]
 pub enum Error {
 	IO(std::io::Error),
+	Database(database::Error),
 	BadGenerationPassword,
 	SecretKeyNotFound,
 	EXIT_SUCCESS,
@@ -57,8 +59,16 @@ pub enum Error {
 
 impl App {
 	/// Initialise la structure de l'application.
-	pub fn new(args: cli_app, env: env_app) -> Self {
-		Self { args, env }
+	pub fn new(
+		args: cli_app,
+		env: env_app,
+		database: database::Client,
+	) -> Self {
+		Self {
+			args,
+			env,
+			database,
+		}
 	}
 
 	/// Gère les commandes de la CLI.
@@ -86,7 +96,7 @@ impl App {
 	}
 
 	/// Lance le serveur de Chat.
-	pub async fn launch(self) -> Result<()> {
+	pub async fn launch(self, _crx: AppContextReader) -> Result<()> {
 		let _cfg =
 			config::load_or_prompt::<ServerConfig>(constants::CONFIG_FILENAME)?;
 
@@ -164,6 +174,12 @@ impl From<std::io::Error> for Error {
 	}
 }
 
+impl From<database::Error> for Error {
+	fn from(err: database::Error) -> Self {
+		Self::Database(err)
+	}
+}
+
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let err_s = match self {
@@ -174,8 +190,11 @@ impl fmt::Display for Error {
 				"la variable d'environnement APP_SECRET_KEY n'existe pas."
 					.to_owned()
 			}
-			| Self::IO(e) => {
-				format!("IO: {e}")
+			| Self::IO(err) => {
+				format!("IO: {err}")
+			}
+			| Self::Database(err) => {
+				format!("Base de données: {err}")
 			}
 			| Self::EXIT_SUCCESS => "exit success".to_owned(),
 		};

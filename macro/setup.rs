@@ -107,7 +107,7 @@ impl<'a> Error<'a> {
 // -------------- //
 
 impl Analyzer {
-	const SUPPORT_ATTRIBUTES: [&str; 1] = ["logger"];
+	const SUPPORT_ATTRIBUTES: [&str; 2] = ["logger", "database"];
 	const TOTAL_ARGUMENTS_EXPECTED: usize = 2;
 
 	/// Construit la fonction principale.
@@ -180,6 +180,7 @@ impl Analyzer {
 				use cli::ProcessEnv;
 				use helpers::lang::WildcardMatching;
 				use logger::{LoggerType, stdout, tui};
+				use database::{DatabaseType};
 
 				pub(super) async fn logger(
 					ctx: app::AppContextWriter,
@@ -216,6 +217,30 @@ impl Analyzer {
 
 					None
 				}
+
+
+				pub(super) async fn database(
+					ctx: app::AppContextWriter,
+					args: #params_ty,
+					ty: impl Into<DatabaseType>,
+				) -> database::Result<database::Client> {
+					match ty.into() {
+						| DatabaseType::Relational => {
+							let cfg = config::load_or_prompt::<config::DatabaseConfig>(
+								constants::CONFIG_DATABASE,
+							)?;
+
+							database::connect(
+								(cfg.ip, cfg.port),
+								(cfg.username, cfg.password),
+								cfg.name,
+							).await
+						}
+						| DatabaseType::FileSystem => {
+							todo!("database: filesystem")
+						}
+					}
+				}
 			}
 		})
 	}
@@ -250,9 +275,9 @@ impl Analyzer {
 
 		let maybe_ident = Ident::new(&format!("maybe_{ident}"), ident.span());
 		Ok(quote! {
-			let (context_tx, mut context_rx) = tokio::sync::mpsc::channel(32);
+			let (ctx, mut crx) = tokio::sync::mpsc::channel(32);
 			#[allow(unused_variables)]
-			let #maybe_ident = setup::#ident(context_tx.clone(), #args_pat, #arg_lit).await;
+			let #maybe_ident = setup::#ident(ctx.clone(), #args_pat, #arg_lit).await;
 		})
 	}
 

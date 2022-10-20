@@ -10,4 +10,5 @@ publish.workspace = true
 path = "./lib.rs"
 
 [dependencies]
+deunicode = "^1.3"
 regex = "^1.6"

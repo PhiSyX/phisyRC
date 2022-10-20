@@ -5,5 +5,6 @@
  */
 
 mod escape;
+mod slugify;
 
-pub use self::escape::*;
+pub use self::{escape::*, slugify::*};

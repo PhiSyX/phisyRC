@@ -11,3 +11,4 @@ path = "./generate.rs"
 
 [dependencies]
 constants.workspace = true
+helpers.workspace = true

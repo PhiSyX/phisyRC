@@ -9,6 +9,8 @@ use std::{
 	io::{Read, Write},
 };
 
+use helpers::string::Slugify;
+
 const ROOT_README_FILE: &str = "./README.md";
 const ROOT_DOCS_DIR: &str = "docs/";
 
@@ -25,6 +27,8 @@ const SHOULD_BE_ABLE_TO_FILL_BUFFER: &str =
 
 fn main() {
 	let output: String = read_input(INPUT);
+
+	let output = generate_toc(&output);
 
 	let mut new_file =
 		File::create(ROOT_README_FILE).expect(SHOULD_CREATE_NEW_FILE);
@@ -73,4 +77,32 @@ fn include_file(line: &str) -> String {
 
 fn relative_file(line: String) -> String {
 	line.replace("(./", &format!("({ROOT_DOCS_DIR}"))
+}
+
+fn generate_toc(input: &str) -> String {
+	let toc = input
+		.lines()
+		.skip(1)
+		.filter(|line| line.starts_with('#'))
+		.map(|line| {
+			let title = line.trim_start_matches('#').trim();
+			let slug = title.slugify();
+			let link = format!("[{title}](#{slug})");
+			let count = line.match_indices('#').count();
+			match count {
+				| 1 => line.replace('#', "-"),
+				| n => line.replacen('#', "\t", n - 1).replace('#', "-"),
+			}
+			.replacen(title, &link, 1)
+		})
+		.collect::<Vec<_>>()
+		.join(constants::CRLF);
+
+	if !toc.is_empty() {
+		let mut title_toc = String::from("# Table des matières");
+		title_toc.push_str(constants::CRLF);
+		input.replace("[TOC]", &format!("{title_toc}{toc}"))
+	} else {
+		input.replace("[TOC]", "")
+	}
 }

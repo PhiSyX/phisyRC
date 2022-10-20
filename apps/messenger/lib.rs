@@ -6,14 +6,20 @@
 
 mod cli;
 mod env;
+mod server;
+mod session;
 
 use core::fmt;
 
 use config::ServerConfig;
+pub(crate) use network::{
+	session::Interface as NetworkSessionInterface, Server as NetworkServer,
+	Session as NetworkSession,
+};
 use tokio::sync::mpsc;
 
-use self::cli::CommandMakePassword;
 pub use self::{cli::cli_app, env::env_app};
+use self::{cli::CommandMakePassword, server::Server as AppServer};
 
 // ---- //
 // Type //
@@ -48,6 +54,7 @@ pub enum AppContext {
 pub enum Error {
 	IO(std::io::Error),
 	Database(database::Error),
+	Network(network::Error),
 	BadGenerationPassword,
 	SecretKeyNotFound,
 	EXIT_SUCCESS,
@@ -98,9 +105,9 @@ impl App {
 	/// Lance le serveur de Chat.
 	pub async fn launch(
 		self,
-		(_, mut crx): (AppContextWriter, AppContextReader),
+		(ctx, mut crx): (AppContextWriter, AppContextReader),
 	) -> Result<()> {
-		let receiver_task = tokio::spawn(async move {
+		let receiver_context_task = tokio::spawn(async move {
 			loop {
 				tokio::select! {
 					Some(app_ctx) = crx.recv() => match app_ctx {
@@ -110,16 +117,23 @@ impl App {
 			}
 		});
 
+		let cfg =
 			config::load_or_prompt::<ServerConfig>(constants::CONFIG_FILENAME)?;
 
-		// Code pour le fun
+		let server_addr = (cfg.ip, cfg.port.into());
+
+		NetworkServer::create(
+			server_addr,
+			|instance: NetworkServer<AppServer>| AppServer::new(ctx, instance),
+		)
+		.await?;
+
 		loop {
-			if receiver_task.is_finished() {
+			if receiver_context_task.is_finished() {
 				break;
 			}
 
-			tokio::time::sleep(tokio::time::Duration::from_millis(64)).await;
-			logger::info!(""); // <- FIXME(phisyx): permet de ne pas bloquer tui
+			logger::info!(""); // <- HACK(phisyx): permet de ne pas bloquer tui
 		}
 
 		Ok(())
@@ -180,6 +194,10 @@ impl terminal::EventLoop for AppContext {
 	}
 }
 
+// -------------- //
+// Implémentation // -> From<T>
+// -------------- //
+
 impl From<argon2::Error> for Error {
 	fn from(_: argon2::Error) -> Self {
 		Self::BadGenerationPassword
@@ -198,6 +216,12 @@ impl From<database::Error> for Error {
 	}
 }
 
+impl From<network::Error> for Error {
+	fn from(err: network::Error) -> Self {
+		Self::Network(err)
+	}
+}
+
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let err_s = match self {
@@ -213,6 +237,9 @@ impl fmt::Display for Error {
 			}
 			| Self::Database(err) => {
 				format!("Base de données: {err}")
+			}
+			| Self::Network(err) => {
+				format!("Réseau: {err}")
 			}
 			| Self::EXIT_SUCCESS => "exit success".to_owned(),
 		};

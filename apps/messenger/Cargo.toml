@@ -24,9 +24,11 @@ database.workspace = true
 env.workspace = true
 helpers.workspace = true
 logger.workspace = true
+network.workspace = true
 terminal.workspace = true
 
 tokio.workspace = true
 clap.workspace = true
 
 argon2 = { version = "^1.0", package = "rust-argon2" }
+uuid = { version = "^1.2", features = ["v4", "fast-rng"] }

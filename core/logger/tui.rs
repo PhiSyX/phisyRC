@@ -26,7 +26,7 @@ use terminal::{
 	tui::{
 		backend::{Backend, CrosstermBackend},
 		layout::{Constraint, Direction, Layout, Rect},
-		style::{Color, Modifier, Style},
+		style::{Color, Style},
 		text::{Span, Spans},
 		widgets::{Block, Borders, List, ListItem, Paragraph},
 		Frame, Terminal,
@@ -68,7 +68,8 @@ pub struct View {
 	reader: LoggerReader,
 	logs: Vec<Entry>,
 	scroll_position: usize,
-	input_line: String,
+	input_line: Vec<char>,
+	input_cursor: usize,
 }
 
 // -------------- //
@@ -180,6 +181,7 @@ impl View {
 			logs: Default::default(),
 			scroll_position: Default::default(),
 			input_line: Default::default(),
+			input_cursor: Default::default(),
 		}
 	}
 }
@@ -205,16 +207,19 @@ impl ViewInterface for View {
 			.skip(self.scroll_position)
 			.map(|entry| {
 				let style = entry.style();
-				let default_style = Style::default().fg(Color::Gray);
+				let delim_style = Style::default().fg(Color::Red);
 				let spans = [
+					Span::styled(entry.level.to_string(), style),
+					Span::styled(" | ", delim_style),
 					Span::styled(
-						entry.level.to_string(),
-						style.add_modifier(Modifier::BOLD),
+						&entry.target,
+						Style::default().fg(Color::DarkGray),
 					),
-					Span::styled(" [", default_style),
-					Span::styled(&entry.target, default_style),
-					Span::styled("] ", default_style),
-					Span::styled(&entry.args, style),
+					Span::styled(" | ", delim_style),
+					Span::styled(
+						&entry.args,
+						Style::default().fg(Color::White),
+					),
 				];
 				ListItem::new(Spans::from(spans.to_vec()))
 			})
@@ -223,46 +228,96 @@ impl ViewInterface for View {
 		let items = List::new(items).block(
 			Block::default()
 				.borders(Borders::ALL.difference(Borders::BOTTOM))
-				.title(" Logger "),
+				.title(" Historique des logs "),
 		);
 
 		frame.render_widget(items, split[0]);
 
-		let input = Paragraph::new(self.input_line.as_str()).block(
+		let s = self.input_line.iter().collect::<String>();
+		let input = Paragraph::new(s.as_str()).block(
 			Block::default()
 				.borders(Borders::ALL)
 				.title(" Boite de saisie "),
 		);
 
-		frame.set_cursor(
-			split[1].x + (self.input_line.len()) as u16 + 1,
-			split[1].y + 1,
-		);
-
+		let diff = self.input_cursor;
+		let cursor = diff % usize::MAX;
+		frame.set_cursor(split[1].x + (cursor as u16) + 1, split[1].y + 1);
 		frame.render_widget(input, split[1]);
 	}
 
 	async fn update_keyboard_event(&mut self, event: KeyEvent) {
 		match event.code {
-			| KeyCode::Char(ch) => {
-				self.input_line.push(ch);
-			}
+			| KeyCode::Char(ch) => match ch {
+				| 'l' | 'L'
+					if event.modifiers.contains(KeyModifiers::CONTROL) =>
+				{
+					self.logs.clear();
+				}
+
+				| _ => {
+					self.input_line.insert(self.input_cursor, ch);
+					self.input_cursor += 1;
+				}
+			},
 
 			| KeyCode::Backspace => {
-				self.input_line.pop();
+				if self.input_line.is_empty() {
+					return;
+				}
+
+				if event.modifiers.contains(KeyModifiers::CONTROL) {
+					self.input_line.drain(0..self.input_cursor);
+					self.input_cursor = 0;
+				} else {
+					let c = (self.input_cursor as isize).saturating_sub(1);
+
+					if c < 0 {
+						return;
+					}
+
+					self.input_cursor = c as usize;
+					self.input_line.remove(self.input_cursor);
+				}
+			}
+
+			| KeyCode::Delete => {
+				if self.input_line.is_empty() {
+					return;
+				}
+
+				if event.modifiers.contains(KeyModifiers::CONTROL) {
+					self.input_line.drain(self.input_cursor..);
+					self.input_cursor = self.input_line.len();
+				} else {
+					let c = (self.input_cursor as isize).saturating_add(1);
+
+					if c > self.input_line.len() as isize {
+						return;
+					}
+
+					self.input_cursor = c as usize;
+					self.input_line.remove(self.input_cursor);
+				}
 			}
 
 			| KeyCode::Enter => {
 				log::warn!(
 					"TODO: envoyer la ligne au serveur: {}",
-					&self.input_line
+					self.input_line.iter().collect::<String>()
 				);
 			}
 			| KeyCode::Left => {
-				log::warn!("TODO: déplacer le curseur vers la gauche.")
+				self.input_cursor = self.input_cursor.saturating_sub(1);
+				if self.input_cursor > self.input_line.len() {
+					self.input_cursor = 0;
+				}
 			}
 			| KeyCode::Right => {
-				log::warn!("TODO: déplacer le curseur vers la droite.");
+				self.input_cursor = self.input_cursor.saturating_add(1);
+				if self.input_cursor > self.input_line.len() {
+					self.input_cursor = self.input_line.len();
+				}
 			}
 
 			| KeyCode::Up => {

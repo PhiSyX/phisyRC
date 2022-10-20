@@ -75,7 +75,6 @@ impl Log for Logger {
 
 		let message = record.args();
 		if message.to_string().trim().is_empty() {
-			println!();
 			return;
 		}
 

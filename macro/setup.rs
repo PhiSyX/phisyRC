@@ -183,11 +183,15 @@ impl Analyzer {
 				use logger::{LoggerType, stdout, tui};
 				use database::{DatabaseType};
 
-				pub(super) async fn logger(
-					ctx: app::AppContextWriter,
+				// FIXME(phisyx): dépendant de tokio
+				pub(super) async fn logger<C>(
+					ctx: tokio::sync::mpsc::UnboundedSender<C>,
 					args: #params_ty,
 					ty: impl Into<LoggerType>
-				) -> Option<tokio::task::JoinHandle<std::io::Result<()>>> {
+				) -> Option<tokio::task::JoinHandle<std::io::Result<()>>>
+				where
+					C: terminal::EventLoop,
+				{
 					let (cli_args, env_args) = args;
 
 					let level_filter = match &cli_args.options.mode {
@@ -220,11 +224,15 @@ impl Analyzer {
 				}
 
 
-				pub(super) async fn database(
-					ctx: app::AppContextWriter,
+				// FIXME(phisyx): dépendant de tokio
+				pub(super) async fn database<C>(
+					ctx: tokio::sync::mpsc::UnboundedSender<C>,
 					args: #params_ty,
 					ty: impl Into<DatabaseType>,
-				) -> database::Result<database::Client> {
+				) -> database::Result<database::Client>
+				where
+					C: terminal::EventLoop,
+				{
 					match ty.into() {
 						| DatabaseType::Relational => {
 							let cfg = config::load_or_prompt::<config::DatabaseConfig>(

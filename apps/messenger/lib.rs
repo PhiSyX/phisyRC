@@ -103,7 +103,7 @@ impl App {
 		// Code pour le fun
 		loop {
 			tokio::time::sleep(tokio::time::Duration::from_millis(64)).await;
-			logger::info!("test");
+			logger::info!(""); // <- FIXME(phisyx): permet de ne pas bloquer tui
 		}
 	}
 }

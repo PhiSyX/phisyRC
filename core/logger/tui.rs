@@ -140,6 +140,7 @@ where
 
 			tokio::select! {
 				incoming_log = view.reader.recv() => match incoming_log {
+					| Some(entry) if entry.args.trim().is_empty() => continue,
 					| Some(entry) => view.logs.push(entry),
 					| None => continue,
 				},
@@ -306,11 +307,6 @@ impl Log for Logger {
 	/// Affiche le log.
 	fn log(&self, record: &Record) {
 		if !self.enabled(record.metadata()) {
-			return;
-		}
-
-		let message = record.args();
-		if message.to_string().trim().is_empty() {
 			return;
 		}
 

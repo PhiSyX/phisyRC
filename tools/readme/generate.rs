@@ -1,35 +1,76 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 use std::{
 	fs::File,
 	io::{Read, Write},
 };
 
+const ROOT_README_FILE: &str = "./README.md";
+const ROOT_DOCS_DIR: &str = "docs/";
+
+const INPUT: &str = include_str!("./TEMPLATE_README.md");
+
+const SHOULD_CREATE_NEW_FILE: &str =
+	"Devait créer un nouveau fichier README.md";
+
+const SHOULD_BE_ABLE_TO_WRITE: &str =
+	"Devrait pouvoir écrire le contenu dans le nouveau fichier README.md";
+
+const SHOULD_BE_ABLE_TO_FILL_BUFFER: &str =
+	"Devrait pouvoir remplir le tampon temporaire avec le contenu du fichier.";
+
 fn main() {
-	let file_content = include_str!("./TEMPLATE_README.md");
+	let output: String = read_input(INPUT);
 
-	let content: String = file_content
+	let mut new_file =
+		File::create(ROOT_README_FILE).expect(SHOULD_CREATE_NEW_FILE);
+
+	new_file
+		.write_all(output.as_bytes())
+		.expect(SHOULD_BE_ABLE_TO_WRITE);
+
+	println!("Le fichier {ROOT_README_FILE} a été généré.");
+}
+
+fn read_input(input: &str) -> String {
+	let mut output = input
 		.lines()
-		.map(|line| {
-			if line.starts_with("#include <") && line.ends_with('>') {
-				let filename = line.replace("#include <", "").replace('>', "");
-				let mut file = File::open(&filename)
-					.unwrap_or_else(|err| panic!("{err} -- > {filename} < "));
-				let mut buffer_content = String::new();
-				file.read_to_string(&mut buffer_content)
-					.unwrap_or_else(|err| panic!("Devrait pouvoir remplir le tampon `buffer_content` du contenu du fichier '{filename}': {err}."));
-				buffer_content
-			} else {
-				line.to_owned()
-			}
-		})
+		.map(include_file)
+		.map(relative_file)
 		.collect::<Vec<String>>()
-		.join("\n");
+		.join(constants::CRLF);
+	output.push_str(constants::CRLF);
+	output
+}
 
-	let mut new_file = File::create("./README.md")
-		.expect("Devait créer un nouveau fichier README.md");
+fn include_file(line: &str) -> String {
+	if !(line.starts_with("#include <") && line.ends_with('>')) {
+		return line.to_owned();
+	}
 
-	new_file.write_all(content.as_bytes()).expect(
-		"Devrait pouvoir écrire le contenu dans le nouveau fichier README.md",
-	);
+	// e.g: "#include<docs/application.md>" vers "docs/application.md"
+	let relative_filename = line.replace("#include <", "").replace('>', "");
 
-	println!("Le fichier README.md a été généré.");
+	let maybe_file = File::open(&relative_filename);
+	if maybe_file.is_err() {
+		eprintln!("Le fichier '{relative_filename}' ne peut pas être lu.");
+		return line.to_owned();
+	}
+
+	let mut file = maybe_file.unwrap();
+
+	let mut temporary_buffer = String::new();
+
+	file.read_to_string(&mut temporary_buffer)
+		.expect(SHOULD_BE_ABLE_TO_FILL_BUFFER);
+
+	read_input(&temporary_buffer)
+}
+
+fn relative_file(line: String) -> String {
+	line.replace("(./", &format!("({ROOT_DOCS_DIR}"))
 }

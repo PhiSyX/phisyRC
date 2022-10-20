@@ -8,6 +8,15 @@
 // Constante //
 // --------- //
 
+/// Séparateur de répertoire.
+///
+/// DS = DIRECTORY_SEPARATOR
+/// Suivant l'OS, le caractère peut être différent.
+pub const DS: &str = if cfg!(windows) { "\\" } else { "/" };
+
+/// Caractère de fin de ligne.
+pub const CRLF: &str = if cfg!(windows) { "\r\n" } else { "\n" };
+
 // ------- //
 // Serveur //
 // ------- //

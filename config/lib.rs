@@ -14,15 +14,10 @@ use std::{
 	path::{Path, PathBuf},
 };
 
+use constants::DS;
 use terminal::io::{confirm, Prompt};
 
 pub use self::export::*;
-
-/// Séparateur de répertoire.
-///
-/// DS = DIRECTORY_SEPARATOR
-/// Suivant l'OS, le caractère peut être différent.
-const DS: &str = if cfg!(windows) { "\\" } else { "/" };
 
 /// Répertoire de configuration.
 ///

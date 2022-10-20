@@ -8,3 +8,6 @@ publish = false
 [[bin]]
 name = "generate-readme"
 path = "./generate.rs"
+
+[dependencies]
+constants.workspace = true

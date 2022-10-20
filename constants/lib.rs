@@ -22,7 +22,7 @@ pub const CRLF: &str = if cfg!(windows) { "\r\n" } else { "\n" };
 // ------- //
 
 /// Nom du fichier de configuration du serveur.
-pub const CONFIG_FILENAME: &str = "server.toml";
+pub const CONFIG_SERVER: &str = "server.toml";
 
 pub const DEFAULT_SERVER_NAME: &str = "localhost";
 pub const DEFAULT_SERVER_IP: &str = "127.0.0.1";

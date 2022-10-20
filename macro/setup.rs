@@ -217,6 +217,17 @@ impl Analyzer {
 							"Le logger ne DOIT pas s'initialiser plusieurs fois."
 						);
 					} else if LoggerType::Tui == logger_type {
+						// FIXME(phisyx): le stdout étant changé lorsqu'on utilise TUI
+						// il y a un léger souci sur la configuration interactive.
+						config::load_or_prompt::<config::ServerConfig>(
+							constants::CONFIG_SERVER,
+							"Voulez-vous créer la configuration serveur?"
+						).ok()?;
+						config::load_or_prompt::<config::DatabaseConfig>(
+							constants::CONFIG_DATABASE,
+							"Voulez-vous créer la configuration de la base de données?"
+						).ok()?;
+
 						return Some(tokio::spawn(logger_builder.build_tui(ctx)));
 					}
 
@@ -229,7 +240,7 @@ impl Analyzer {
 					ctx: tokio::sync::mpsc::UnboundedSender<C>,
 					args: #params_ty,
 					ty: impl Into<DatabaseType>,
-				) -> database::Result<database::Client>
+				) -> app::Result<database::Client>
 				where
 					C: terminal::EventLoop,
 				{
@@ -237,13 +248,14 @@ impl Analyzer {
 						| DatabaseType::Relational => {
 							let cfg = config::load_or_prompt::<config::DatabaseConfig>(
 								constants::CONFIG_DATABASE,
+								"Voulez-vous créer la configuration de la base de données?"
 							)?;
 
-							database::connect(
+							Ok(database::connect(
 								(cfg.ip, cfg.port),
 								(cfg.username, cfg.password),
 								cfg.name,
-							).await
+							).await?)
 						}
 						| DatabaseType::FileSystem => {
 							todo!("database: filesystem")

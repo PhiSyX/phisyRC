@@ -9,6 +9,7 @@ mod database;
 mod export;
 mod server;
 
+use core::fmt;
 use std::{
 	fs, io,
 	path::{Path, PathBuf},
@@ -89,7 +90,10 @@ where
 /// son type [<T>] (passé par générique) ou demande à l'utilisateur de générer
 /// une nouveau fichier de configuration de manière interactive ou utiliser
 /// la configuration par défaut.
-pub fn load_or_prompt<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
+pub fn load_or_prompt<T>(
+	path: impl AsRef<Path>,
+	title: impl fmt::Display,
+) -> Result<T, io::Error>
 where
 	T: serde::de::DeserializeOwned,
 	T: serde::ser::Serialize,
@@ -109,7 +113,7 @@ where
 	cfg_path.push(path);
 
 	if !cfg_path.exists() {
-		println!("Une configuration est manquante...");
+		println!("Configuration manquante... {title}");
 		println!();
 
 		let choice = confirm("Voulez-vous créer la configuration ?");
@@ -122,7 +126,7 @@ where
 		} else {
 			return Err(io::Error::new(
 				io::ErrorKind::Interrupted,
-				"tant pis...",
+				"la configuration est manquante...",
 			));
 		}
 		.expect("devrait pouvoir sérialiser la structure");

@@ -87,10 +87,10 @@ impl App {
 				}
 				| cli::Command::Config(config_cli) => {
 					if config_cli.options.delete {
-						config::delete(constants::CONFIG_FILENAME)?;
+						config::delete(constants::CONFIG_SERVER)?;
 					} else if config_cli.options.show {
 						let cfg = config::load::<ServerConfig>(
-							constants::CONFIG_FILENAME,
+							constants::CONFIG_SERVER,
 						)?;
 						println!("{cfg:#?}");
 					}
@@ -117,8 +117,10 @@ impl App {
 			}
 		});
 
-		let cfg =
-			config::load_or_prompt::<ServerConfig>(constants::CONFIG_FILENAME)?;
+		let cfg = config::load_or_prompt::<ServerConfig>(
+			constants::CONFIG_SERVER,
+			"Voulez-vous créer la configuration serveur?",
+		)?;
 
 		let server_addr = (cfg.ip, cfg.port.into());
 

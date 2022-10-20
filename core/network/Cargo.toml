@@ -1,0 +1,20 @@
+[package]
+name = "phisyrc-network"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[lib]
+path = "./lib.rs"
+
+[dependencies]
+logger.workspace = true
+
+futures.workspace = true
+tokio.workspace = true
+
+async-trait = "^0.1"
+bytes = "^1.2"
+tokio-util = { version = "^0.7", features = ["codec"] }

@@ -8,6 +8,7 @@ members = [
 	"core/env",
 	"core/helpers",
 	"core/logger",
+	"core/network",
 	"core/terminal",
 	"macro",
 	"tools/readme",
@@ -29,6 +30,7 @@ database = { path = "./core/database", package = "phisyrc-database" }
 env = { path = "./core/env", package = "phisyrc-env" }
 helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
 logger = { path = "./core/logger", package = "phisyrc-logger" }
+network = { path = "./core/network", package = "phisyrc-network" }
 terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
 
 chrono = "^0.4"

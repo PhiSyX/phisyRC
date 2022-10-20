@@ -97,7 +97,10 @@ impl Builder {
 		.apply()
 	}
 
-	pub async fn build_tui<Ctx>(self, ctx: mpsc::Sender<Ctx>) -> io::Result<()>
+	pub async fn build_tui<Ctx>(
+		self,
+		ctx: mpsc::UnboundedSender<Ctx>,
+	) -> io::Result<()>
 	where
 		Ctx: EventLoop,
 	{

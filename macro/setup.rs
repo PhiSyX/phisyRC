@@ -169,6 +169,7 @@ impl Analyzer {
 			#(#fn_attrs)*
 			#async_tokens
 			#maybe_asyncness fn main() #output_type {
+				let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel();
 				#setup
 				#(#setup_by_attrs)*
 				#body_block
@@ -275,7 +276,6 @@ impl Analyzer {
 
 		let maybe_ident = Ident::new(&format!("maybe_{ident}"), ident.span());
 		Ok(quote! {
-			let (ctx, mut crx) = tokio::sync::mpsc::channel(32);
 			#[allow(unused_variables)]
 			let #maybe_ident = setup::#ident(ctx.clone(), #args_pat, #arg_lit).await;
 		})

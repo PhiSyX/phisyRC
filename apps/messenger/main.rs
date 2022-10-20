@@ -20,5 +20,5 @@ where
 		}
 	}
 
-	app.launch(crx).await
+	app.launch((ctx, crx)).await
 }

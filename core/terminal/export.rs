@@ -11,6 +11,6 @@ use crate::format::Interface;
 
 impl<S> Interface for S where S: AsRef<str> {}
 
-pub trait EventLoop: 'static + Send {
+pub trait EventLoop: 'static + Send + Sync {
 	fn quit() -> Self;
 }

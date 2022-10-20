@@ -60,7 +60,7 @@ where
 	W: Write,
 	C: EventLoop,
 {
-	ctx: tokio::sync::mpsc::Sender<C>,
+	ctx: tokio::sync::mpsc::UnboundedSender<C>,
 	terminal: Terminal<CrosstermBackend<W>>,
 }
 
@@ -96,7 +96,7 @@ where
 	C: EventLoop,
 {
 	pub async fn launch(
-		ctx: tokio::sync::mpsc::Sender<C>,
+		ctx: tokio::sync::mpsc::UnboundedSender<C>,
 		reader: LoggerReader,
 	) -> io::Result<()> {
 		let view = View::new(reader);
@@ -116,7 +116,7 @@ where
 	C: EventLoop,
 {
 	fn new(
-		ctx: tokio::sync::mpsc::Sender<C>,
+		ctx: tokio::sync::mpsc::UnboundedSender<C>,
 		mut output: W,
 	) -> io::Result<Self> {
 		enable_raw_mode().and_then(|_| {
@@ -152,7 +152,6 @@ where
 						if event.modifiers == KeyModifiers::CONTROL
 							&& quit_key_bindings.contains(&event.code)
 						{
-							_ = self.ctx.send(C::quit());
 							break;
 						}
 
@@ -310,9 +309,7 @@ impl Log for Logger {
 			return;
 		}
 
-		if let Err(err) = self.writer.send(record.into()) {
-			eprintln!("Erreur lors de l'envoie du log: {err}");
-		}
+		_ = self.writer.send(record.into());
 	}
 
 	fn flush(&self) {}
@@ -332,6 +329,8 @@ where
 		.and_then(|_| disable_raw_mode())
 		.expect("Tui#drop");
 
-		println!("Arrêt du logger.");
+		_ = self.ctx.send(C::quit());
+
+		println!("Interface utilisateur des logs fermée.");
 	}
 }

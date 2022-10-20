@@ -19,8 +19,8 @@ pub use self::{cli::cli_app, env::env_app};
 // Type //
 // ---- //
 
-pub type AppContextWriter = mpsc::Sender<AppContext>;
-pub type AppContextReader = mpsc::Receiver<AppContext>;
+pub type AppContextWriter = mpsc::UnboundedSender<AppContext>;
+pub type AppContextReader = mpsc::UnboundedReceiver<AppContext>;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -96,15 +96,33 @@ impl App {
 	}
 
 	/// Lance le serveur de Chat.
-	pub async fn launch(self, _crx: AppContextReader) -> Result<()> {
-		let _cfg =
+	pub async fn launch(
+		self,
+		(_, mut crx): (AppContextWriter, AppContextReader),
+	) -> Result<()> {
+		let receiver_task = tokio::spawn(async move {
+			loop {
+				tokio::select! {
+					Some(app_ctx) = crx.recv() => match app_ctx {
+						| AppContext::Quit => break,
+					}
+				}
+			}
+		});
+
 			config::load_or_prompt::<ServerConfig>(constants::CONFIG_FILENAME)?;
 
 		// Code pour le fun
 		loop {
+			if receiver_task.is_finished() {
+				break;
+			}
+
 			tokio::time::sleep(tokio::time::Duration::from_millis(64)).await;
 			logger::info!(""); // <- FIXME(phisyx): permet de ne pas bloquer tui
 		}
+
+		Ok(())
 	}
 }
 

@@ -6,7 +6,7 @@ serveur de Chat.
 ## Syntaxe de la ligne de commande
 
 ```sh
-[ENV=] phisyrc-server [COMMAND] [OPTIONS]
+[ENV=] phisyrc-messenger [COMMAND] [OPTIONS]
 ```
 
 ## Variables d'environnement

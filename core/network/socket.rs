@@ -76,12 +76,14 @@ where
 #[derive(Clone)]
 pub enum IncomingPacket {
 	Raw(String),
+	Bin(Vec<u8>),
 }
 
 #[derive(Debug)]
 #[derive(Clone)]
 pub enum OutgoingPacket {
 	Raw(String),
+	Bin(Vec<u8>),
 }
 
 // -------------- //
@@ -205,11 +207,12 @@ where
 	async fn run(mut self) -> Result<()> {
 		while let Some(result) = self.stream.next().await {
 			let result = result.map(P::into);
-			logger::trace!("réception du message: {:?}", result);
+			logger::info!("réception du message: {:?}", result);
 
 			let message = Ok(match result {
 				| Ok(msg) => match msg {
 					| IncomingPacket::Raw(t) => OutgoingPacket::Raw(t),
+					| IncomingPacket::Bin(b) => OutgoingPacket::Bin(b),
 				},
 				| Err(err) => return Err(err),
 			});
@@ -245,7 +248,8 @@ impl From<IncomingPacket> for String {
 impl From<OutgoingPacket> for IncomingPacket {
 	fn from(packet: OutgoingPacket) -> Self {
 		match packet {
-			| OutgoingPacket::Raw(s) => Self::Raw(s),
+			| OutgoingPacket::Raw(t) => Self::Raw(t),
+			| OutgoingPacket::Bin(b) => Self::Bin(b),
 		}
 	}
 }

@@ -5,9 +5,8 @@
  */
 
 use core::fmt;
-use std::marker::PhantomData;
 
-use tokio::sync::{mpsc, oneshot};
+use tokio::sync::mpsc;
 
 use crate::{
 	server::Result,
@@ -24,6 +23,8 @@ pub trait Interface: Send + Sync {
 	type ID: Send + Sync + Clone + fmt::Debug + fmt::Display;
 
 	async fn raw(&mut self, text: String) -> Result<()>;
+
+	async fn binary(&mut self, bytes: Vec<u8>) -> Result<()>;
 }
 
 // --------- //
@@ -110,6 +111,7 @@ where
 					match maybe_message {
 						| Some(Ok(message)) => match message {
 							OutgoingPacket::Raw(raw) => self.session.raw(raw).await?,
+							OutgoingPacket::Bin(bytes) => self.session.binary(bytes).await?,
 						}
 						| Some(Err(err)) => {
 							logger::error!("Erreur de connexion: {err} ({})", self.id.clone());

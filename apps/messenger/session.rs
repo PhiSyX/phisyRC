@@ -52,4 +52,9 @@ impl network::session::Interface for Actor {
 		logger::debug!("raw text : {text}");
 		Ok(())
 	}
+
+	async fn binary(&mut self, bytes: Vec<u8>) -> network::server::Result<()> {
+		logger::debug!("binary data : {bytes:?}");
+		Ok(())
+	}
 }

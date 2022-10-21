@@ -1,6 +1,6 @@
 # Bienvenue sur phisyRC
 
-**phisyRC** est une application de Chat complète.
+**phisyRC** est une application de Chat (extra WIP).
 
 L'**I**nterface **U**tilisateur de l'application de Chat **phisyRC** est\
 développée sous plusieurs formes :

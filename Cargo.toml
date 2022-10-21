@@ -12,6 +12,7 @@ members = [
 	"core/setup",
 	"core/terminal",
 	"macro",
+	"tools/license",
 	"tools/readme",
 ]
 
@@ -46,3 +47,9 @@ tokio = { version = "^1.21", features = [
 	"sync",
 	"time",
 ] }
+
+[profile.release]
+strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1

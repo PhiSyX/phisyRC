@@ -1,0 +1,13 @@
+[package]
+name = "check-license"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+publish = false
+
+[[bin]]
+name = "check-license"
+path = "./check.rs"
+
+[dependencies]
+include_dir = { version = "^0.7", features = ["glob"] }

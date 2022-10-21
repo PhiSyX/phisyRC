@@ -114,6 +114,9 @@ impl Builder {
 		}
 		.apply()
 		.expect("Le logger ne DOIT pas s'initialiser plusieurs fois.");
-		tui::Tui::launch(ctx, rx).await
+
+		tokio::spawn(tui::Tui::launch(ctx, rx));
+
+		Ok(())
 	}
 }

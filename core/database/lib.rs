@@ -23,16 +23,6 @@ pub type Result<T, E = Error> = core::result::Result<T, E>;
 // Énumération //
 // ----------- //
 
-#[derive(Debug)]
-#[derive(Default)]
-#[derive(Copy, Clone)]
-#[derive(PartialEq, Eq)]
-pub enum DatabaseType {
-	#[default]
-	Relational,
-	FileSystem,
-}
-
 pub enum Client {
 	Relational(postgres::Client),
 	FileSystem(/* todo */),
@@ -85,17 +75,6 @@ pub async fn connect(
 // Implémentation // -> Interface
 // -------------- //
 
-impl FromStr for DatabaseType {
-	type Err = ();
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(match s {
-			| "fs" | "filesystem" | "local" => Self::FileSystem,
-			| _ => Self::Relational,
-		})
-	}
-}
-
 impl From<std::io::Error> for Error {
 	fn from(err: std::io::Error) -> Self {
 		Self::IO(err)
@@ -105,12 +84,6 @@ impl From<std::io::Error> for Error {
 impl From<postgres::Error> for Error {
 	fn from(err: postgres::Error) -> Self {
 		Self::Relational(err)
-	}
-}
-
-impl<'a> From<&'a str> for DatabaseType {
-	fn from(s: &'a str) -> Self {
-		s.parse().unwrap_or_default()
 	}
 }
 

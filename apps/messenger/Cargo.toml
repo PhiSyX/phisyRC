@@ -25,6 +25,7 @@ env.workspace = true
 helpers.workspace = true
 logger.workspace = true
 network.workspace = true
+setup = { workspace = true, features = ["config", "logger", "database"] }
 terminal.workspace = true
 
 tokio.workspace = true

@@ -34,7 +34,7 @@ use terminal::{
 	view::Interface as ViewInterface,
 	EventLoop,
 };
-use tokio::time;
+use tokio::{sync::mpsc, time};
 
 use crate::{
 	builder::Builder,
@@ -97,7 +97,7 @@ where
 	C: EventLoop,
 {
 	pub async fn launch(
-		ctx: tokio::sync::mpsc::UnboundedSender<C>,
+		ctx: mpsc::UnboundedSender<C>,
 		reader: LoggerReader,
 	) -> io::Result<()> {
 		let view = View::new(reader);
@@ -116,10 +116,7 @@ where
 	W: Write,
 	C: EventLoop,
 {
-	fn new(
-		ctx: tokio::sync::mpsc::UnboundedSender<C>,
-		mut output: W,
-	) -> io::Result<Self> {
+	fn new(ctx: mpsc::UnboundedSender<C>, mut output: W) -> io::Result<Self> {
 		enable_raw_mode().and_then(|_| {
 			execute!(output, EnterAlternateScreen, EnableMouseCapture)
 		})?;

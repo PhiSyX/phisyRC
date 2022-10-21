@@ -53,6 +53,7 @@ pub enum AppContext {
 #[allow(non_camel_case_types)]
 pub enum Error {
 	IO(std::io::Error),
+	Boxed(Box<dyn std::error::Error>),
 	Database(database::Error),
 	Network(network::Error),
 	BadGenerationPassword,
@@ -211,6 +212,11 @@ impl From<std::io::Error> for Error {
 		Self::IO(err)
 	}
 }
+impl From<Box<dyn std::error::Error>> for Error {
+	fn from(err: Box<dyn std::error::Error>) -> Self {
+		Self::Boxed(err)
+	}
+}
 
 impl From<database::Error> for Error {
 	fn from(err: database::Error) -> Self {
@@ -237,6 +243,7 @@ impl fmt::Display for Error {
 			| Self::IO(err) => {
 				format!("IO: {err}")
 			}
+			| Self::Boxed(err) => err.to_string(),
 			| Self::Database(err) => {
 				format!("Base de données: {err}")
 			}

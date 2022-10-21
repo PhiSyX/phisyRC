@@ -139,6 +139,12 @@ impl cli_app {
 // Implémentation // -> Interface
 // -------------- //
 
+impl setup::SetupCliInterface for cli_app {
+	fn process_env(&self) -> cli::ProcessEnv {
+		self.options.mode
+	}
+}
+
 impl ops::Deref for cli_app {
 	type Target = CliApp;
 

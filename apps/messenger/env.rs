@@ -4,6 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+// --------- //
+// Structure //
+// --------- //
+
 #[derive(Debug)]
 #[derive(phisyrc::Env)]
 #[allow(non_camel_case_types)]
@@ -13,4 +17,14 @@ pub struct env_app {
 
 	#[var(key = "APP_SECRET_KEY")]
 	pub app_secret_key: String,
+}
+
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
+
+impl setup::SetupEnvInterface for env_app {
+	fn debug_filter(&self) -> String {
+		self.debug_filter.clone()
+	}
 }

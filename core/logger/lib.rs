@@ -10,8 +10,6 @@ mod export;
 pub mod stdout;
 pub mod tui;
 
-use std::str::FromStr;
-
 pub use self::export::*;
 
 // ---- //
@@ -31,41 +29,6 @@ pub(crate) const NO: NopeLogger = NopeLogger;
 // --------- //
 
 pub(crate) struct NopeLogger;
-
-// ----------- //
-// Énumération //
-// ----------- //
-
-#[derive(Debug)]
-#[derive(Default)]
-#[derive(Copy, Clone)]
-#[derive(PartialEq, Eq)]
-pub enum LoggerType {
-	#[default]
-	Stdout,
-	Tui,
-}
-
-// -------------- //
-// Implémentation // -> Interface
-// -------------- //
-
-impl FromStr for LoggerType {
-	type Err = ();
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(match s {
-			| "tui" => Self::Tui,
-			| _ => Self::Stdout,
-		})
-	}
-}
-
-impl<'a> From<&'a str> for LoggerType {
-	fn from(s: &'a str) -> Self {
-		s.parse().unwrap_or_default()
-	}
-}
 
 impl Log for NopeLogger {
 	fn enabled(&self, _: &Metadata) -> bool {

@@ -14,8 +14,8 @@ use syn::{
 	},
 	punctuated::Punctuated,
 	spanned::Spanned,
-	FnArg, GenericParam, Ident, Meta, Pat, PatReference, PatTuple, Path, Type,
-	TypeParamBound, TypeReference, TypeTuple, WherePredicate,
+	FnArg, GenericParam, Ident, Meta, Pat, PatReference, PatTuple, Path,
+	TypeParamBound, WherePredicate,
 };
 
 // ---- //
@@ -152,116 +152,14 @@ impl Analyzer {
 			quote! {}
 		};
 
-		let params_ty = {
-			let mut list = Punctuated::new();
-			if let Some(i) = self.get_first_arg_ty() {
-				list.push(i);
-			}
-			if let Some(i) = self.get_last_arg_ty() {
-				list.push(i);
-			}
-			TypeTuple {
-				paren_token: syn::token::Paren(self.input.span()),
-				elems: list,
-			}
-		};
 		Ok(quote! {
 			#(#fn_attrs)*
 			#async_tokens
 			#maybe_asyncness fn main() #output_type {
-				let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel();
+				let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel::<app::AppContext>();
 				#setup
 				#(#setup_by_attrs)*
 				#body_block
-			}
-
-			mod setup {
-				use super::*;
-
-				use cli::ProcessEnv;
-				use helpers::lang::WildcardMatching;
-				use logger::{LoggerType, stdout, tui};
-				use database::{DatabaseType};
-
-				// FIXME(phisyx): dépendant de tokio
-				pub(super) async fn logger<C>(
-					ctx: tokio::sync::mpsc::UnboundedSender<C>,
-					args: #params_ty,
-					ty: impl Into<LoggerType>
-				) -> Option<tokio::task::JoinHandle<std::io::Result<()>>>
-				where
-					C: terminal::EventLoop,
-				{
-					let (cli_args, env_args) = args;
-
-					let level_filter = match &cli_args.options.mode {
-						| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
-						| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
-						| ProcessEnv::TEST => logger::LevelFilter::Trace,
-					};
-
-					let logger_type = ty.into();
-
-					let debug_filter = env_args.debug_filter.clone();
-					let logger_builder = stdout::Logger::builder()
-						.with_color()
-						.with_level(level_filter)
-						.with_timestamp()
-						.filter(move |metadata| {
-							metadata.target().iswm(&debug_filter)
-						});
-
-					if LoggerType::Stdout == logger_type || cli_args.command.is_some() {
-						logger_builder.build_stdout()
-						.expect(
-							"Le logger ne DOIT pas s'initialiser plusieurs fois."
-						);
-					} else if LoggerType::Tui == logger_type {
-						// FIXME(phisyx): le stdout étant changé lorsqu'on utilise TUI
-						// il y a un léger souci sur la configuration interactive.
-						config::load_or_prompt::<config::ServerConfig>(
-							constants::CONFIG_SERVER,
-							"Voulez-vous créer la configuration serveur?"
-						).ok()?;
-						config::load_or_prompt::<config::DatabaseConfig>(
-							constants::CONFIG_DATABASE,
-							"Voulez-vous créer la configuration de la base de données?"
-						).ok()?;
-
-						return Some(tokio::spawn(logger_builder.build_tui(ctx)));
-					}
-
-					None
-				}
-
-
-				// FIXME(phisyx): dépendant de tokio
-				pub(super) async fn database<C>(
-					ctx: tokio::sync::mpsc::UnboundedSender<C>,
-					args: #params_ty,
-					ty: impl Into<DatabaseType>,
-				) -> app::Result<database::Client>
-				where
-					C: terminal::EventLoop,
-				{
-					match ty.into() {
-						| DatabaseType::Relational => {
-							let cfg = config::load_or_prompt::<config::DatabaseConfig>(
-								constants::CONFIG_DATABASE,
-								"Voulez-vous créer la configuration de la base de données?"
-							)?;
-
-							Ok(database::connect(
-								(cfg.ip, cfg.port),
-								(cfg.username, cfg.password),
-								cfg.name,
-							).await?)
-						}
-						| DatabaseType::FileSystem => {
-							todo!("database: filesystem")
-						}
-					}
-				}
 			}
 		})
 	}
@@ -297,7 +195,19 @@ impl Analyzer {
 		let maybe_ident = Ident::new(&format!("maybe_{ident}"), ident.span());
 		Ok(quote! {
 			#[allow(unused_variables)]
-			let #maybe_ident = setup::#ident(ctx.clone(), #args_pat, #arg_lit).await;
+			let #maybe_ident = setup::#ident(#args_pat, #arg_lit, ctx.clone()).await;
+			if let Err(err) = #maybe_ident {
+				use terminal::format::Interface;
+				eprintln!();
+				eprintln!(
+					"{}: #[phisyrc::setup({})]: quelque chose s'est mal passée -- {}",
+					"runtime error".red(),
+					stringify!(#ident),
+					err
+				);
+				eprintln!();
+				std::process::exit(1);
+			}
 		})
 	}
 
@@ -321,52 +231,6 @@ impl Analyzer {
 				pat: boxed_pat,
 			}),
 			| _ => unreachable!("#[phisyrc::setup]: get_first_arg_pat"),
-		})
-	}
-
-	fn get_first_arg_ty(&self) -> Option<Type> {
-		let inputs = &self.input.sig.inputs;
-
-		if inputs.is_empty() {
-			return None;
-		}
-
-		let first_argument = inputs.first().and_then(|arg| match arg {
-			| FnArg::Typed(paty) => Some(paty.ty.clone()),
-			| FnArg::Receiver(_) => None,
-		});
-
-		first_argument.map(|boxed_type| match &*boxed_type {
-			| Type::Path(_) => Type::Reference(TypeReference {
-				and_token: syn::token::And(boxed_type.span()),
-				lifetime: Default::default(),
-				mutability: Default::default(),
-				elem: boxed_type,
-			}),
-			| _ => unreachable!("#[phisyrc::setup]: get_first_arg_ty"),
-		})
-	}
-
-	fn get_last_arg_ty(&self) -> Option<Type> {
-		let inputs = &self.input.sig.inputs;
-
-		if inputs.len() != Self::TOTAL_ARGUMENTS_EXPECTED {
-			return None;
-		}
-
-		let last_argument = inputs.last().and_then(|arg| match arg {
-			| FnArg::Typed(paty) => Some(paty.ty.clone()),
-			| FnArg::Receiver(_) => None,
-		});
-
-		last_argument.map(|boxed_type| match &*boxed_type {
-			| Type::Path(_) => Type::Reference(TypeReference {
-				and_token: syn::token::And(boxed_type.span()),
-				lifetime: Default::default(),
-				mutability: Default::default(),
-				elem: boxed_type,
-			}),
-			| _ => unreachable!("#[phisyrc::setup]: get_last_arg_ty"),
 		})
 	}
 

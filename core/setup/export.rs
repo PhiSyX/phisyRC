@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#[cfg(feature = "config")]
+pub use crate::config::config;
 #[cfg(feature = "database")]
 pub use crate::database::database;
 #[cfg(feature = "logger")]

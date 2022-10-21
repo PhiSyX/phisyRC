@@ -113,16 +113,20 @@ where
 	cfg_path.push(path);
 
 	if !cfg_path.exists() {
-		println!("Configuration manquante... {title}");
+		println!(
+			"Configuration '{}' manquante... {title}",
+			cfg_path.display()
+		);
 		println!();
 
-		let choice = confirm("Voulez-vous créer la configuration ?");
-		let s = if choice {
-			println!("Configuration interactive...");
-			toml::to_string(&T::prompt())
-		} else if confirm("Voulez-vous utiliser la configuration par défaut?")
+		let s = if confirm("Voulez-vous utiliser la configuration par défaut?")
 		{
 			toml::to_string(&T::default())
+		} else if confirm(
+			"Voulez-vous créer la configuration de manière interactive?",
+		) {
+			println!("Configuration interactive...");
+			toml::to_string(&T::prompt())
 		} else {
 			return Err(io::Error::new(
 				io::ErrorKind::Interrupted,

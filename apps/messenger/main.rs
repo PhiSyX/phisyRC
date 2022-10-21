@@ -6,15 +6,17 @@
 
 use app::App;
 
-#[phisyrc::setup(logger = "tui", database = "postgres")]
-async fn main<Async, ctx, crx>(
+#[phisyrc::setup(config = "interactive", logger = "tui", database = "postgres")]
+async fn main<Async, Context>(
 	args: app::cli_app,
 	env: app::env_app,
 ) -> app::Result<()>
 where
 	Async: tokio,
-	ctx: app::AppContextWriter,
-	crx: app::AppContextReader,
+
+	Context: app::AppContext,
+	[ctx]: app::AppContextWriter,
+	[crx]: app::AppContextReader,
 {
 	let app = App::new(args, env, maybe_database?);
 

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use terminal::io::{prompt_default, Prompt};
+use terminal::io::{confirm, prompt_default, Prompt};
 
 use crate::Port;
 
@@ -61,12 +61,24 @@ impl Prompt for DatabaseConfig {
 			constants::DEFAULT_DATABASE_NAME,
 		);
 
-		Self {
+		let build = Self {
 			name,
 			ip,
 			port: port.into(),
 			username,
 			password,
+		};
+
+		println!("Configuration terminée : {:#?}", &build);
+		println!();
+
+		if confirm("Êtes vous satisfait de cette configuration?") {
+			build
+		} else {
+			println!("Recommençons...");
+			println!();
+
+			Self::prompt()
 		}
 	}
 }

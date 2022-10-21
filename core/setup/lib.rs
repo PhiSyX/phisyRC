@@ -11,6 +11,9 @@ mod export;
 #[cfg(feature = "logger")]
 mod logger;
 
+#[cfg(feature = "config")]
+mod config;
+
 pub use self::export::*;
 
 // --------- //

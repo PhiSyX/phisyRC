@@ -107,7 +107,7 @@ impl<'a> Error<'a> {
 // -------------- //
 
 impl Analyzer {
-	const SUPPORT_ATTRIBUTES: [&str; 2] = ["logger", "database"];
+	const SUPPORT_ATTRIBUTES: [&str; 3] = ["config", "logger", "database"];
 	const TOTAL_ARGUMENTS_EXPECTED: usize = 2;
 
 	/// Construit la fonction principale.

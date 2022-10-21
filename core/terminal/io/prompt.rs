@@ -35,10 +35,12 @@ pub fn confirm(message: impl fmt::Display) -> bool {
 			temporary_buffer = line.trim().to_lowercase();
 			if temporary_buffer == "y" {
 				choice = true;
+				break;
 			} else if temporary_buffer == "n" {
 				choice = false;
+				break;
 			}
-			break;
+			continue;
 		} else {
 			temporary_buffer.clear();
 		}

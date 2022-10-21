@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use terminal::io::{prompt_default, prompt_optional, Prompt};
+use terminal::io::{confirm, prompt_default, prompt_optional, Prompt};
 
 use crate::Port;
 
@@ -47,11 +47,23 @@ impl Prompt for ServerConfig {
 
 		let password = prompt_optional("Mot de passe de connexion au serveur");
 
-		Self {
+		let build = Self {
 			name,
 			ip,
 			port: port.into(),
 			password,
+		};
+
+		println!("Configuration terminée : {:#?}", &build);
+		println!();
+
+		if confirm("Êtes vous satisfait de cette configuration?") {
+			build
+		} else {
+			println!("Recommençons...");
+			println!();
+
+			Self::prompt()
 		}
 	}
 }

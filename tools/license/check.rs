@@ -4,14 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use std::path::Path;
+use std::{path::Path, process::ExitCode};
 
 use include_dir::{include_dir, Dir, File};
 
-const LICENSE: &str = r#"/*
+const LICENSE_MPL: &str = r#"/*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */"#;
+
+const LICENSE_MPL_PUB: &str = r#"/*
+ * Any copyright is dedicated to the Public Domain.
+ * https://creativecommons.org/publicdomain/zero/1.0/
  */"#;
 
 const APPS_DIR: Dir = include_dir!("apps");
@@ -21,7 +26,7 @@ const CORE_DIR: Dir = include_dir!("core");
 const MACRO_DIR: Dir = include_dir!("macro");
 const TOOLS_DIR: Dir = include_dir!("tools");
 
-fn main() {
+fn main() -> ExitCode {
 	let mut files = vec![];
 
 	check_license(&APPS_DIR, &mut files);
@@ -33,15 +38,18 @@ fn main() {
 
 	if files.is_empty() {
 		println!("OK.");
-		return;
+		return ExitCode::SUCCESS;
 	}
 
+	println!();
 	for file in files {
-		println!(
+		eprintln!(
 			"Le fichier source '{}' ne contient pas l'en-tête de la licence.",
 			file.display()
 		);
 	}
+
+	ExitCode::FAILURE
 }
 
 fn check_license(directory: &'static Dir, append_files: &mut Vec<&Path>) {
@@ -65,7 +73,10 @@ fn check_license(directory: &'static Dir, append_files: &mut Vec<&Path>) {
 fn check_file(file: &'static File, append_files: &mut Vec<&Path>) {
 	if file
 		.contents_utf8()
-		.filter(|content| content.starts_with(LICENSE))
+		.filter(|content| {
+			content.starts_with(LICENSE_MPL)
+				|| content.starts_with(LICENSE_MPL_PUB)
+		})
 		.is_none()
 	{
 		append_files.push(file.path());

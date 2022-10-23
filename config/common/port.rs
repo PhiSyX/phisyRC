@@ -50,7 +50,7 @@ impl Port {
 			.ok_or_else(|| {
 				let msg = format!(
 					"Le port d'écoute est invalide. Il DOIT être compris entre \
-					{} et {}.",
+					« {} » et « {} ».",
 					Self::MIN_USER_PORT, Self::MAX_USER_PORT
 				);
 				serde::de::Error::custom(msg)

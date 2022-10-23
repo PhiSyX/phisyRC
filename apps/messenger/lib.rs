@@ -179,7 +179,7 @@ impl App {
 		}?;
 
 		println!(
-			"Le mot de passe '{}' généré par {}: {}",
+			"Le mot de passe « {} » généré par « {} »: {}",
 			raw_password, algo, password
 		);
 

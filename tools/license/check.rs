@@ -44,7 +44,7 @@ fn main() -> ExitCode {
 	println!();
 	for file in files {
 		eprintln!(
-			"Le fichier source '{}' ne contient pas l'en-tête de la licence.",
+			"Le fichier source « {} » ne contient pas l'en-tête de la licence.",
 			file.display()
 		);
 	}

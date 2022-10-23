@@ -55,7 +55,7 @@ where
 	if !cfg_dir.exists() {
 		fs::create_dir(&cfg_dir)?;
 		logger::info!(
-			"Création du répertoire de configuration: '{}'",
+			"Création du répertoire de configuration: « {} »",
 			cfg_dir.display()
 		);
 	}
@@ -68,8 +68,8 @@ where
 			.expect("devrait pouvoir sérialiser la structure");
 		fs::write(&cfg_path, &s)?;
 		logger::info!(
-			"Création du fichier de configuration '{}' avec les valeurs par \
-			défaut de la structure '{}'",
+			"Création du fichier de configuration « {} » avec les valeurs par \
+			défaut de la structure « {} »",
 			cfg_path.display(),
 			core::any::type_name::<T>()
 		);
@@ -78,7 +78,7 @@ where
 	let content = fs::read_to_string(&cfg_path)?;
 	let obj = toml::from_str(&content)?;
 	logger::trace!(
-		"Fichier de configuration '{}' dé-sérialisé en type '{}' avec succès.",
+		"Fichier de configuration « {} » dé-sérialisé en type « {} » avec succès.",
 		cfg_path.display(),
 		core::any::type_name::<T>()
 	);
@@ -104,7 +104,7 @@ where
 	if !cfg_dir.exists() {
 		fs::create_dir(&cfg_dir)?;
 		logger::info!(
-			"Création du répertoire de configuration: '{}'",
+			"Création du répertoire de configuration: « {} »",
 			cfg_dir.display()
 		);
 	}
@@ -114,7 +114,7 @@ where
 
 	if !cfg_path.exists() {
 		println!(
-			"Configuration '{}' manquante... {title}",
+			"Configuration « {} » manquante... {title}",
 			cfg_path.display()
 		);
 		println!();
@@ -139,8 +139,8 @@ where
 
 		fs::write(&cfg_path, &s)?;
 		logger::info!(
-			"Création du fichier de configuration '{}' avec les valeurs par \
-			défaut de la structure '{}'",
+			"Création du fichier de configuration « {} » avec les valeurs par \
+			défaut de la structure « {} »",
 			cfg_path.display(),
 			core::any::type_name::<T>()
 		);
@@ -149,7 +149,7 @@ where
 	let content = fs::read_to_string(&cfg_path)?;
 	let obj = toml::from_str(&content)?;
 	logger::trace!(
-		"Fichier de configuration '{}' dé-sérialisé en type '{}' avec succès.",
+		"Fichier de configuration « {} » dé-sérialisé en type « {} » avec succès.",
 		cfg_path.display(),
 		core::any::type_name::<T>()
 	);
@@ -163,7 +163,7 @@ pub fn delete(path: impl AsRef<Path>) -> io::Result<()> {
 
 	if cfg.exists() {
 		logger::info!(
-			"Suppression du fichier de configuration '{}'.",
+			"Suppression du fichier de configuration « {} ».",
 			cfg.display(),
 		);
 		return fs::remove_file(cfg);

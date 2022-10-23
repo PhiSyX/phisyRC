@@ -494,15 +494,18 @@ impl fmt::Display for Error<'_> {
 				"Une clause `where` est attendue.".to_owned()
 			}
 			| Self::WhereClauseName(ident, _) => {
-				format!("La clause where ne contient pas la générique {ident}.")
+				format!(
+					"La clause where ne contient pas la générique « {} ».",
+					ident
+				)
 			}
 			| Self::MissingContextGeneric(_) => {
 				"La générique 'Context' est manquante.".to_owned()
 			}
 			| Self::TooManyArguments(n, _) => {
 				format!(
-					"la fonction principale ne peut avoir plus de {} \
-					arguments maximum (le nombre d'arguments actuel est de {}).",
+					"la fonction principale ne peut avoir plus de « {} » \
+					arguments maximum (le nombre d'arguments actuel est de « {} »).",
 					Analyzer::TOTAL_ARGUMENTS_EXPECTED,
 					n
 				)

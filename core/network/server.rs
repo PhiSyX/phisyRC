@@ -127,7 +127,7 @@ where
 
 			async move {
 				logger::info!(
-					"En attente de connexion au serveur '{}'",
+					"En attente de connexion au serveur « {} »",
 					listener.local_addr()?
 				);
 
@@ -186,7 +186,7 @@ where
 		loop {
 			tokio::select! {
 			Some(Incoming { socket, addr, respond }) = self.incoming.recv() => {
-				logger::info!("Connexion accepté: {addr}");
+				logger::info!("Connexion accepté: « {} »", addr);
 				let session = self.user_instance.accept(socket, addr).await?;
 				_= respond.send(session.id);
 			}

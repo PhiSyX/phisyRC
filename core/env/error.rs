@@ -32,10 +32,14 @@ impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let reason = match self {
 			| Self::BadFormat(name) => format!(
-				"Impossible d'analyser la variable d'environnement '{name}'."
+				"Impossible d'analyser la variable d'environnement « {} ».",
+				name
 			),
 			| Self::NotFound(name) => {
-				format!("La variable d'environnement '{name}' est manquante.")
+				format!(
+					"La variable d'environnement « {} » est manquante.",
+					name
+				)
 			}
 		};
 

@@ -236,7 +236,7 @@ impl<'a> fmt::Display for Error<'a> {
 				}
 				| Self::IsNotContainsLiteral(..) => {
 					format!(
-						"l'attribut '{}' du champ '{}' DOIT contenir \
+						"l'attribut « {} » du champ « {} » DOIT contenir \
 						une valeur littérale. (ex: {})",
 						Analyzer::ATTR_NAME,
 						field::name(self.field()),
@@ -246,7 +246,7 @@ impl<'a> fmt::Display for Error<'a> {
 				| Self::Parse(..) => {
 					format!(
 						"impossible d'analyser les options/paramètres de \
-						l'attribut '{}' pour le champ '{}'",
+						l'attribut « {} » pour le champ « {} »",
 						Analyzer::ATTR_NAME,
 						field::name(self.field()),
 					)

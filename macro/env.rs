@@ -19,7 +19,7 @@ use syn::{
 	Attribute, Lit, NestedMeta,
 };
 
-use crate::{field_name, token_upper};
+use crate::utils::{attribute, field};
 
 // ---- //
 // Type //
@@ -61,21 +61,17 @@ impl Analyzer {
 	}
 
 	/// Construit la structure utilisateur.
-	pub(super) fn build(&self) -> Result<'_, TokenStream> {
-		if !self.is_named_fields() {
+	pub(super) fn build(&self) -> Result<TokenStream> {
+		if !field::is_structure_of_fields_named(&self.input.fields) {
 			return Err(Error::IsNotNamedStruct(self.input.span()));
 		}
 
-		let maybe_fields = self
+		let fields: Vec<_> = self
 			.input
 			.fields
 			.iter()
-			.map(|field| self.parse_field(field));
-
-		let mut fields = Vec::with_capacity(maybe_fields.len());
-		for field in maybe_fields {
-			fields.push(field?);
-		}
+			.map(|field| self.parse_field(field))
+			.collect::<Result<_>>()?;
 
 		let struct_ident = &self.input.ident;
 		let output = quote! {
@@ -123,25 +119,6 @@ impl Analyzer {
 			.find(|attr| attr.path.is_ident(Self::ATTR_NAME))
 	}
 
-	/// Récupère une propriété d'une liste d'attributs.
-	//
-	// -> #[var( prop = "value", prop2 = "value2" )]
-	fn get_prop_in_attrlist<'f, 'n>(
-		&'f self,
-		list: &'n Punctuated<NestedMeta, Comma>,
-		prop: &'n str,
-	) -> Option<&'n Lit> {
-		list.iter().find_map(|nested_meta| {
-			if let syn::NestedMeta::Meta(syn::Meta::NameValue(name_value)) =
-				nested_meta
-			{
-				name_value.path.is_ident(prop).then_some(&name_value.lit)
-			} else {
-				None
-			}
-		})
-	}
-
 	/// Initialise une valeur pour un champ.
 	fn initialize_value_for_field<'a>(
 		&self,
@@ -177,16 +154,11 @@ impl Analyzer {
 		}
 	}
 
-	/// Vérifie que la structure est une structure de champs nommés.
-	fn is_named_fields(&self) -> bool {
-		matches!(self.input.fields, syn::Fields::Named(_))
-	}
-
 	fn parse_field<'a>(&'a self, field: &'a Field) -> Result<'_, TokenStream2> {
 		let maybe_attr = self.find_attr(field);
 
 		if maybe_attr.is_none() {
-			let token = token_upper(field);
+			let token = field::token_upper(field);
 			return self.initialize_value_for_field(field, token, None);
 		}
 
@@ -209,15 +181,21 @@ impl Analyzer {
 			})
 			.ok_or_else(|| Error::Parse(field, field.span()))??;
 
-		let default_attr = self.get_prop_in_attrlist(&nested_list, "default");
-		let key_attr = self.get_prop_in_attrlist(&nested_list, "key");
+		let env_key_token = Self::get_env_key(field, &nested_list);
+		let default_attr = attribute::get_prop_in_list(&nested_list, "default");
 
-		let field_token = match key_attr {
+		self.initialize_value_for_field(field, env_key_token, default_attr)
+	}
+
+	pub fn get_env_key(
+		field: &Field,
+		nested_list: &Punctuated<NestedMeta, Comma>,
+	) -> TokenStream2 {
+		let key_attr = attribute::get_prop_in_list(nested_list, "key");
+		match key_attr {
 			| Some(val) => quote! { #val },
-			| None => token_upper(field),
-		};
-
-		self.initialize_value_for_field(field, field_token, default_attr)
+			| None => field::token_upper(field),
+		}
 	}
 }
 
@@ -261,7 +239,7 @@ impl<'a> fmt::Display for Error<'a> {
 						"l'attribut '{}' du champ '{}' DOIT contenir \
 						une valeur littérale. (ex: {})",
 						Analyzer::ATTR_NAME,
-						field_name(self.field()),
+						field::name(self.field()),
 						r#"#[var(<name> = "hello world", ...)]"#
 					)
 				}
@@ -270,7 +248,7 @@ impl<'a> fmt::Display for Error<'a> {
 						"impossible d'analyser les options/paramètres de \
 						l'attribut '{}' pour le champ '{}'",
 						Analyzer::ATTR_NAME,
-						field_name(self.field()),
+						field::name(self.field()),
 					)
 				}
 			}

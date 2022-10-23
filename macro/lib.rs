@@ -6,13 +6,20 @@
 
 /// Macro derivable `Env`
 mod env;
+/// Macro derivable `Prompt`
+mod prompt;
 /// Macro attribute `setup`
 mod setup;
 
-use proc_macro::TokenStream;
-use syn::__private::{quote::quote, ToTokens, TokenStream2};
+/// Des utilitaires pour les proc-macros.
+mod utils;
 
-use self::{env::Analyzer as EnvAnalyzer, setup::Analyzer as SetupAnalyzer};
+use proc_macro::TokenStream;
+
+use self::{
+	env::Analyzer as EnvAnalyzer, prompt::Analyzer as PromptAnalyzer,
+	setup::Analyzer as SetupAnalyzer,
+};
 
 /// Attribut `setup`. Déclare la fonction principale `main`.
 // Utilisation de l'attribut.
@@ -62,8 +69,8 @@ pub fn setup(attrs: TokenStream, input: TokenStream) -> TokenStream {
 // 		nick: String,
 // 	}
 // ```
-#[proc_macro_derive(Env, attributes(var, default))]
-pub fn env_trait_derive(input: TokenStream) -> proc_macro::TokenStream {
+#[proc_macro_derive(Env, attributes(var))]
+pub fn env_trait_derive(input: TokenStream) -> TokenStream {
 	let struct_input = syn::parse_macro_input!(input as syn::ItemStruct);
 	let analyzer = EnvAnalyzer::new(struct_input);
 	match analyzer.build() {
@@ -72,18 +79,13 @@ pub fn env_trait_derive(input: TokenStream) -> proc_macro::TokenStream {
 	}
 }
 
-pub(crate) fn field_name(field: &syn::Field) -> String {
-	token_to_string(&field.ident)
-}
-
-pub(crate) fn token_to_string<T>(tokens: &T) -> String
-where
-	T: ToTokens,
-{
-	quote!(#tokens).to_string()
-}
-
-pub(crate) fn token_upper(field: &syn::Field) -> TokenStream2 {
-	let field = field.ident.as_ref().unwrap().to_string().to_uppercase();
-	quote! { #field }
+/// Derive `Prompt`.
+#[proc_macro_derive(Prompt, attributes(prompt))]
+pub fn prompt_trait_derive(input: TokenStream) -> TokenStream {
+	let struct_input = syn::parse_macro_input!(input as syn::ItemStruct);
+	let analyzer = PromptAnalyzer::new(struct_input);
+	match analyzer.build() {
+		| Ok(ok) => ok,
+		| Err(err) => err.compile_error(),
+	}
 }

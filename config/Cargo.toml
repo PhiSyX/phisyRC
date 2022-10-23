@@ -12,6 +12,7 @@ path = "./lib.rs"
 [dependencies]
 constants.workspace = true
 logger.workspace = true
+phisyrc.workspace = true
 terminal.workspace = true
 serde.workspace = true
 dirs = "^4.0"

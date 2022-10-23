@@ -5,6 +5,7 @@
  */
 
 use core::{fmt, ops};
+use std::str::FromStr;
 
 use serde::Deserialize;
 
@@ -70,6 +71,14 @@ impl From<Port> for u16 {
 impl From<u16> for Port {
 	fn from(port: u16) -> Self {
 		Self(port)
+	}
+}
+
+impl FromStr for Port {
+	type Err = std::num::ParseIntError;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		s.parse::<u16>().map(Self)
 	}
 }
 

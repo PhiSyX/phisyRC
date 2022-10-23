@@ -4,8 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use terminal::io::{confirm, prompt_default, Prompt};
-
 use crate::Port;
 
 // --------- //
@@ -15,73 +13,30 @@ use crate::Port;
 /// Configuration de la base de données.
 #[derive(Debug)]
 #[derive(serde::Deserialize, serde::Serialize)]
+#[derive(phisyrc::Prompt)]
 pub struct DatabaseConfig {
-	/// Adresse IP.
+	/// Adresse IP de la base de données
+	#[prompt(default = "127.0.0.1")]
 	pub ip: String,
-	/// Port de connexion.
+	/// Port de connexion de la base de données
+	#[prompt(default = "5432")]
 	pub port: Port,
 
 	/// Nom d'utilisateur.
+	#[prompt(default = "root")]
 	pub username: String,
 	/// Mot de passe.
+	#[prompt(default = "root")]
 	pub password: String,
 
 	/// Nom de la base de données.
+	#[prompt(default = "phisyrc")]
 	pub name: String,
 }
 
 // -------------- //
 // Implémentation // -> Interface
 // -------------- //
-
-impl Prompt for DatabaseConfig {
-	fn prompt() -> Self {
-		let ip = prompt_default(
-			"Adresse IP de la base de données",
-			constants::DEFAULT_DATABASE_IP,
-		);
-
-		let port = prompt_default::<u16>(
-			"Port de connexion à la base de données",
-			constants::DEFAULT_DATABASE_PORT,
-		);
-
-		let username = prompt_default(
-			"Nom d'utilisateur de connexion à la base de données",
-			constants::DEFAULT_DATABASE_USERNAME,
-		);
-
-		let password = prompt_default(
-			"Mot de passe de connexion à la base de données",
-			constants::DEFAULT_DATABASE_PASSWORD,
-		);
-
-		let name = prompt_default(
-			"Nom de la base de données",
-			constants::DEFAULT_DATABASE_NAME,
-		);
-
-		let build = Self {
-			name,
-			ip,
-			port: port.into(),
-			username,
-			password,
-		};
-
-		println!("Configuration terminée : {:#?}", &build);
-		println!();
-
-		if confirm("Êtes vous satisfait de cette configuration?") {
-			build
-		} else {
-			println!("Recommençons...");
-			println!();
-
-			Self::prompt()
-		}
-	}
-}
 
 impl Default for DatabaseConfig {
 	fn default() -> Self {

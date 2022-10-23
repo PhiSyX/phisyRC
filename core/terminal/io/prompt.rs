@@ -10,6 +10,8 @@ use std::{
 	str::FromStr,
 };
 
+use crate::format::Interface;
+
 // --------- //
 // Interface //
 // --------- //
@@ -28,7 +30,7 @@ pub fn confirm(message: impl fmt::Display) -> bool {
 	let mut choice = false;
 
 	while temporary_buffer.is_empty() {
-		println!("$ {message} (y/n)");
+		println!("{} {message} ({})", "$".cyan(), "y/N".gray());
 
 		let stdin = io::stdin().lock().lines().next();
 		if let Some(Ok(line)) = stdin {
@@ -58,7 +60,7 @@ where
 	let mut temporary_buffer = String::new();
 
 	loop {
-		println!("$ {message} (optionnel)");
+		println!("{} {message} (optionnel)", "$".cyan());
 		let stdin = io::stdin().lock().lines().next();
 		if let Some(Ok(line)) = stdin {
 			temporary_buffer = line.trim().to_owned();
@@ -83,8 +85,9 @@ where
 {
 	let mut temporary_buffer = String::new();
 
+	println!("{} {message}", "$".cyan());
+
 	while temporary_buffer.is_empty() {
-		println!("$ {message}");
 		let stdin = io::stdin().lock().lines().next();
 		if let Some(Ok(line)) = stdin {
 			temporary_buffer = line.trim().to_owned();
@@ -110,7 +113,12 @@ where
 {
 	let mut temporary_buffer = String::new();
 	loop {
-		println!("$ {message} (par défaut: {})", default.to_string());
+		println!(
+			"{} {message} (par défaut: {})",
+			"$".cyan(),
+			default.to_string().yellow(),
+		);
+		{}
 		let stdin = io::stdin().lock().lines().next();
 		if let Some(Ok(line)) = stdin {
 			temporary_buffer = line.trim().to_owned();
@@ -122,7 +130,7 @@ where
 
 	if temporary_buffer.is_empty() {
 		temporary_buffer = default.to_string();
-		println!("\t > {temporary_buffer}");
+		println!("\t > {}", temporary_buffer.yellow());
 		println!();
 	}
 

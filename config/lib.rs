@@ -125,7 +125,9 @@ where
 		} else if confirm(
 			"Voulez-vous créer la configuration de manière interactive?",
 		) {
+			println!();
 			println!("Configuration interactive...");
+			println!();
 			toml::to_string(&T::prompt())
 		} else {
 			return Err(io::Error::new(

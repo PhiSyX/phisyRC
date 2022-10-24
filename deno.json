@@ -1,0 +1,22 @@
+{
+	"fmt": {
+		"options": {
+			"lineWidth": 80,
+			"indentWidth": 4,
+			"singleQuote": false,
+			"useTabs": true
+		}
+	},
+	"lint": {
+		"rules": {
+			"exclude": [
+				"prefer-const"
+			]
+		}
+	},
+	"tasks": {
+		"dev": "cd apps/web && deno run -A --unstable --node-modules-dir npm:vite",
+		"build": "cd apps/web && deno run -A --unstable --node-modules-dir npm:vite build",
+		"lint": "cd apps/web && deno lint --ignore=node_modules,.vite,dist"
+	}
+}

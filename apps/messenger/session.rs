@@ -48,12 +48,7 @@ impl Actor {
 impl network::session::Interface for Actor {
 	type ID = SessionID;
 
-	async fn raw(&mut self, text: String) -> network::server::Result<()> {
-		logger::debug!("raw text : {text}");
-		Ok(())
-	}
-
-	async fn binary(&mut self, bytes: Vec<u8>) -> network::server::Result<()> {
+	async fn binary(&mut self, bytes: Vec<u8>) -> network::Result<()> {
 		logger::debug!("binary data : {bytes:?}");
 		Ok(())
 	}

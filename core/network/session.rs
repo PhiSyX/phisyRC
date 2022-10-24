@@ -9,9 +9,8 @@ use core::fmt;
 use tokio::sync::mpsc;
 
 use crate::{
-	server::Result,
 	socket::{OutgoingPacket, OutgoingPacketReader, OutgoingPacketWriter},
-	Socket,
+	Result, Socket,
 };
 
 // --------- //
@@ -21,8 +20,6 @@ use crate::{
 #[async_trait::async_trait]
 pub trait Interface: Send + Sync {
 	type ID: Send + Sync + Clone + fmt::Debug + fmt::Display;
-
-	async fn raw(&mut self, text: String) -> Result<()>;
 
 	async fn binary(&mut self, bytes: Vec<u8>) -> Result<()>;
 }
@@ -110,8 +107,7 @@ where
 				maybe_message = self.socket.recv() => {
 					match maybe_message {
 						| Some(Ok(message)) => match message {
-							OutgoingPacket::Raw(raw) => self.session.raw(raw).await?,
-							OutgoingPacket::Bin(bytes) => self.session.binary(bytes).await?,
+							| OutgoingPacket::Bin(bytes) => self.session.binary(bytes).await?,
 						}
 						| Some(Err(err)) => {
 							logger::error!("Erreur de connexion: {err} ({})", self.id.clone());

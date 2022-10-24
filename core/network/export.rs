@@ -7,7 +7,5 @@
 pub use async_trait::async_trait;
 
 pub use crate::{
-	server::{Error, Server},
-	session::Session,
-	socket::Socket,
+	client::Client, server::Server, session::Session, socket::Socket,
 };

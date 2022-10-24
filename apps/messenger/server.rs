@@ -49,7 +49,7 @@ impl network::server::Interface for Server {
 		&mut self,
 		socket: network::Socket,
 		addr: std::net::SocketAddr,
-	) -> network::server::Result<
+	) -> network::Result<
 		NetworkSession<<Self::Session as NetworkSessionInterface>::ID>,
 	> {
 		let id = uuid::Uuid::new_v4();

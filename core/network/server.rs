@@ -4,23 +4,20 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use core::fmt;
-use std::{io, net::SocketAddr};
+use std::net::SocketAddr;
 
 use futures::TryStreamExt;
 use tokio::{
 	net::{TcpListener, ToSocketAddrs},
 	sync::{mpsc, oneshot},
 };
-use tokio_util::codec::{Framed, LinesCodec};
+use tokio_util::codec::{BytesCodec, Framed};
 
-use crate::{session, socket::Socket};
+use crate::{session, socket::Socket, Error, Result};
 
 // ---- //
 // Type //
 // ---- //
-
-pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub type IncomingReader<T> = mpsc::UnboundedReceiver<Incoming<T>>;
 pub type IncomingWriter<T> = mpsc::UnboundedSender<Incoming<T>>;
@@ -80,16 +77,6 @@ where
 	pub user_instance: I,
 }
 
-// ----------- //
-// Énumération //
-// ----------- //
-
-#[derive(Debug)]
-pub enum Error {
-	IO(io::Error),
-	Codec(tokio_util::codec::LinesCodecError),
-}
-
 // -------------- //
 // Implémentation // -> API Publique
 // -------------- //
@@ -134,8 +121,8 @@ where
 				loop {
 					let (socket_stream, socket_addr) =
 						listener.accept().await?;
-					let codec = Framed::new(socket_stream, LinesCodec::new());
-					let socket = Socket::new(codec.map_err(Error::Codec));
+					let codec = Framed::new(socket_stream, BytesCodec::new());
+					let socket = Socket::new(codec.map_err(Error::IO));
 					server.accept(socket, socket_addr).await;
 				}
 
@@ -212,31 +199,5 @@ where
 			incoming: self.incoming.clone(),
 			outgoing: self.outgoing.clone(),
 		}
-	}
-}
-
-// -------------- //
-// Implémentation // -> From<T>
-// -------------- //
-
-impl From<io::Error> for Error {
-	fn from(err: io::Error) -> Self {
-		Self::IO(err)
-	}
-}
-
-impl From<tokio_util::codec::LinesCodecError> for Error {
-	fn from(err: tokio_util::codec::LinesCodecError) -> Self {
-		Self::Codec(err)
-	}
-}
-
-impl fmt::Display for Error {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let err_s = match self {
-			| Error::IO(err) => err.to_string(),
-			| Error::Codec(err) => err.to_string(),
-		};
-		write!(f, "{err_s}")
 	}
 }

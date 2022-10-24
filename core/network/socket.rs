@@ -9,7 +9,7 @@ use core::{fmt, marker::PhantomData, ops};
 use futures::{Future, SinkExt, StreamExt, TryStreamExt};
 use tokio::{sync::mpsc, task};
 
-use crate::server::Result;
+use crate::Result;
 
 // ---- //
 // Type //
@@ -32,7 +32,7 @@ pub type MaybeOutgoingPacketWriter =
 
 pub struct Socket {
 	sink: Sink,
-	stream: Stream,
+	pub(crate) stream: Stream,
 }
 
 #[derive(Debug)]
@@ -75,14 +75,12 @@ where
 #[derive(Debug)]
 #[derive(Clone)]
 pub enum IncomingPacket {
-	Raw(String),
 	Bin(Vec<u8>),
 }
 
 #[derive(Debug)]
 #[derive(Clone)]
 pub enum OutgoingPacket {
-	Raw(String),
 	Bin(Vec<u8>),
 }
 
@@ -206,18 +204,13 @@ where
 {
 	async fn run(mut self) -> Result<()> {
 		while let Some(result) = self.stream.next().await {
-			let result = result.map(P::into);
-			logger::info!("réception du message: {:?}", result);
+			let input = result.map(P::into);
 
-			let message = Ok(match result {
-				| Ok(msg) => match msg {
-					| IncomingPacket::Raw(t) => OutgoingPacket::Raw(t),
-					| IncomingPacket::Bin(b) => OutgoingPacket::Bin(b),
-				},
-				| Err(err) => return Err(err),
+			let output = input.map(|packet| match packet {
+				| IncomingPacket::Bin(b) => OutgoingPacket::Bin(b),
 			});
 
-			_ = self.writer.send(message);
+			_ = self.writer.send(output);
 		}
 
 		Ok(())
@@ -228,27 +221,25 @@ where
 // Implémentation // -> From<T>
 // -------------- //
 
-impl From<String> for IncomingPacket {
-	fn from(mut message: String) -> Self {
-		message.push_str("\r\n");
-		Self::Raw(message)
+impl From<bytes::BytesMut> for IncomingPacket {
+	fn from(b: bytes::BytesMut) -> Self {
+		Self::Bin(b.to_vec())
 	}
 }
 
-impl From<IncomingPacket> for String {
-	fn from(s: IncomingPacket) -> Self {
-		if let IncomingPacket::Raw(s) = s {
-			format!("{s}\r\n")
-		} else {
-			String::default()
+impl From<IncomingPacket> for bytes::BytesMut {
+	fn from(packet: IncomingPacket) -> Self {
+		let mut bytes_m = Self::new();
+		match packet {
+			| IncomingPacket::Bin(b) => bytes_m.extend(b),
 		}
+		bytes_m
 	}
 }
 
 impl From<OutgoingPacket> for IncomingPacket {
 	fn from(packet: OutgoingPacket) -> Self {
 		match packet {
-			| OutgoingPacket::Raw(t) => Self::Raw(t),
 			| OutgoingPacket::Bin(b) => Self::Bin(b),
 		}
 	}

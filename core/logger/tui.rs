@@ -60,11 +60,15 @@ where
 	W: Write,
 	C: EventLoop,
 {
-	ctx: tokio::sync::mpsc::UnboundedSender<C>,
+	ctx: mpsc::UnboundedSender<C>,
 	terminal: Terminal<CrosstermBackend<W>>,
 }
 
-pub struct View {
+pub struct View<C>
+where
+	C: EventLoop,
+{
+	ctx: mpsc::UnboundedSender<C>,
 	reader: LoggerReader,
 	logs: Vec<Entry>,
 	scroll_position: usize,
@@ -100,7 +104,7 @@ where
 		ctx: mpsc::UnboundedSender<C>,
 		reader: LoggerReader,
 	) -> io::Result<()> {
-		let view = View::new(reader);
+		let view = View::new(ctx.clone(), reader);
 		let stdout = io::stdout();
 		let mut tui = Self::new(ctx, stdout)?;
 		tui.run(view).await
@@ -127,7 +131,7 @@ where
 		})
 	}
 
-	async fn run(&mut self, mut view: View) -> io::Result<()> {
+	async fn run(&mut self, mut view: View<C>) -> io::Result<()> {
 		let mut event_stream = EventStream::new();
 
 		let timeout = time::Duration::from_millis(64);
@@ -164,16 +168,20 @@ where
 		Ok(())
 	}
 
-	fn render(&mut self, view: &mut View) -> io::Result<()> {
+	fn render(&mut self, view: &mut View<C>) -> io::Result<()> {
 		self.terminal
 			.draw(|frame| view.render(frame, frame.size()))
 			.map(|_| ())
 	}
 }
 
-impl View {
-	fn new(reader: LoggerReader) -> Self {
+impl<C> View<C>
+where
+	C: EventLoop,
+{
+	fn new(ctx: mpsc::UnboundedSender<C>, reader: LoggerReader) -> Self {
 		Self {
+			ctx,
 			reader,
 			logs: Default::default(),
 			scroll_position: Default::default(),
@@ -188,7 +196,10 @@ impl View {
 // -------------- //
 
 #[async_trait::async_trait]
-impl ViewInterface for View {
+impl<C> ViewInterface for View<C>
+where
+	C: EventLoop,
+{
 	fn render(&mut self, frame: &mut Frame<impl Backend>, _: Rect) {
 		let split = Layout::default()
 			.direction(Direction::Vertical)
@@ -299,10 +310,13 @@ impl ViewInterface for View {
 			}
 
 			| KeyCode::Enter => {
-				log::warn!(
-					"TODO: envoyer la ligne au serveur: {}",
-					self.input_line.iter().collect::<String>()
-				);
+				if self.input_line.is_empty() {
+					return;
+				}
+				let input = self.input_line.iter().collect::<String>();
+				_ = self.ctx.send(C::input(input));
+				self.input_line.clear();
+				self.input_cursor = 0;
 			}
 			| KeyCode::Left => {
 				self.input_cursor = self.input_cursor.saturating_sub(1);

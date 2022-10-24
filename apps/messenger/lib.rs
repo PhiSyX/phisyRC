@@ -34,6 +34,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 // Structure //
 // --------- //
 
+#[allow(dead_code)]
 pub struct App {
 	args: cli_app,
 	env: env_app,
@@ -46,6 +47,7 @@ pub struct App {
 
 #[derive(Debug)]
 pub enum AppContext {
+	InputFromTUI(String),
 	Quit,
 }
 
@@ -108,28 +110,27 @@ impl App {
 		self,
 		(ctx, mut crx): (AppContextWriter, AppContextReader),
 	) -> Result<()> {
+		let cfg = config::load::<ServerConfig>(constants::CONFIG_SERVER)?;
+
+		let _server = NetworkServer::create(
+			(cfg.ip, cfg.port.into()),
+			|instance: NetworkServer<AppServer>| AppServer::new(ctx, instance),
+		)
+		.await?;
+
 		let receiver_context_task = tokio::spawn(async move {
 			loop {
 				tokio::select! {
 					Some(app_ctx) = crx.recv() => match app_ctx {
 						| AppContext::Quit => break,
+
+						| AppContext::InputFromTUI(msg) => {
+							logger::warn!("TODO: parser la ligne: {msg}");
+						}
 					}
 				}
 			}
 		});
-
-		let cfg = config::load_or_prompt::<ServerConfig>(
-			constants::CONFIG_SERVER,
-			"Voulez-vous créer la configuration serveur?",
-		)?;
-
-		let server_addr = (cfg.ip, cfg.port.into());
-
-		NetworkServer::create(
-			server_addr,
-			|instance: NetworkServer<AppServer>| AppServer::new(ctx, instance),
-		)
-		.await?;
 
 		loop {
 			if receiver_context_task.is_finished() {
@@ -192,6 +193,10 @@ impl App {
 // -------------- //
 
 impl terminal::EventLoop for AppContext {
+	fn input(msg: String) -> Self {
+		Self::InputFromTUI(msg)
+	}
+
 	fn quit() -> Self {
 		Self::Quit
 	}

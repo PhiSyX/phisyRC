@@ -12,5 +12,7 @@ use crate::format::Interface;
 impl<S> Interface for S where S: AsRef<str> {}
 
 pub trait EventLoop: 'static + Send + Sync {
+	fn input(input: String) -> Self;
+
 	fn quit() -> Self;
 }

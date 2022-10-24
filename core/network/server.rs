@@ -90,7 +90,7 @@ where
 	pub async fn create(
 		addr: impl ToSocketAddrs,
 		ctor: impl FnOnce(Self) -> I,
-	) -> Result<()> {
+	) -> Result<Self> {
 		let (incoming_sender, incoming_receiver) = mpsc::unbounded_channel();
 		let (outgoing_sender, outgoing_receiver) = mpsc::unbounded_channel();
 
@@ -133,12 +133,12 @@ where
 
 		tokio::spawn(actor.receiver_task());
 
-		Ok(())
+		Ok(this)
 	}
 }
 
 // -------------- //
-// Implémentation //
+// Implémentation // -> API Publique
 // -------------- //
 
 impl<I> Server<I>
@@ -161,6 +161,10 @@ where
 		reader.await.unwrap()
 	}
 }
+
+// -------------- //
+// Implémentation //
+// -------------- //
 
 impl<I> Actor<I>
 where

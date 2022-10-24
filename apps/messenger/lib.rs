@@ -113,7 +113,8 @@ impl App {
 		let cfg = config::load::<ServerConfig>(constants::CONFIG_SERVER)?;
 
 		let _server = NetworkServer::create(
-			(cfg.ip, cfg.port.into()),
+			(cfg.ip.to_owned(), cfg.port.into()),
+			(cfg.ip, cfg.websocket_port.into()),
 			|instance: NetworkServer<AppServer>| AppServer::new(ctx, instance),
 		)
 		.await?;
@@ -138,6 +139,7 @@ impl App {
 			}
 
 			logger::info!(""); // <- HACK(phisyx): permet de ne pas bloquer tui
+			tokio::time::sleep(tokio::time::Duration::from_millis(64)).await;
 		}
 
 		Ok(())

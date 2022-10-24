@@ -30,6 +30,7 @@ pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(Debug)]
 pub enum Error {
 	IO(io::Error),
+	WebSocket(tokio_tungstenite::tungstenite::Error),
 }
 
 // -------------- //
@@ -42,10 +43,17 @@ impl From<io::Error> for Error {
 	}
 }
 
+impl From<tokio_tungstenite::tungstenite::Error> for Error {
+	fn from(err: tokio_tungstenite::tungstenite::Error) -> Self {
+		Self::WebSocket(err)
+	}
+}
+
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let err_s = match self {
-			| Error::IO(err) => err.to_string(),
+			| Self::IO(err) => err.to_string(),
+			| Self::WebSocket(err) => err.to_string(),
 		};
 		write!(f, "{err_s}")
 	}

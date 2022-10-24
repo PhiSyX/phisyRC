@@ -8,6 +8,7 @@ use core::{fmt, marker::PhantomData, ops};
 
 use futures::{Future, SinkExt, StreamExt, TryStreamExt};
 use tokio::{sync::mpsc, task};
+use tokio_tungstenite::tungstenite;
 
 use crate::Result;
 
@@ -237,10 +238,42 @@ impl From<IncomingPacket> for bytes::BytesMut {
 	}
 }
 
+impl From<IncomingPacket> for tungstenite::Message {
+	fn from(message: IncomingPacket) -> Self {
+		match message {
+			| IncomingPacket::Bin(bytes) => Self::Binary(bytes),
+		}
+	}
+}
+
+impl From<tungstenite::Message> for IncomingPacket {
+	fn from(message: tungstenite::Message) -> Self {
+		match message {
+			| tungstenite::Message::Binary(bytes) => Self::Bin(bytes),
+			| tungstenite::Message::Text(text) => {
+				let bytes = text.as_bytes();
+				Self::Bin(bytes.to_vec())
+			}
+			| m => {
+				logger::warn!("From Message to Incoming : {m}");
+				Self::Bin(vec![])
+			}
+		}
+	}
+}
+
 impl From<OutgoingPacket> for IncomingPacket {
 	fn from(packet: OutgoingPacket) -> Self {
 		match packet {
 			| OutgoingPacket::Bin(b) => Self::Bin(b),
+		}
+	}
+}
+
+impl From<OutgoingPacket> for tungstenite::Message {
+	fn from(message: OutgoingPacket) -> Self {
+		match message {
+			| OutgoingPacket::Bin(bytes) => tungstenite::Message::Binary(bytes),
 		}
 	}
 }

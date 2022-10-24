@@ -27,6 +27,7 @@ pub const CONFIG_SERVER: &str = "server.toml";
 pub const DEFAULT_SERVER_NAME: &str = "localhost";
 pub const DEFAULT_SERVER_IP: &str = "127.0.0.1";
 pub const DEFAULT_SERVER_PORT: u16 = 6667;
+pub const DEFAULT_SERVER_WEBSOCKET_PORT: u16 = 9667;
 pub const DEFAULT_SERVER_PASSWORD: Option<String> = None;
 
 // --------------- //

@@ -88,7 +88,8 @@ where
 	I: Interface,
 {
 	pub async fn create(
-		addr: impl ToSocketAddrs,
+		tcp_addr: impl ToSocketAddrs,
+		ws_addr: impl ToSocketAddrs,
 		ctor: impl FnOnce(Self) -> I,
 	) -> Result<Self> {
 		let (incoming_sender, incoming_receiver) = mpsc::unbounded_channel();
@@ -109,7 +110,7 @@ where
 		};
 
 		tokio::spawn({
-			let listener = TcpListener::bind(addr).await?;
+			let listener = TcpListener::bind(tcp_addr).await?;
 			let server = this.clone();
 
 			async move {
@@ -123,6 +124,31 @@ where
 						listener.accept().await?;
 					let codec = Framed::new(socket_stream, BytesCodec::new());
 					let socket = Socket::new(codec.map_err(Error::IO));
+					server.accept(socket, socket_addr).await;
+				}
+
+				#[allow(unreachable_code)]
+				Result::<()>::Ok(())
+			}
+		});
+
+		tokio::spawn({
+			let listener = TcpListener::bind(ws_addr).await?;
+			let server = this.clone();
+
+			async move {
+				logger::info!(
+					"En attente de connexion au serveur WebSocket « {} »",
+					listener.local_addr()?
+				);
+
+				loop {
+					let (socket_stream, socket_addr) =
+						listener.accept().await?;
+					let websocket =
+						tokio_tungstenite::accept_async(socket_stream).await?;
+					let socket =
+						Socket::new(websocket.map_err(Error::WebSocket));
 					server.accept(socket, socket_addr).await;
 				}
 

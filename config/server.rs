@@ -27,6 +27,10 @@ pub struct ServerConfig {
 	#[prompt(default = "6667")]
 	pub port: Port,
 
+	/// Port de communication WebSocket du serveur
+	#[prompt(default = "9667")]
+	pub websocket_port: Port,
+
 	/// Mot de passe de connexion au serveur
 	#[prompt]
 	pub password: Option<String>,
@@ -42,6 +46,7 @@ impl Default for ServerConfig {
 			name: constants::DEFAULT_SERVER_NAME.into(),
 			ip: constants::DEFAULT_SERVER_IP.into(),
 			port: constants::DEFAULT_SERVER_PORT.into(),
+			websocket_port: constants::DEFAULT_SERVER_WEBSOCKET_PORT.into(),
 			password: constants::DEFAULT_SERVER_PASSWORD,
 		}
 	}

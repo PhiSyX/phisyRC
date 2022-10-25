@@ -42,6 +42,13 @@ use crate::{
 	FilterFn, LoggerReader, NO,
 };
 
+// -------- //
+// Constant //
+// -------- //
+
+const CTRL: KeyModifiers = KeyModifiers::CONTROL;
+const SHIFT: KeyModifiers = KeyModifiers::SHIFT;
+
 // --------- //
 // Structure //
 // --------- //
@@ -151,7 +158,7 @@ where
 					if let Event::Key(event) = event {
 						// NOTE(phisyx): quitter l'application.
 						let quit_key_bindings = ['c', 'C', 'q', 'Q'].map(KeyCode::Char);
-						if event.modifiers == KeyModifiers::CONTROL
+						if event.modifiers == CTRL
 							&& quit_key_bindings.contains(&event.code)
 						{
 							break;
@@ -257,9 +264,7 @@ where
 	async fn update_keyboard_event(&mut self, event: KeyEvent) {
 		match event.code {
 			| KeyCode::Char(ch) => match ch {
-				| 'l' | 'L'
-					if event.modifiers.contains(KeyModifiers::CONTROL) =>
-				{
+				| 'l' | 'L' if event.modifiers.contains(CTRL) => {
 					self.logs.clear();
 				}
 
@@ -274,7 +279,7 @@ where
 					return;
 				}
 
-				if event.modifiers.contains(KeyModifiers::CONTROL) {
+				if event.modifiers.contains(CTRL) {
 					self.input_line.drain(0..self.input_cursor);
 					self.input_cursor = 0;
 				} else {
@@ -294,7 +299,7 @@ where
 					return;
 				}
 
-				if event.modifiers.contains(KeyModifiers::CONTROL) {
+				if event.modifiers.contains(CTRL) {
 					self.input_line.drain(self.input_cursor..);
 					self.input_cursor = self.input_line.len();
 				} else {
@@ -331,10 +336,10 @@ where
 				}
 			}
 
-			| KeyCode::Up => {
+			| KeyCode::Up if event.modifiers.contains(SHIFT) => {
 				self.scroll_position = self.scroll_position.saturating_sub(1);
 			}
-			| KeyCode::Down => {
+			| KeyCode::Down if event.modifiers.contains(SHIFT) => {
 				self.scroll_position = self.scroll_position.saturating_add(1);
 			}
 			| KeyCode::Home => {

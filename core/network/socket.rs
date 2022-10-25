@@ -10,7 +10,7 @@ use futures::{Future, SinkExt, StreamExt, TryStreamExt};
 use tokio::{sync::mpsc, task};
 use tokio_tungstenite::tungstenite;
 
-use crate::Result;
+use crate::{server::Reason, Result};
 
 // ---- //
 // Type //
@@ -77,12 +77,14 @@ where
 #[derive(Clone)]
 pub enum IncomingPacket {
 	Bin(Vec<u8>),
+	Quit(Option<Reason>),
 }
 
 #[derive(Debug)]
 #[derive(Clone)]
 pub enum OutgoingPacket {
 	Bin(Vec<u8>),
+	Quit(Option<Reason>),
 }
 
 // -------------- //
@@ -209,6 +211,7 @@ where
 
 			let output = input.map(|packet| match packet {
 				| IncomingPacket::Bin(b) => OutgoingPacket::Bin(b),
+				| IncomingPacket::Quit(mr) => OutgoingPacket::Quit(mr),
 			});
 
 			_ = self.writer.send(output);
@@ -233,6 +236,7 @@ impl From<IncomingPacket> for bytes::BytesMut {
 		let mut bytes_m = Self::new();
 		match packet {
 			| IncomingPacket::Bin(b) => bytes_m.extend(b),
+			| IncomingPacket::Quit(_) => unimplemented!(),
 		}
 		bytes_m
 	}
@@ -242,6 +246,12 @@ impl From<IncomingPacket> for tungstenite::Message {
 	fn from(message: IncomingPacket) -> Self {
 		match message {
 			| IncomingPacket::Bin(bytes) => Self::Binary(bytes),
+			| IncomingPacket::Quit(mr) => Self::Close({
+				mr.map(|r| tungstenite::protocol::CloseFrame {
+					code: r.code.into(),
+					reason: r.reason.into(),
+				})
+			}),
 		}
 	}
 }
@@ -254,8 +264,14 @@ impl From<tungstenite::Message> for IncomingPacket {
 				let bytes = text.as_bytes();
 				Self::Bin(bytes.to_vec())
 			}
+			| tungstenite::Message::Close(mcf) => Self::Quit({
+				mcf.map(|cf| Reason {
+					code: cf.code.into(),
+					reason: cf.reason.into(),
+				})
+			}),
 			| m => {
-				logger::warn!("From Message to Incoming : {m}");
+				logger::warn!("From Message to Incoming : {m:?}");
 				Self::Bin(vec![])
 			}
 		}
@@ -266,6 +282,9 @@ impl From<OutgoingPacket> for IncomingPacket {
 	fn from(packet: OutgoingPacket) -> Self {
 		match packet {
 			| OutgoingPacket::Bin(b) => Self::Bin(b),
+			| OutgoingPacket::Quit(_) => {
+				unimplemented!("out -> inc : quit")
+			}
 		}
 	}
 }
@@ -274,6 +293,14 @@ impl From<OutgoingPacket> for tungstenite::Message {
 	fn from(message: OutgoingPacket) -> Self {
 		match message {
 			| OutgoingPacket::Bin(bytes) => tungstenite::Message::Binary(bytes),
+			| OutgoingPacket::Quit(maybe_r) => {
+				tungstenite::Message::Close(maybe_r.map(|r| {
+					tungstenite::protocol::CloseFrame {
+						code: r.code.into(),
+						reason: r.reason.into(),
+					}
+				}))
+			}
 		}
 	}
 }

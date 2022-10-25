@@ -59,4 +59,12 @@ impl network::server::Interface for Server {
 		self.sessions.insert(id, session.clone());
 		Ok(session)
 	}
+
+	async fn close(
+		&mut self,
+		id: <Self::Session as network::session::Interface>::ID,
+	) -> network::Result<()> {
+		self.sessions.remove(&id);
+		Ok(())
+	}
 }

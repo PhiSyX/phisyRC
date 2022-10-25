@@ -37,6 +37,11 @@ pub trait Interface: Send {
 		socket: Socket,
 		addr: SocketAddr,
 	) -> Result<session::Session<<Self::Session as session::Interface>::ID>>;
+
+	async fn close(
+		&mut self,
+		id: <Self::Session as session::Interface>::ID,
+	) -> Result<()>;
 }
 
 // --------- //
@@ -62,9 +67,19 @@ where
 }
 
 #[derive(Debug)]
-pub struct Outgoing<I> {
-	// TODO(phisyx): ajouter un code et une raison lié à ce code
-	_marker: I,
+pub struct Outgoing<I>
+where
+	I: Interface,
+{
+	id: <I::Session as session::Interface>::ID,
+	reason: Result<Option<Reason>>,
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+pub struct Reason {
+	pub code: u16,
+	pub reason: String,
 }
 
 pub struct Actor<I>
@@ -73,7 +88,7 @@ where
 {
 	pub incoming: IncomingReader<I>,
 	pub outgoing: OutgoingReader<I>,
-	pub this_instance: Server<I>,
+	pub server_instance: Server<I>,
 	pub user_instance: I,
 }
 
@@ -105,7 +120,7 @@ where
 		let actor = Actor {
 			incoming: incoming_receiver,
 			outgoing: outgoing_receiver,
-			this_instance: this.clone(),
+			server_instance: this.clone(),
 			user_instance: instance.clone(),
 		};
 
@@ -186,6 +201,17 @@ where
 
 		reader.await.unwrap()
 	}
+
+	async fn close(
+		&self,
+		session_id: <I::Session as session::Interface>::ID,
+		reason: Result<Option<Reason>, Error>,
+	) {
+		_ = self.outgoing.send(Outgoing {
+			id: session_id,
+			reason,
+		})
+	}
 }
 
 // -------------- //
@@ -198,18 +224,39 @@ where
 	I: Send,
 	I: Interface,
 {
-	// TODO(phisyx): gérer la déconnexion
 	async fn receiver_task(mut self) -> Result<()> {
 		loop {
 			tokio::select! {
 			Some(Incoming { socket, addr, respond }) = self.incoming.recv() => {
 				logger::info!("Connexion accepté: « {} »", addr);
 				let session = self.user_instance.accept(socket, addr).await?;
-				_= respond.send(session.id);
+				_ = respond.send(session.id.clone());
+				tokio::spawn({
+					let server = self.server_instance.clone();
+					async move {
+						let reason = session.close().await;
+						server.close(session.id, reason).await;
+					}
+				});
 			}
 
-			Some(Outgoing { .. }) = self.outgoing.recv() => {
-				logger::warn!("Gérer la déconnexion...");
+			Some(Outgoing { id, reason }) = self.outgoing.recv() => {
+				self.user_instance.close(id.clone()).await?;
+				match reason {
+					| Ok(Some(Reason { code, reason })) => {
+						if reason.is_empty() {
+							logger::info!("[{id}]: connexion fermée ({code})");
+						} else {
+							logger::info!("[{id}]: connexion fermée: {reason} ({code})");
+						}
+					},
+					| Ok(_) => {
+						logger::info!("[{id}]: connexion fermée");
+					}
+					| Err(err) => {
+						logger::error!("[{id}]: connexion fermée: {err}");
+					},
+				}
 			}
 			}
 		}

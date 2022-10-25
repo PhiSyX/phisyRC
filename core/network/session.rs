@@ -5,13 +5,22 @@
  */
 
 use core::fmt;
+use std::sync::Arc;
 
-use tokio::sync::mpsc;
+use futures::channel::oneshot;
+use tokio::sync::{mpsc, Mutex};
 
 use crate::{
+	server::Reason,
 	socket::{OutgoingPacket, OutgoingPacketReader, OutgoingPacketWriter},
 	Result, Socket,
 };
+
+// ---- //
+// Type //
+// ---- //
+
+type DisconnectedReader = oneshot::Receiver<Result<Option<Reason>>>;
 
 // --------- //
 // Interface //
@@ -35,6 +44,7 @@ where
 {
 	pub id: I,
 	socket: OutgoingPacketWriter,
+	outgoing: Arc<Mutex<Option<DisconnectedReader>>>,
 }
 
 struct Actor<I>
@@ -66,17 +76,28 @@ where
 		U: Interface<ID = I>,
 	{
 		let (socket_sender, socket_receiver) = mpsc::unbounded_channel();
+		let (outgoing_sender, outgoing_receiver) = oneshot::channel();
 
 		let this = Self {
 			id: id.clone(),
 			socket: socket_sender,
+			outgoing: Arc::new(Mutex::new(Some(outgoing_receiver))),
 		};
 
 		let instance = ctor(this.clone());
 
 		let actor = Actor::new(instance, id, socket_receiver, socket);
-		tokio::spawn(actor.run());
+		tokio::spawn(async move {
+			let reason = actor.run().await;
+			outgoing_sender.send(reason).unwrap()
+		});
 		this
+	}
+
+	pub(crate) async fn close(&self) -> Result<Option<Reason>> {
+		let mut outgoing = self.outgoing.lock().await;
+		let reason = outgoing.take().unwrap();
+		reason.await.unwrap()
 	}
 }
 
@@ -98,16 +119,22 @@ where
 		}
 	}
 
-	async fn run(mut self) -> Result<()> {
+	async fn run(mut self) -> Result<Option<Reason>> {
 		loop {
 			tokio::select! {
 				Some(message) = self.packet_reader.recv() => {
 					self.socket.send(message.clone());
+					if let OutgoingPacket::Quit(r) = message {
+						return Ok(r)
+					}
 				}
 				maybe_message = self.socket.recv() => {
 					match maybe_message {
 						| Some(Ok(message)) => match message {
 							| OutgoingPacket::Bin(bytes) => self.session.binary(bytes).await?,
+							| OutgoingPacket::Quit(reason) => {
+								return Ok(reason.map(Reason::from))
+							},
 						}
 						| Some(Err(err)) => {
 							logger::error!("Erreur de connexion: {err} ({})", self.id.clone());
@@ -118,7 +145,7 @@ where
 				else => break,
 			}
 		}
-		Ok(())
+		Ok(None)
 	}
 }
 
@@ -134,6 +161,7 @@ where
 		Self {
 			id: self.id.clone(),
 			socket: self.socket.clone(),
+			outgoing: self.outgoing.clone(),
 		}
 	}
 }

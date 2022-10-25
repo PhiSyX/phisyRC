@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-let websocket!: WebSocket;
-let websocket_uri_el = ref<HTMLInputElement | null>(null);
+let websocket = ref<WebSocket | null>(null);
+let websocket_uri = ref("ws://localhost:9667/");
 
 let input = ref("hello world");
 let output = ref<any>([]);
@@ -17,15 +17,18 @@ enum Output {
 
 type FIXME = any;
 
-function handle_connect(evt: MouseEvent) {
-	let websocket_uri = websocket_uri_el.value!.value;
-	websocket = new WebSocket(websocket_uri);
-	websocket.binaryType = "arraybuffer";
+function handle_click_connect(evt: MouseEvent) {
+	websocket.value = new WebSocket(websocket_uri.value);
+	websocket.value.binaryType = "arraybuffer";
 
-	websocket.addEventListener("open", handle_open_connection);
-	websocket.addEventListener("close", handle_close_connection);
-	websocket.addEventListener("message", handle_message);
-	websocket.addEventListener("error", handle_error);
+	websocket.value.addEventListener("open", handle_open_connection);
+	websocket.value.addEventListener("close", handle_close_connection);
+	websocket.value.addEventListener("message", handle_message);
+	websocket.value.addEventListener("error", handle_error);
+}
+
+function handle_click_close(evt: MouseEvent) {
+	handle_close_connection(evt);
 }
 
 function handle_submit(evt: Event) {
@@ -39,9 +42,10 @@ function handle_open_connection(evt: Event) {
 	write_output(Output.Connected);
 }
 
-function handle_close_connection(evt: CloseEvent) {
+function handle_close_connection(evt: CloseEvent | MouseEvent) {
 	write_output(Output.Disconnected);
-	websocket!.close();
+	websocket.value!.close();
+	websocket.value = null;
 }
 
 function handle_error(evt: Event) {
@@ -67,7 +71,7 @@ function handle_binary_input(evt: ProgressEvent<FileReader>) {
 }
 
 function process(raw: NonNullable<ArrayBuffer>) {
-	if (!websocket) {
+	if (!websocket.value) {
 		return;
 	}
 	write_output(Output.Received, raw);
@@ -77,7 +81,7 @@ function write_socket(message: string) {
 	write_output(Output.Send, message);
 	let encoder = new TextEncoder();
 	let bytes = encoder.encode(`${message}\r\n`);
-	websocket!.send(bytes);
+	websocket.value!.send(bytes);
 }
 
 function write_socket_from_input() {
@@ -95,16 +99,19 @@ function write_output(state: Output, ...args: FIXME) {
 	<h1>Test communication WebSocket</h1>
 
 	<form method="post" @submit="handle_submit">
-		<div class="form-group">
-			<input ref="websocket_uri_el" type="text" value="ws://localhost:9667/">
-			<button type="button" @click.once="handle_connect">Se connecter</button>
+		<div class="form-group" v-if="!websocket">
+			<input v-model="websocket_uri" type="text">
+			<button type="button" @click.once="handle_click_connect">Se connecter</button>
+		</div>
+		<div class="form-group" v-else>
+			<button type="button" @click.once="handle_click_close">Fermer la connexion</button>
 		</div>
 
 		<output>
 			<p if="output.length > 0" v-for="[state, item] in output">[ {{ state }} ]: {{ item }}</p>
 		</output>
 
-		<div class="form-group">
+		<div class="form-group" v-if="websocket">
 			<input v-model="input" type="text">
 			<button type="submit">Envoie du message au serveur</button>
 		</div>

@@ -122,6 +122,9 @@ where
 					match result {
 						| Some(Ok(message)) => match message.to_owned() {
 							| OutgoingPacket::Bin(bytes) => self.client.binary(bytes).await?,
+							| OutgoingPacket::Quit(_) => {
+								logger::warn!("reconnexion?");
+							}
 						}
 						Some(Err(err)) => {
 							logger::error!("Erreur de la connexion: {err}");

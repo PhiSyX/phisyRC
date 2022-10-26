@@ -8,7 +8,7 @@ use std::io;
 
 use log::{LevelFilter, SetLoggerError};
 use terminal::{
-	format::Interface,
+	format::color::Interface,
 	layout::{Alignment, Cell},
 	EventLoop,
 };

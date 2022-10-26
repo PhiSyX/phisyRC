@@ -10,7 +10,7 @@ use std::{
 	str::FromStr,
 };
 
-use crate::format::Interface;
+use crate::format::color::Interface;
 
 // --------- //
 // Interface //

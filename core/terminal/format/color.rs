@@ -307,6 +307,10 @@ pub enum Color {
 	Gray,
 }
 
+// -------------- //
+// Implémentation //
+// -------------- //
+
 impl Color {
 	/// Constante d'arrière plan.
 	const BACKGROUND: u8 = 49;

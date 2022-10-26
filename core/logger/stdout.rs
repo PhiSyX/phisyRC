@@ -11,7 +11,7 @@ use log::{
 	max_level, set_boxed_logger, set_logger, set_max_level, Level, LevelFilter,
 	Log, Metadata, Record, SetLoggerError,
 };
-use terminal::{format::Interface, layout::GridLayout};
+use terminal::{format::color::Interface, layout::GridLayout};
 
 use crate::{builder::Builder, echo::Echo, FilterFn, NO};
 

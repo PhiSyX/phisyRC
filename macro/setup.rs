@@ -212,7 +212,7 @@ impl Analyzer {
 			#[allow(unused_variables)]
 			let #maybe_ident = setup::#ident(#args_pat, #arg_lit, ctx.clone()).await;
 			if let Err(err) = #maybe_ident {
-				use terminal::format::Interface;
+				use terminal::format::color::Interface;
 				eprintln!();
 				eprintln!(
 					"{}: #[phisyrc::setup({})]: quelque chose s'est mal passée -- {}",

@@ -7,7 +7,7 @@
 pub mod color;
 pub mod style;
 
-pub use self::color::{Color, Interface};
+// pub use self::color::Color;
 
 pub(crate) const PREFIX_FORMAT: &str = "\x1b[";
 pub(crate) const SUFFIX_FORMAT: &str = "m";

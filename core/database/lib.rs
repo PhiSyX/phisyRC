@@ -7,7 +7,6 @@
 mod export;
 
 use core::fmt;
-use std::str::FromStr;
 
 use postgres::NoTls;
 

@@ -36,8 +36,11 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[allow(dead_code)]
 pub struct App {
-	args: cli_app,
+	/// Argument de la CLI.
+	cli: cli_app,
+	/// Les variables d'environnement.
 	env: env_app,
+	/// Client de la base de données.
 	database: database::Client,
 }
 
@@ -47,20 +50,29 @@ pub struct App {
 
 #[derive(Debug)]
 pub enum AppContext {
-	InputFromTUI(String),
+	/// Utilisé pour quitter l'application.
 	Quit,
+	/// Entrée utilisateur envoyé depuis le terminal (stdout / TUI)
+	InputFromTUI(String),
+	/// Message IRC.
 	IRC(irc_msg::Message),
 }
 
 #[derive(Debug)]
 #[allow(non_camel_case_types)]
 pub enum Error {
+	/// Erreur I/O.
 	IO(std::io::Error),
-	Boxed(Box<dyn std::error::Error>),
+	/// Erreur liée à la base de données.
 	Database(database::Error),
+	/// Erreur liée au réseau (serveur / client).
 	Network(network::Error),
+	/// Génération du hachage de mot de passe invalide.
 	BadGenerationPassword,
+	/// La variable d'environnement APP_SECRET_KEY n'est pas définie.
 	SecretKeyNotFound,
+
+	/// [std::process::ExitCode::SUCCESS]
 	EXIT_SUCCESS,
 }
 
@@ -76,7 +88,7 @@ impl App {
 		database: database::Client,
 	) -> Self {
 		Self {
-			args,
+			cli: args,
 			env,
 			database,
 		}
@@ -84,7 +96,7 @@ impl App {
 
 	/// Gère les commandes de la CLI.
 	pub fn handle_command(&self) -> Result<()> {
-		match self.args.command.as_ref() {
+		match self.cli.command.as_ref() {
 			| Some(cmd) => match cmd {
 				| cli::Command::MakePassword(make_password) => {
 					self.handle_make_password_command(make_password)
@@ -155,6 +167,8 @@ impl App {
 // -------------- //
 
 impl App {
+	/// [CLI] Génère un mot de passe haché avec l'algorithme de hachage choisi
+	/// par le choix utilisateur.
 	fn handle_make_password_command(
 		&self,
 		make_password: &CommandMakePassword,
@@ -223,11 +237,6 @@ impl From<std::io::Error> for Error {
 		Self::IO(err)
 	}
 }
-impl From<Box<dyn std::error::Error>> for Error {
-	fn from(err: Box<dyn std::error::Error>) -> Self {
-		Self::Boxed(err)
-	}
-}
 
 impl From<database::Error> for Error {
 	fn from(err: database::Error) -> Self {
@@ -254,7 +263,6 @@ impl fmt::Display for Error {
 			| Self::IO(err) => {
 				format!("IO: {err}")
 			}
-			| Self::Boxed(err) => err.to_string(),
 			| Self::Database(err) => {
 				format!("Base de données: {err}")
 			}

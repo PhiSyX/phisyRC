@@ -8,6 +8,7 @@
 // Structure //
 // --------- //
 
+/// Les variables d'environnement de l'application.
 #[derive(Debug)]
 #[derive(phisyrc::Env)]
 #[allow(non_camel_case_types)]

@@ -26,6 +26,12 @@ pub type CommandMakePassword =
 // Structure //
 // --------- //
 
+/// CLI de l'application.
+#[allow(non_camel_case_types)]
+#[derive(Debug)]
+pub struct cli_app(CliApp);
+
+/// Les options par défaut.
 #[derive(Debug)]
 #[derive(Parser)]
 pub struct Options {
@@ -57,10 +63,6 @@ pub struct Options {
 	pub mode: ProcessEnv,
 }
 
-#[allow(non_camel_case_types)]
-#[derive(Debug)]
-pub struct cli_app(CliApp);
-
 #[derive(Debug)]
 #[derive(Parser)]
 pub struct CommandMakePasswordFlags {
@@ -68,6 +70,7 @@ pub struct CommandMakePasswordFlags {
 	pub password: String,
 }
 
+/// Les options de la sous-commande `config`.
 #[derive(Debug)]
 #[derive(Parser)]
 pub struct CommandConfigOptions {
@@ -79,6 +82,7 @@ pub struct CommandConfigOptions {
 	pub show: bool,
 }
 
+/// Les options de la sous-commande `password`.
 #[derive(Debug)]
 #[derive(Parser)]
 pub struct CommandMakePasswordOptions {
@@ -95,6 +99,7 @@ pub struct CommandMakePasswordOptions {
 // Énumération //
 // ----------- //
 
+/// Toutes les (sous-)commandes.
 #[derive(Debug)]
 #[derive(Parser)]
 pub enum Command {
@@ -105,6 +110,7 @@ pub enum Command {
 	MakePassword(CommandMakePassword),
 }
 
+/// Les algorithmes de hachage du mot de passe.
 #[derive(Debug)]
 #[derive(Default)]
 #[derive(Copy, Clone)]

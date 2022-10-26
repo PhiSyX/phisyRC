@@ -29,6 +29,7 @@ pub struct Server {
 // -------------- //
 
 impl Server {
+	/// Crée un nouveau serveur.
 	pub fn new(ctx: AppContextWriter, instance: NetworkServer<Self>) -> Self {
 		Self {
 			inner: instance,

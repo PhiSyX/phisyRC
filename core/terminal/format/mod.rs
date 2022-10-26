@@ -4,7 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-mod color;
+pub mod color;
+pub mod style;
 
 pub use self::color::{Color, Interface};
 

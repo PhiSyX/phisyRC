@@ -72,9 +72,7 @@ impl<'d> Row<'d> {
 					.fold(0, |n, c| n + widths[spanned_columns + c]);
 
 				let callback_fn = |(row_index, row): (usize, &mut String)| {
-					let mut _pad = String::default();
-
-					if wrapped_cells[column_index].len() > row_index {
+					let pad = if wrapped_cells[column_index].len() > row_index {
 						let str_width =
 							str_len(&wrapped_cells[column_index][row_index]);
 
@@ -88,20 +86,20 @@ impl<'d> Row<'d> {
 							}
 						}
 
-						_pad = self.padding_string(
+						self.padding_string(
 							padding,
 							cell.alignment,
 							&wrapped_cells[column_index][row_index],
-						);
+						)
 					} else {
-						_pad = str::repeat(
+						str::repeat(
 							" ",
 							widths[spanned_columns] * cell.colspan
 								+ cell.colspan - 1,
-						);
-					}
+						)
+					};
 
-					row.push_str(&format!("{}{}", style.vertical, _pad));
+					row.push_str(&format!("{}{}", style.vertical, pad));
 				};
 
 				lines

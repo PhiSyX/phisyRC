@@ -43,7 +43,7 @@ where
 	I: Clone,
 {
 	pub id: I,
-	socket: OutgoingPacketWriter,
+	packet_writer: OutgoingPacketWriter,
 	outgoing: Arc<Mutex<Option<DisconnectedReader>>>,
 }
 
@@ -75,18 +75,18 @@ where
 		U: 'static,
 		U: Interface<ID = I>,
 	{
-		let (socket_sender, socket_receiver) = mpsc::unbounded_channel();
+		let (packet_sender, packet_receiver) = mpsc::unbounded_channel();
 		let (outgoing_sender, outgoing_receiver) = oneshot::channel();
 
 		let this = Self {
 			id: id.clone(),
-			socket: socket_sender,
+			packet_writer: packet_sender,
 			outgoing: Arc::new(Mutex::new(Some(outgoing_receiver))),
 		};
 
 		let instance = ctor(this.clone());
 
-		let actor = Actor::new(instance, id, socket_receiver, socket);
+		let actor = Actor::new(instance, id, socket, packet_receiver);
 		tokio::spawn(async move {
 			let reason = actor.run().await;
 			outgoing_sender.send(reason).unwrap()
@@ -108,14 +108,14 @@ where
 	pub(crate) fn new(
 		session: I,
 		id: I::ID,
-		packet_reader: OutgoingPacketReader,
 		socket: Socket,
+		packet_reader: OutgoingPacketReader,
 	) -> Self {
 		Self {
 			id,
 			session,
-			packet_reader,
 			socket,
+			packet_reader,
 		}
 	}
 
@@ -160,7 +160,7 @@ where
 	fn clone(&self) -> Self {
 		Self {
 			id: self.id.clone(),
-			socket: self.socket.clone(),
+			packet_writer: self.packet_writer.clone(),
 			outgoing: self.outgoing.clone(),
 		}
 	}

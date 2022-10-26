@@ -271,7 +271,9 @@ impl From<tungstenite::Message> for IncomingPacket {
 				})
 			}),
 			| m => {
-				logger::warn!("From Message to Incoming : {m:?}");
+				logger::warn!(
+					"from tungstenite::Message to IncomingPacket : '{m:?}'"
+				);
 				Self::Bin(vec![])
 			}
 		}
@@ -283,7 +285,7 @@ impl From<OutgoingPacket> for IncomingPacket {
 		match packet {
 			| OutgoingPacket::Bin(b) => Self::Bin(b),
 			| OutgoingPacket::Quit(_) => {
-				unimplemented!("out -> inc : quit")
+				unimplemented!("OutgoingPacket -> IncomingPacket : quit")
 			}
 		}
 	}

@@ -109,6 +109,7 @@ where
 	I: Clone,
 	I: Interface,
 {
+	/// Crée un nouveau serveur TCP + WebSocket.
 	pub async fn create(
 		tcp_addr: impl ToSocketAddrs,
 		ws_addr: impl ToSocketAddrs,
@@ -196,6 +197,7 @@ impl<I> Server<I>
 where
 	I: Interface,
 {
+	/// Notifie le serveur d'un nouvel arrivant.
 	pub async fn accept(
 		&self,
 		socket: Socket,
@@ -212,6 +214,7 @@ where
 		reader.await.unwrap()
 	}
 
+	/// Notifie le serveur d'une connexion fermée.
 	pub fn close(
 		&self,
 		session_id: <I::Session as session::Interface>::ID,
@@ -223,6 +226,7 @@ where
 		})
 	}
 
+	/// Notifie le serveur qu'un nouvel argument DOIT être envoyé.
 	pub fn notify(&self, argument: I::Argument) {
 		_ = self.notifier.send(argument);
 	}

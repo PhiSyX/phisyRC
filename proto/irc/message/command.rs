@@ -13,9 +13,7 @@ use std::str::{Chars, FromStr};
 
 use lang::stream::{InputStream, InputStreamError};
 
-use self::{
-	builder::ParseCommandBuilder, parameters::MessageCommandParameters,
-};
+use self::{builder::CommandBuilder, parameters::Parameters};
 
 // --------- //
 // Structure //
@@ -25,14 +23,14 @@ use self::{
 #[derive(PartialEq, Eq)]
 #[derive(serde::Serialize)]
 #[serde(untagged)]
-pub enum MessageCommand {
+pub enum Command {
 	/// Une commande numérique est dotée de 3 chiffres.
 	/// Cette commande est obligatoirement poursuivie par un paramètre.
 	Numeric {
 		/// Code de 3 chiffres.
 		code: String,
 		/// Les informations supplémentaires de la commande numérique.
-		parameters: MessageCommandParameters,
+		parameters: Parameters,
 	},
 
 	/// Une commande textuelle est dotée d'une suite de lettre alphabétique.
@@ -48,7 +46,7 @@ pub enum MessageCommand {
 		/// INPUT = "pass mot de passe"
 		///
 		/// parameters = ["mot", "de", "passe"]
-		parameters: MessageCommandParameters,
+		parameters: Parameters,
 	},
 }
 
@@ -59,9 +57,9 @@ pub enum MessageCommand {
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessageCommandError {
+pub enum Error {
 	InputStream,
-	ParseError,
+	Parse,
 	IsEmpty,
 	InvalidCharacter { found: char, help: &'static str },
 	NumericCodeIsTooShort,
@@ -73,14 +71,14 @@ pub enum MessageCommandError {
 // Implémentation //
 // -------------- //
 
-impl MessageCommand {
+impl Command {
 	/// Analyse d'une commande.
 	//
 	// BNF <command>: 1*letter / 3digit
 	pub(super) fn parse(
 		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<Self, MessageCommandError> {
-		let mut builder = ParseCommandBuilder::initialize(stream);
+	) -> Result<Self, Error> {
+		let mut builder = CommandBuilder::initialize(stream);
 		builder.analyze()?;
 		builder.finish().and_then(|mut command| {
 			let parameters = Self::parse_parameters(stream)?;
@@ -91,13 +89,13 @@ impl MessageCommand {
 
 	fn parse_parameters(
 		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<MessageCommandParameters, MessageCommandError> {
-		MessageCommandParameters::parse(stream)
+	) -> Result<Parameters, Error> {
+		Parameters::parse(stream)
 	}
 }
 
-impl MessageCommand {
-	fn set_parameters(&mut self, new_parameters: MessageCommandParameters) {
+impl Command {
+	fn set_parameters(&mut self, new_parameters: Parameters) {
 		match self {
 			| Self::Numeric { parameters, .. } => {
 				*parameters = new_parameters;
@@ -113,13 +111,13 @@ impl MessageCommand {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessageCommandError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl fmt::Display for MessageCommandError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
@@ -127,7 +125,7 @@ impl fmt::Display for MessageCommandError {
 			match self {
 				| Self::InputStream => "erreur d'analyse".to_owned(),
 				| Self::IsEmpty => "la ligne est vide".to_owned(),
-				| Self::ParseError => "erreur d'analyse".to_owned(),
+				| Self::Parse => "erreur d'analyse".to_owned(),
 				| Self::InvalidCharacter { found, .. } => format!(
 					"le caractère « {found} » est invalide pour la commande."
 				),
@@ -142,14 +140,14 @@ impl fmt::Display for MessageCommandError {
 	}
 }
 
-impl FromStr for MessageCommandError {
+impl FromStr for Error {
 	type Err = &'static str;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		if s.ends_with("la ligne est vide") {
 			return Ok(Self::IsEmpty);
 		} else if s.ends_with("erreur d'analyse") {
-			return Ok(Self::ParseError);
+			return Ok(Self::Parse);
 		} else if s.contains("caractère invalide -> ") {
 			let parts = unsafe {
 				s.split_once(" -> ")
@@ -187,9 +185,9 @@ impl FromStr for MessageCommandError {
 mod tests {
 	use super::*;
 
-	fn parse(source: &str) -> Result<MessageCommand, MessageCommandError> {
+	fn parse(source: &str) -> Result<Command, Error> {
 		let mut input = InputStream::new(source.chars());
-		MessageCommand::parse(&mut input)
+		Command::parse(&mut input)
 	}
 
 	#[test]
@@ -198,7 +196,7 @@ mod tests {
 		let output = parse(input).unwrap();
 		assert_eq!(
 			output,
-			MessageCommand::Numeric {
+			Command::Numeric {
 				code: "001".to_owned(),
 				parameters: ["PhiSyX", "Welcome to the Internet Relay Network"]
 					.into()
@@ -212,7 +210,7 @@ mod tests {
 		let output = parse(input).unwrap();
 		assert_eq!(
 			output,
-			MessageCommand::Text {
+			Command::Text {
 				command: "NICK".to_owned(),
 				parameters: ["NAME"].into()
 			}

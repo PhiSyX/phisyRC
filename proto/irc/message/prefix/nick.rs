@@ -19,7 +19,7 @@ use lang::{
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessagePrefixNickError {
+pub enum Error {
 	InputStream,
 
 	IsEmpty,
@@ -38,7 +38,7 @@ pub enum MessagePrefixNickError {
 //      <number>  ::= %x30-39                  ; 0-9
 //      <special> ::= %x5B-60 / %x7B-7D        ; "[", "]", "\", "`", "_", "^",
 //                                               "{", "|", "}"
-pub(super) fn parse(input: &str) -> Result<String, MessagePrefixNickError> {
+pub(super) fn parse(input: &str) -> Result<String, Error> {
 	let bytes: ByteStream = ByteStream::from(input);
 	let mut stream = InputStream::new(bytes.chars());
 
@@ -64,7 +64,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixNickError> {
 		match state {
 			| State::Initial => {
 				if input.is_empty() {
-					return Err(MessagePrefixNickError::IsEmpty);
+					return Err(Error::IsEmpty);
 				}
 
 				state.switch(State::First);
@@ -106,9 +106,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixNickError> {
 				// Tous les autres points de code.
 				//
 				// Il s'agit d'une erreur d'analyse.
-				| _ => {
-					return Err(MessagePrefixNickError::InvalidFirstCharacter)
-				}
+				| _ => return Err(Error::InvalidFirstCharacter),
 			},
 
 			| State::AfterFirst => match stream.consume_next()? {
@@ -147,7 +145,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixNickError> {
 				// Tous les autres points de code.
 				//
 				// Il s'agit d'une erreur d'analyse.
-				| _ => return Err(MessagePrefixNickError::InvalidCharacter),
+				| _ => return Err(Error::InvalidCharacter),
 			},
 		}
 	}
@@ -159,13 +157,13 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixNickError> {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessagePrefixNickError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl fmt::Display for MessagePrefixNickError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
@@ -192,7 +190,7 @@ mod tests {
 
 	#[test]
 	fn test_nick_empty() {
-		assert_eq!(parse(""), Err(MessagePrefixNickError::IsEmpty));
+		assert_eq!(parse(""), Err(Error::IsEmpty));
 	}
 
 	#[test]
@@ -214,17 +212,17 @@ mod tests {
 	fn test_nick_invalid_first_character() {
 		let input = "1PhiSyX";
 		let output = parse(input);
-		assert_eq!(output, Err(MessagePrefixNickError::InvalidFirstCharacter));
+		assert_eq!(output, Err(Error::InvalidFirstCharacter));
 
 		let input = "-PhiSyX";
 		let output = parse(input);
-		assert_eq!(output, Err(MessagePrefixNickError::InvalidFirstCharacter));
+		assert_eq!(output, Err(Error::InvalidFirstCharacter));
 	}
 
 	#[test]
 	fn test_nick_invalid_character() {
 		let input = "Phi@SyX";
 		let output = parse(input);
-		assert_eq!(output, Err(MessagePrefixNickError::InvalidCharacter));
+		assert_eq!(output, Err(Error::InvalidCharacter));
 	}
 }

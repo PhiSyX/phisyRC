@@ -12,7 +12,7 @@ use lang::lexer::ParseState;
 
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
-pub(super) enum ParseCommandState {
+pub(super) enum CommandState {
 	/// L'état initiale de l'analyse de commande.
 	#[default]
 	Initial,
@@ -32,7 +32,7 @@ pub(super) enum ParseCommandState {
 
 /// Les états sont organisés par ordre par lesquelles l'analyseur doit passer.
 #[derive(Default)]
-pub(super) enum ParseCommandParametersStepState {
+pub(super) enum ParametersStepState {
 	/// État initiale de l'analyse de paramètres.
 	#[default]
 	Initial,
@@ -53,9 +53,9 @@ pub(super) enum ParseCommandParametersStepState {
 // Implémentation //
 // -------------- //
 
-impl ParseCommandState {
+impl CommandState {
 	pub(super) fn increment_counter(&mut self) {
-		if let ParseCommandState::Numeric { counter } = self {
+		if let CommandState::Numeric { counter } = self {
 			*counter += 1;
 		}
 	}
@@ -65,13 +65,13 @@ impl ParseCommandState {
 // Implémentation // -> Interface
 // -------------- //
 
-impl ParseState for ParseCommandState {
+impl ParseState for CommandState {
 	fn switch(&mut self, new_state: Self) {
 		*self = new_state;
 	}
 }
 
-impl ParseState for ParseCommandParametersStepState {
+impl ParseState for ParametersStepState {
 	fn switch(&mut self, new_state: Self) {
 		*self = new_state;
 	}

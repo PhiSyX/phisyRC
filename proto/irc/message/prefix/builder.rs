@@ -12,24 +12,24 @@ use lang::{
 	stream::{InputStream, StreamIterator},
 };
 
-use super::{host, nick, state::ParsePrefixState, user};
-use crate::{MessagePrefix, MessagePrefixError};
+use super::{host, nick, state::State, user};
+use crate::{prefix, Prefix};
 
 // --------- //
 // Structure //
 // --------- //
 
-pub(super) struct ParsePrefixBuilder<'a, 'b> {
+pub(super) struct Builder<'a, 'b> {
 	stream: &'a mut InputStream<Chars<'b>, char>,
 	temporary_buffer: String,
-	state: ParsePrefixState,
+	state: State,
 }
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
-impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
+impl<'a, 'b> Builder<'a, 'b> {
 	pub(super) fn initialize(
 		stream: &'a mut InputStream<Chars<'b>, char>,
 	) -> Self {
@@ -41,11 +41,11 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 	}
 }
 
-impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
-	pub(super) fn analyze(&mut self) -> Result<(), MessagePrefixError> {
+impl<'a, 'b> Builder<'a, 'b> {
+	pub(super) fn analyze(&mut self) -> Result<(), prefix::Error> {
 		loop {
 			match self.state {
-				| ParsePrefixState::Initial => {
+				| State::Initial => {
 					match self.stream.consume_next()? {
 						// U+003A COLON (:)
 						//
@@ -63,7 +63,7 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 								break;
 							}
 
-							return Err(MessagePrefixError::InvalidCharacter {
+							return Err(prefix::Error::InvalidCharacter {
 								found: codepoint.unit(),
 								help: "Un point de code valide est attendu",
 							});
@@ -78,7 +78,7 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 							if !self.temporary_buffer.is_empty() =>
 						{
 							self.add_codepoint_to_temporary_buffer(codepoint);
-							self.state.switch(ParsePrefixState::User);
+							self.state.switch(State::User);
 						}
 
 						// U+002E FULL STOP (.)
@@ -88,7 +88,7 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 							self.add_codepoint_to_temporary_buffer(
 								CodePoint::FULL_STOP,
 							);
-							self.state.switch(ParsePrefixState::Server);
+							self.state.switch(State::Server);
 						}
 
 						// Insérer tous les points de code valides dans le
@@ -102,11 +102,11 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 						// Tous autres caractères.
 						//
 						// Il s'agit d'une erreur d'analyse.
-						| _ => return Err(MessagePrefixError::ParseError),
+						| _ => return Err(prefix::Error::Parse),
 					}
 				}
 
-				| ParsePrefixState::User => match self.stream.consume_next()? {
+				| State::User => match self.stream.consume_next()? {
 					// Espaces blancs
 					//
 					// Un préfixe NE PEUT PAS contenir d'espaces blancs.
@@ -132,10 +132,10 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 					// Tous autres caractères.
 					//
 					// Il s'agit d'une erreur d'analyse.
-					| _ => return Err(MessagePrefixError::ParseError),
+					| _ => return Err(prefix::Error::Parse),
 				},
 
-				| ParsePrefixState::Server => {
+				| State::Server => {
 					match self.stream.consume_next()? {
 						// Espaces blancs
 						//
@@ -153,7 +153,7 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 						// Tous autres caractères.
 						//
 						// Il s'agit d'une erreur d'analyse.
-						| _ => return Err(MessagePrefixError::ParseError),
+						| _ => return Err(prefix::Error::Parse),
 					}
 				}
 			}
@@ -170,27 +170,27 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 	}
 }
 
-impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
-	pub(super) fn finish(self) -> Result<MessagePrefix, MessagePrefixError> {
+impl<'a, 'b> Builder<'a, 'b> {
+	pub(super) fn finish(self) -> Result<Prefix, prefix::Error> {
 		match self.state {
 			// NOTE(phisyx): cas spécifique. Si on ne le fait pas, on tombe
 			// dans le cas de Self::User.
-			| ParsePrefixState::Initial => {
+			| State::Initial => {
 				if self.temporary_buffer == "localhost" {
-					return Ok(MessagePrefix::Server {
+					return Ok(Prefix::Server {
 						origin: self.temporary_buffer,
 					});
 				}
 
-				Ok(MessagePrefix::User {
+				Ok(Prefix::User {
 					nick: nick::parse(&self.temporary_buffer)?,
 					user: Default::default(),
 					host: Default::default(),
 				})
 			}
 
-			| ParsePrefixState::User => {
-				let mut prefix_user = MessagePrefix::User {
+			| State::User => {
+				let mut prefix_user = Prefix::User {
 					nick: Default::default(),
 					user: Default::default(),
 					host: Default::default(),
@@ -224,8 +224,8 @@ impl<'a, 'b> ParsePrefixBuilder<'a, 'b> {
 				Ok(prefix_user)
 			}
 
-			| ParsePrefixState::Server => {
-				let prefix_server = MessagePrefix::Server {
+			| State::Server => {
+				let prefix_server = Prefix::Server {
 					origin: self.temporary_buffer,
 				};
 				prefix_server.check_fields()?;

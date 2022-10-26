@@ -23,7 +23,7 @@ use lang::{
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessagePrefixHostError {
+pub enum Error {
 	InputStream,
 	IsEmpty,
 	InvalidFirstCharacter,
@@ -48,7 +48,7 @@ pub enum MessagePrefixHostError {
 //
 // NOTE(phisyx): certains serveurs IRC acceptent le caractère '/' dans le nom
 // d'hôte.
-pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
+pub(super) fn parse(input: &str) -> Result<String, Error> {
 	let bytes: ByteStream = ByteStream::from(input);
 	let mut stream = InputStream::new(bytes.chars());
 
@@ -72,7 +72,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
 		match state {
 			| State::Initial => {
 				if input.is_empty() {
-					return Err(MessagePrefixHostError::IsEmpty);
+					return Err(Error::IsEmpty);
 				}
 
 				// NOTE(phisyx): ceci gère le cas `<hostaddr>`.
@@ -96,9 +96,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
 				// Tous les autres points de code.
 				//
 				// Il s'agit d'une erreur d'analyse.
-				| _ => {
-					return Err(MessagePrefixHostError::InvalidFirstCharacter)
-				}
+				| _ => return Err(Error::InvalidFirstCharacter),
 			},
 
 			| State::HostnameAfterFirstCharacter => {
@@ -117,9 +115,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
 					| CodePoint::FULL_STOP
 					| CodePoint::SOLIDUS) => {
 						if stream.peek_next()?.is_eof() {
-							return Err(
-								MessagePrefixHostError::InvalidLastCharacter,
-							);
+							return Err(Error::InvalidLastCharacter);
 						}
 
 						host.push(codepoint.unit());
@@ -131,7 +127,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
 					//
 					// Il s'agit d'une erreur d'analyse.
 					| _ => {
-						return Err(MessagePrefixHostError::InvalidCharacter);
+						return Err(Error::InvalidCharacter);
 					}
 				}
 			}
@@ -145,13 +141,13 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixHostError> {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessagePrefixHostError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl fmt::Display for MessagePrefixHostError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,

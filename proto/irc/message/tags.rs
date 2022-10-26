@@ -16,7 +16,7 @@ use std::{
 
 use lang::stream::{InputStream, InputStreamError};
 
-use crate::tags::builder::ParseTagsBuilder;
+use crate::tags::builder::Builder;
 
 // --------- //
 // Structure //
@@ -26,7 +26,7 @@ use crate::tags::builder::ParseTagsBuilder;
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
 #[derive(serde::Serialize)]
-pub struct MessageTags(pub HashMap<String, String>);
+pub struct Tags(pub HashMap<String, String>);
 
 // ----------- //
 // Énumération //
@@ -35,10 +35,10 @@ pub struct MessageTags(pub HashMap<String, String>);
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessageTagsError {
+pub enum Error {
 	InputStream,
 	InvalidCharacter { found: char, help: &'static str },
-	ParseError,
+	Parse,
 	IsNotStartingWithCommercialChar,
 	KeyIsEmpty,
 	ValueIsEmpty,
@@ -48,11 +48,11 @@ pub enum MessageTagsError {
 // Implémentation //
 // -------------- //
 
-impl MessageTags {
+impl Tags {
 	pub(super) fn parse(
 		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<Self, MessageTagsError> {
-		let mut builder = ParseTagsBuilder::initial(stream);
+	) -> Result<Self, Error> {
+		let mut builder = Builder::initial(stream);
 		builder.analyze()?;
 		builder.finish()
 	}
@@ -67,7 +67,7 @@ impl MessageTags {
 // Implémentation // -> Interface
 // -------------- //
 
-impl<const N: usize, K, V> From<[(K, V); N]> for MessageTags
+impl<const N: usize, K, V> From<[(K, V); N]> for Tags
 where
 	K: Into<String> + PartialEq + Eq + Clone,
 	V: Into<String> + PartialEq + Eq + Clone,
@@ -79,7 +79,7 @@ where
 	}
 }
 
-impl ops::Deref for MessageTags {
+impl ops::Deref for Tags {
 	type Target = HashMap<String, String>;
 
 	fn deref(&self) -> &Self::Target {
@@ -87,26 +87,26 @@ impl ops::Deref for MessageTags {
 	}
 }
 
-impl ops::DerefMut for MessageTags {
+impl ops::DerefMut for Tags {
 	fn deref_mut(&mut self) -> &mut Self::Target {
 		&mut self.0
 	}
 }
 
-impl From<InputStreamError> for MessageTagsError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl fmt::Display for MessageTagsError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
 			"{}",
 			match self {
 				| Self::InputStream => "erreur dans le flux".to_owned(),
-				| Self::ParseError => "erreur d'analyse".to_owned(),
+				| Self::Parse => "erreur d'analyse".to_owned(),
 				| Self::InvalidCharacter { found, .. } =>
 					format!("caractère {found} invalide"),
 				| Self::IsNotStartingWithCommercialChar =>
@@ -118,7 +118,7 @@ impl fmt::Display for MessageTagsError {
 	}
 }
 
-impl FromStr for MessageTagsError {
+impl FromStr for Error {
 	type Err = &'static str;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -145,7 +145,7 @@ impl FromStr for MessageTagsError {
 	}
 }
 
-impl fmt::Display for MessageTags {
+impl fmt::Display for Tags {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let mut output = String::new();
 
@@ -172,9 +172,9 @@ impl fmt::Display for MessageTags {
 mod tests {
 	use super::*;
 
-	fn parse(input: &str) -> Result<MessageTags, MessageTagsError> {
+	fn parse(input: &str) -> Result<Tags, Error> {
 		let mut stream = InputStream::new(input.chars());
-		MessageTags::parse(&mut stream)
+		Tags::parse(&mut stream)
 	}
 
 	#[test]

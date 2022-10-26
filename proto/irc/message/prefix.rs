@@ -15,11 +15,7 @@ use std::str::{Chars, FromStr};
 
 use lang::stream::{ByteStream, InputStream, InputStreamError};
 
-use self::builder::ParsePrefixBuilder;
-pub(super) use self::{
-	host::MessagePrefixHostError, nick::MessagePrefixNickError,
-	user::MessagePrefixUserError,
-};
+use self::builder::Builder;
 
 // ----------- //
 // Énumération //
@@ -29,7 +25,7 @@ pub(super) use self::{
 #[derive(PartialEq, Eq)]
 #[derive(serde::Serialize)]
 #[serde(untagged)]
-pub enum MessagePrefix {
+pub enum Prefix {
 	User {
 		nick: String,
 		user: String,
@@ -44,68 +40,58 @@ pub enum MessagePrefix {
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessagePrefixError {
+pub enum Error {
 	InputStream,
-	ParseError,
+	Parse,
 
 	InvalidCharacter { found: char, help: &'static str },
 
-	InvalidNick(MessagePrefixNickError),
-	InvalidUser(MessagePrefixUserError),
-	InvalidHost(MessagePrefixHostError),
-	InvalidOrigin(MessagePrefixHostError),
+	InvalidNick(nick::Error),
+	InvalidUser(user::Error),
+	InvalidHost(host::Error),
+	InvalidOrigin(host::Error),
 }
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
-impl MessagePrefix {
+impl Prefix {
 	pub fn parse(
 		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<Self, MessagePrefixError> {
-		let mut builder = ParsePrefixBuilder::initialize(stream);
+	) -> Result<Self, Error> {
+		let mut builder = Builder::initialize(stream);
 		builder.analyze()?;
 		builder.finish()
 	}
 
-	pub fn parse_from_str(
-		raw: impl Into<String>,
-	) -> Result<Self, MessagePrefixError> {
+	pub fn parse_from_str(raw: impl Into<String>) -> Result<Self, Error> {
 		let bytestream = ByteStream::new(raw);
 		let mut inputstream = InputStream::new(bytestream.chars());
 		Self::parse(&mut inputstream)
 	}
 }
 
-impl MessagePrefix {
-	fn check_fields(&self) -> Result<(), MessagePrefixError> {
+impl Prefix {
+	fn check_fields(&self) -> Result<(), Error> {
 		match self {
-			| MessagePrefix::User { nick, user, host } => {
+			| Prefix::User { nick, user, host } => {
 				if nick.is_empty() {
-					return Err(MessagePrefixError::InvalidNick(
-						MessagePrefixNickError::IsEmpty,
-					));
+					return Err(Error::InvalidNick(nick::Error::IsEmpty));
 				}
 				if user.is_empty() {
-					return Err(MessagePrefixError::InvalidUser(
-						MessagePrefixUserError::IsEmpty,
-					));
+					return Err(Error::InvalidUser(user::Error::IsEmpty));
 				}
 
 				if host.is_empty() {
-					return Err(MessagePrefixError::InvalidHost(
-						MessagePrefixHostError::IsEmpty,
-					));
+					return Err(Error::InvalidHost(host::Error::IsEmpty));
 				}
 
 				Ok(())
 			}
-			| MessagePrefix::Server { origin } => {
+			| Prefix::Server { origin } => {
 				if origin.is_empty() {
-					return Err(MessagePrefixError::InvalidOrigin(
-						MessagePrefixHostError::IsEmpty,
-					));
+					return Err(Error::InvalidOrigin(host::Error::IsEmpty));
 				}
 				Ok(host::parse(origin).map(|_| ())?)
 			}
@@ -135,31 +121,31 @@ impl MessagePrefix {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessagePrefixError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl From<MessagePrefixNickError> for MessagePrefixError {
-	fn from(err: MessagePrefixNickError) -> Self {
+impl From<nick::Error> for Error {
+	fn from(err: nick::Error) -> Self {
 		Self::InvalidNick(err)
 	}
 }
 
-impl From<MessagePrefixUserError> for MessagePrefixError {
-	fn from(err: MessagePrefixUserError) -> Self {
+impl From<user::Error> for Error {
+	fn from(err: user::Error) -> Self {
 		Self::InvalidUser(err)
 	}
 }
 
-impl From<MessagePrefixHostError> for MessagePrefixError {
-	fn from(err: MessagePrefixHostError) -> Self {
+impl From<host::Error> for Error {
+	fn from(err: host::Error) -> Self {
 		Self::InvalidHost(err)
 	}
 }
 
-impl fmt::Display for MessagePrefixError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,
@@ -167,7 +153,7 @@ impl fmt::Display for MessagePrefixError {
 			match self {
 				| Self::InputStream =>
 					"erreur dans le flux d'entrée".to_owned(),
-				| Self::ParseError => "erreur d'analyse".to_owned(),
+				| Self::Parse => "erreur d'analyse".to_owned(),
 				| Self::InvalidCharacter { found, .. } => format!(
 					"le caractère « {found:?} » est invalide pour un préfixe."
 				),
@@ -183,24 +169,20 @@ impl fmt::Display for MessagePrefixError {
 	}
 }
 
-impl FromStr for MessagePrefixError {
+impl FromStr for Error {
 	type Err = &'static str;
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		if s.ends_with("pseudonyme manquant") {
-			return Ok(Self::InvalidNick(MessagePrefixNickError::IsEmpty));
+			return Ok(Self::InvalidNick(nick::Error::IsEmpty));
 		} else if s.ends_with("nom d'hôte manquant") {
-			return Ok(Self::InvalidHost(MessagePrefixHostError::IsEmpty));
+			return Ok(Self::InvalidHost(host::Error::IsEmpty));
 		} else if s.ends_with("origine invalide") {
-			return Ok(Self::InvalidOrigin(MessagePrefixHostError::IsEmpty));
+			return Ok(Self::InvalidOrigin(host::Error::IsEmpty));
 		} else if s.ends_with("1er caractère invalide") {
-			return Ok(Self::InvalidHost(
-				MessagePrefixHostError::InvalidFirstCharacter,
-			));
+			return Ok(Self::InvalidHost(host::Error::InvalidFirstCharacter));
 		} else if s.ends_with("dernier caractère invalide") {
-			return Ok(Self::InvalidHost(
-				MessagePrefixHostError::InvalidLastCharacter,
-			));
+			return Ok(Self::InvalidHost(host::Error::InvalidLastCharacter));
 		} else if s.contains("caractère invalide -> ") {
 			let x = unsafe {
 				s.split_once(" -> ")
@@ -222,7 +204,7 @@ impl FromStr for MessagePrefixError {
 	}
 }
 
-impl fmt::Display for MessagePrefix {
+impl fmt::Display for Prefix {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		let mut output = String::new();
 
@@ -249,9 +231,9 @@ impl fmt::Display for MessagePrefix {
 mod tests {
 	use super::*;
 
-	fn parse(source: &str) -> Result<MessagePrefix, MessagePrefixError> {
+	fn parse(source: &str) -> Result<Prefix, Error> {
 		let mut input = InputStream::new(source.chars());
-		MessagePrefix::parse(&mut input)
+		Prefix::parse(&mut input)
 	}
 
 	#[test]
@@ -259,7 +241,7 @@ mod tests {
 		let output = parse(":nick!user@host ");
 		assert_eq!(
 			output,
-			Ok(MessagePrefix::User {
+			Ok(Prefix::User {
 				nick: "nick".to_owned(),
 				user: "user".to_owned(),
 				host: "host".to_owned()
@@ -272,7 +254,7 @@ mod tests {
 		let output = parse(":localhost");
 		assert_eq!(
 			output,
-			Ok(MessagePrefix::Server {
+			Ok(Prefix::Server {
 				origin: "localhost".to_owned()
 			})
 		);

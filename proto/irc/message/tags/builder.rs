@@ -12,16 +12,16 @@ use lang::{
 	stream::{InputStream, StreamIterator},
 };
 
-use super::state::ParseTagsState;
-use crate::{MessageTags, MessageTagsError};
+use super::state::State;
+use crate::{tags, Tags};
 
 // --------- //
 // Structure //
 // --------- //
 
-pub(super) struct ParseTagsBuilder<'a, 'b> {
+pub(super) struct Builder<'a, 'b> {
 	stream: &'a mut InputStream<Chars<'b>, char>,
-	state: ParseTagsState,
+	state: State,
 	temporary_key: String,
 	temporary_value: String,
 	temporary_map: HashMap<String, String>,
@@ -31,7 +31,7 @@ pub(super) struct ParseTagsBuilder<'a, 'b> {
 // Implémentation //
 // -------------- //
 
-impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
+impl<'a, 'b> Builder<'a, 'b> {
 	pub(super) fn initial(
 		stream: &'a mut InputStream<Chars<'b>, char>,
 	) -> Self {
@@ -45,27 +45,27 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 	}
 }
 
-impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
-	pub(super) fn analyze(&mut self) -> Result<(), MessageTagsError> {
+impl<'a, 'b> Builder<'a, 'b> {
+	pub(super) fn analyze(&mut self) -> Result<(), tags::Error> {
 		loop {
 			match self.state {
-				| ParseTagsState::Initial => {
-					match self.stream.consume_next()? {
-						| CodePoint::COMMERCIAL_AT => {
-							self.temporary_key.clear();
-							self.state.switch(ParseTagsState::LeftKey);
-						}
-
-						| _ => return Err(
-							MessageTagsError::IsNotStartingWithCommercialChar,
-						),
+				| State::Initial => match self.stream.consume_next()? {
+					| CodePoint::COMMERCIAL_AT => {
+						self.temporary_key.clear();
+						self.state.switch(State::LeftKey);
 					}
-				}
 
-				| ParseTagsState::LeftKey => {
+					| _ => {
+						return Err(
+							tags::Error::IsNotStartingWithCommercialChar,
+						)
+					}
+				},
+
+				| State::LeftKey => {
 					match self.stream.consume_next()? {
 						| codepoint if codepoint.is_newline() => {
-							return Err(MessageTagsError::InvalidCharacter {
+							return Err(tags::Error::InvalidCharacter {
 								found: codepoint.unit(),
 								help: "Un point de code valide est attendu",
 							});
@@ -87,17 +87,17 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 						}
 
 						| CodePoint::EOF => {
-							return Err(MessageTagsError::ParseError);
+							return Err(tags::Error::Parse);
 						}
 
 						// exemple: "[?]="
 						| CodePoint::EQUALS_SIGN => {
 							// exemple: "?="
 							if self.temporary_key.is_empty() {
-								return Err(MessageTagsError::KeyIsEmpty);
+								return Err(tags::Error::KeyIsEmpty);
 							}
 							// exemple: "*="
-							self.state.switch(ParseTagsState::RightValue);
+							self.state.switch(State::RightValue);
 						}
 
 						| CodePoint::Whitespace(_) => {
@@ -112,11 +112,11 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 							self.add_character_to_current_key(codepoint.unit());
 						}
 
-						| _ => return Err(MessageTagsError::ParseError),
+						| _ => return Err(tags::Error::Parse),
 					}
 				}
 
-				| ParseTagsState::RightValue => {
+				| State::RightValue => {
 					match self.stream.consume_next()? {
 						| CodePoint::SEMICOLON => {
 							self.temporary_map.insert(
@@ -125,7 +125,7 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 							);
 							self.temporary_key.clear();
 							self.temporary_value.clear();
-							self.state.switch(ParseTagsState::LeftKey);
+							self.state.switch(State::LeftKey);
 						}
 
 						| CodePoint::REVERSE_SOLIDUS => {
@@ -173,7 +173,7 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 
 						| codepoint if codepoint.is_whitespace() => {
 							if self.temporary_value.is_empty() {
-								return Err(MessageTagsError::ValueIsEmpty);
+								return Err(tags::Error::ValueIsEmpty);
 							}
 
 							self.temporary_map.insert(
@@ -186,7 +186,7 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 						// Pour le test
 						| CodePoint::EOF if cfg!(test) => {
 							if self.temporary_value.is_empty() {
-								return Err(MessageTagsError::ValueIsEmpty);
+								return Err(tags::Error::ValueIsEmpty);
 							}
 
 							self.temporary_map.insert(
@@ -202,7 +202,7 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 							);
 						}
 
-						| _ => return Err(MessageTagsError::ParseError),
+						| _ => return Err(tags::Error::Parse),
 					}
 				}
 			}
@@ -224,8 +224,8 @@ impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
 	}
 }
 
-impl<'a, 'b> ParseTagsBuilder<'a, 'b> {
-	pub(super) fn finish(self) -> Result<MessageTags, MessageTagsError> {
-		Ok(MessageTags(self.temporary_map))
+impl<'a, 'b> Builder<'a, 'b> {
+	pub(super) fn finish(self) -> Result<Tags, tags::Error> {
+		Ok(Tags(self.temporary_map))
 	}
 }

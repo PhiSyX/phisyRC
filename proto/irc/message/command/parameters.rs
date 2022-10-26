@@ -8,9 +8,7 @@ use std::{ops, str::Chars};
 
 use lang::stream::InputStream;
 
-use crate::{
-	command::builder::ParseCommandParametersBuilder, MessageCommandError,
-};
+use crate::command::{self, builder::ParametersBuilder};
 
 // --------- //
 // Structure //
@@ -20,17 +18,17 @@ use crate::{
 #[derive(Default)]
 #[derive(PartialEq, Eq)]
 #[derive(serde::Serialize)]
-pub struct MessageCommandParameters(pub Vec<String>);
+pub struct Parameters(pub Vec<String>);
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
-impl MessageCommandParameters {
+impl Parameters {
 	pub(super) fn parse(
 		stream: &mut InputStream<Chars<'_>, char>,
-	) -> Result<Self, MessageCommandError> {
-		let mut builder = ParseCommandParametersBuilder::initialize(stream);
+	) -> Result<Self, command::Error> {
+		let mut builder = ParametersBuilder::initialize(stream);
 		builder.analyze()?;
 		builder.finish()
 	}
@@ -46,7 +44,7 @@ impl MessageCommandParameters {
 // -------------- //
 
 #[cfg(test)] // NOTE(phisyx): code utilisé que lors des tests.
-impl<const N: usize, T> From<[T; N]> for MessageCommandParameters
+impl<const N: usize, T> From<[T; N]> for Parameters
 where
 	T: Into<String>,
 	T: Clone,
@@ -56,7 +54,7 @@ where
 	}
 }
 
-impl ops::Deref for MessageCommandParameters {
+impl ops::Deref for Parameters {
 	type Target = [String];
 
 	fn deref(&self) -> &Self::Target {
@@ -64,7 +62,7 @@ impl ops::Deref for MessageCommandParameters {
 	}
 }
 
-impl ops::DerefMut for MessageCommandParameters {
+impl ops::DerefMut for Parameters {
 	fn deref_mut(&mut self) -> &mut Self::Target {
 		&mut self.0
 	}

@@ -16,11 +16,7 @@ use lang::{
 	stream::{ByteStream, InputStream, InputStreamError, StreamIterator},
 };
 
-use self::{
-	command::{MessageCommand, MessageCommandError},
-	prefix::{MessagePrefix, MessagePrefixError},
-	tags::{MessageTags, MessageTagsError},
-};
+use self::{command::Command, prefix::Prefix, tags::Tags};
 
 // --------- //
 // Structure //
@@ -30,9 +26,9 @@ use self::{
 #[derive(serde::Serialize)]
 pub struct Message {
 	pub raw: Option<String>,
-	pub tags: MessageTags,
-	pub prefix: Option<MessagePrefix>,
-	pub command: MessageCommand,
+	pub tags: Tags,
+	pub prefix: Option<Prefix>,
+	pub command: Command,
 }
 
 // ----------- //
@@ -41,12 +37,12 @@ pub struct Message {
 
 #[derive(Debug)]
 #[derive(PartialEq, Eq)]
-pub enum MessageError {
+pub enum Error {
 	InputStream,
 	IsEmpty,
-	InvalidTags(MessageTagsError),
-	InvalidPrefix(MessagePrefixError),
-	InvalidCommand(MessageCommandError),
+	InvalidTags(tags::Error),
+	InvalidPrefix(prefix::Error),
+	InvalidCommand(command::Error),
 }
 
 // -------------- //
@@ -73,26 +69,26 @@ impl Message {
 	// NOTE(phisyx): crlf n'est pas inclus dans notre analyse.
 	pub fn parse(
 		mut input: InputStream<Chars<'_>, char>,
-	) -> Result<Self, MessageError> {
+	) -> Result<Self, Error> {
 		// NOTE(phisyx): analyse des `<tags>` ; cette partie n'est pas
 		// obligatoire.
 		let tags = if let CodePoint::COMMERCIAL_AT = input.peek_next()? {
-			MessageTags::parse(&mut input)?
+			Tags::parse(&mut input)?
 		} else {
-			MessageTags::default()
+			Tags::default()
 		};
 
 		// NOTE(phisyx): analyse du `<prefix>` ; cette partie n'est
 		// pas obligatoire.
 		let prefix = if let CodePoint::COLON = input.peek_next()? {
-			Some(MessagePrefix::parse(&mut input)?)
+			Some(Prefix::parse(&mut input)?)
 		} else {
 			None
 		};
 
 		// NOTE(phisyx): la `<command>` est obligatoire. Le résultat de
 		// l'analyse suivante inclus les paramètres, s'il y en a.
-		let command = MessageCommand::parse(&mut input)?;
+		let command = Command::parse(&mut input)?;
 
 		Ok(Self {
 			raw: None,
@@ -104,7 +100,7 @@ impl Message {
 
 	pub fn parse_from(
 		raw: impl Into<ByteStream> + ToString,
-	) -> Result<Self, MessageError> {
+	) -> Result<Self, Error> {
 		let raw_input = raw.to_string();
 		let bytestream = raw.into();
 		let inputstream = InputStream::new(bytestream.chars());
@@ -126,31 +122,31 @@ impl Message {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessageError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl From<MessageTagsError> for MessageError {
-	fn from(err: MessageTagsError) -> Self {
+impl From<tags::Error> for Error {
+	fn from(err: tags::Error) -> Self {
 		Self::InvalidTags(err)
 	}
 }
 
-impl From<MessagePrefixError> for MessageError {
-	fn from(err: MessagePrefixError) -> Self {
+impl From<prefix::Error> for Error {
+	fn from(err: prefix::Error) -> Self {
 		Self::InvalidPrefix(err)
 	}
 }
 
-impl From<MessageCommandError> for MessageError {
-	fn from(err: MessageCommandError) -> Self {
+impl From<command::Error> for Error {
+	fn from(err: command::Error) -> Self {
 		Self::InvalidCommand(err)
 	}
 }
 
-impl fmt::Display for MessageError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,

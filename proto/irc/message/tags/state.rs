@@ -11,7 +11,7 @@ use lang::lexer::ParseState;
 // ----------- //
 
 #[derive(Default)]
-pub(super) enum ParseTagsState {
+pub(super) enum State {
 	#[default]
 	Initial,
 	LeftKey,
@@ -22,7 +22,7 @@ pub(super) enum ParseTagsState {
 // Implémentation // -> Interface
 // -------------- //
 
-impl ParseState for ParseTagsState {
+impl ParseState for State {
 	fn switch(&mut self, new_state: Self) {
 		*self = new_state;
 	}

@@ -18,7 +18,7 @@ use lang::{
 #[derive(Debug)]
 #[derive(Copy, Clone)]
 #[derive(PartialEq, Eq)]
-pub enum MessagePrefixUserError {
+pub enum Error {
 	InputStream,
 
 	IsEmpty,
@@ -33,14 +33,14 @@ pub enum MessagePrefixUserError {
 //
 // BNF <user> ::= 1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
 //				; any octet except NUL, CR, LF, " " and "@"
-pub(super) fn parse(input: &str) -> Result<String, MessagePrefixUserError> {
+pub(super) fn parse(input: &str) -> Result<String, Error> {
 	let bytes: ByteStream = ByteStream::from(input);
 	let mut stream = InputStream::new(bytes.chars());
 
 	let mut user = String::new();
 
 	if input.is_empty() {
-		return Err(MessagePrefixUserError::IsEmpty);
+		return Err(Error::IsEmpty);
 	}
 
 	loop {
@@ -49,14 +49,14 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixUserError> {
 			//
 			// Il s'agit d'une erreur d'analyse.
 			| codepoint if codepoint.is_newline() => {
-				return Err(MessagePrefixUserError::InvalidCharacter);
+				return Err(Error::InvalidCharacter);
 			}
 
 			// U+0040 COMMERCIAL AT (@)
 			//
 			// Il s'agit d'une erreur d'analyse.
 			| CodePoint::COMMERCIAL_AT => {
-				return Err(MessagePrefixUserError::InvalidCharacter);
+				return Err(Error::InvalidCharacter);
 			}
 
 			// Tous les points de code valides
@@ -71,7 +71,7 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixUserError> {
 			// Tous les autres points de code.
 			//
 			// Il s'agit d'une erreur d'analyse.
-			| _ => return Err(MessagePrefixUserError::InvalidCharacter),
+			| _ => return Err(Error::InvalidCharacter),
 		}
 	}
 
@@ -82,13 +82,13 @@ pub(super) fn parse(input: &str) -> Result<String, MessagePrefixUserError> {
 // Implémentation // -> Interface
 // -------------- //
 
-impl From<InputStreamError> for MessagePrefixUserError {
+impl From<InputStreamError> for Error {
 	fn from(_: InputStreamError) -> Self {
 		Self::InputStream
 	}
 }
 
-impl fmt::Display for MessagePrefixUserError {
+impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		write!(
 			f,

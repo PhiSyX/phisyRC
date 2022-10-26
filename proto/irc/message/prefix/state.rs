@@ -12,7 +12,7 @@ use lang::lexer::ParseState;
 
 #[derive(Debug)]
 #[derive(Default)]
-pub(super) enum ParsePrefixState {
+pub(super) enum State {
 	#[default]
 	Initial,
 
@@ -24,7 +24,7 @@ pub(super) enum ParsePrefixState {
 // Implémentation //
 // -------------- //
 
-impl ParseState for ParsePrefixState {
+impl ParseState for State {
 	fn switch(&mut self, new_state: Self) {
 		*self = new_state;
 	}

@@ -4,9 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-mod command;
-mod prefix;
-mod tags;
+pub mod command;
+pub mod prefix;
+pub mod tags;
 
 use core::fmt;
 use std::str::Chars;

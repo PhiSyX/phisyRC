@@ -13,6 +13,7 @@ members = [
 	"core/terminal",
 	"macro",
 	"proto/irc/message",
+	"tests",
 	"tools/license",
 	"tools/readme",
 ]

@@ -29,6 +29,7 @@ pub struct Builder {
 }
 
 impl Builder {
+	/// Ajoute un filtre au système de log.
 	pub fn filter<F>(mut self, predicate: F) -> Self
 	where
 		F: 'static,
@@ -40,26 +41,31 @@ impl Builder {
 		self
 	}
 
+	/// Autorise les logs à être colorés.
 	pub fn with_color(mut self) -> Self {
 		self.colorized = true;
 		self
 	}
 
+	/// Le format du log.
 	pub fn with_format(mut self, format: FormatFn) -> Self {
 		self.format_fn.replace(format);
 		self
 	}
 
+	/// Le niveau de log.
 	pub fn with_level(mut self, level: LevelFilter) -> Self {
 		self.level.replace(level);
 		self
 	}
 
+	/// Autorise les logs à avoir un timestamp.
 	pub fn with_timestamp(mut self) -> Self {
 		self.timestamp = true;
 		self
 	}
 
+	/// Construction du logger (normal)
 	pub fn build_stdout(self) -> Result<(), SetLoggerError> {
 		stdout::Logger {
 			colorized: self.colorized,
@@ -99,6 +105,7 @@ impl Builder {
 		.apply()
 	}
 
+	/// Construction du logger (tui).
 	pub async fn build_tui<Ctx>(
 		self,
 		ctx: mpsc::UnboundedSender<Ctx>,

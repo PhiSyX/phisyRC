@@ -42,6 +42,12 @@ use crate::{
 	FilterFn, LoggerReader, NO,
 };
 
+// ---- //
+// Type //
+// ---- //
+
+pub type AppContext<C> = mpsc::UnboundedSender<C>;
+
 // -------- //
 // Constant //
 // -------- //
@@ -67,7 +73,9 @@ where
 	W: Write,
 	C: EventLoop,
 {
-	ctx: mpsc::UnboundedSender<C>,
+	/// Contexte d'application
+	ctx: AppContext<C>,
+	/// Terminal (TUI)
 	terminal: Terminal<CrosstermBackend<W>>,
 }
 
@@ -75,11 +83,16 @@ pub struct View<C>
 where
 	C: EventLoop,
 {
-	ctx: mpsc::UnboundedSender<C>,
+	/// Contexte d'application
+	ctx: AppContext<C>,
 	reader: LoggerReader,
+	/// Tous les logs.
 	logs: Vec<Entry>,
+	/// Position du scroll.
 	scroll_position: usize,
+	/// Entrée utilisateur.
 	input_line: Vec<char>,
+	/// Position du curseur de l'entrée utilisateur.
 	input_cursor: usize,
 }
 
@@ -207,6 +220,9 @@ impl<C> ViewInterface for View<C>
 where
 	C: EventLoop,
 {
+	/// Dessine une section contenant les logs et une boite de saisie
+	/// utilisateur, permettant d'envoyer des messages au contexte de
+	/// l'application.
 	fn render(&mut self, frame: &mut Frame<impl Backend>, _: Rect) {
 		let split = Layout::default()
 			.direction(Direction::Vertical)
@@ -261,6 +277,7 @@ where
 		frame.render_widget(input, split[1]);
 	}
 
+	/// Binding des touches
 	async fn update_keyboard_event(&mut self, event: KeyEvent) {
 		match event.code {
 			| KeyCode::Char(ch) => match ch {

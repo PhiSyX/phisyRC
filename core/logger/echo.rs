@@ -43,6 +43,7 @@ pub type LoggerReader = mpsc::UnboundedReceiver<Entry>;
 // -------------- //
 
 impl Echo<'_> {
+	/// [Stdout]: Affichage du log.
 	pub(super) fn log(self, text: String) {
 		if self.record_level == LevelFilter::Error {
 			eprint!("{text}");
@@ -53,6 +54,7 @@ impl Echo<'_> {
 }
 
 impl Entry {
+	/// [TUI]: le style d'un log.
 	pub(super) fn style(&self) -> Style {
 		match self.level {
 			| LevelFilter::Off => Style::default(),

@@ -66,7 +66,7 @@ where
 	if !cfg_path.exists() {
 		let s = toml::to_string(&T::default())
 			.expect("devrait pouvoir sérialiser la structure");
-		fs::write(&cfg_path, &s)?;
+		fs::write(&cfg_path, s)?;
 		logger::info!(
 			"Création du fichier de configuration « {} » avec les valeurs par \
 			défaut de la structure « {} »",
@@ -137,7 +137,7 @@ where
 		}
 		.expect("devrait pouvoir sérialiser la structure");
 
-		fs::write(&cfg_path, &s)?;
+		fs::write(&cfg_path, s)?;
 		logger::info!(
 			"Création du fichier de configuration « {} » avec les valeurs par \
 			défaut de la structure « {} »",

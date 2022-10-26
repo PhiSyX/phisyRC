@@ -4,7 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use crate::{server::Server as AppServer, NetworkServer, NetworkSession};
+use lang::stream::ByteStream;
+
+use crate::{
+	server::Server as AppServer, AppContext, NetworkServer, NetworkSession,
+};
 
 // ---- //
 // Type //
@@ -49,7 +53,14 @@ impl network::session::Interface for Actor {
 	type ID = SessionID;
 
 	async fn binary(&mut self, bytes: Vec<u8>) -> network::Result<()> {
-		logger::debug!("binary data : {bytes:?}");
+		let bytes_stream = ByteStream::from(bytes);
+
+		// Vérifie que le message est de type IRC
+		if let Ok(message) = irc_msg::Message::parse_from(bytes_stream) {
+			// Reply...
+			self.server.notify(AppContext::IRC(message));
+		}
+
 		Ok(())
 	}
 }

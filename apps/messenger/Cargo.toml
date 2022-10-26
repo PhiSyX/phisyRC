@@ -23,6 +23,7 @@ constants.workspace = true
 database.workspace = true
 env.workspace = true
 helpers.workspace = true
+lang.workspace = true
 logger.workspace = true
 network.workspace = true
 setup = { workspace = true, features = ["config", "logger", "database"] }
@@ -30,6 +31,10 @@ terminal.workspace = true
 
 tokio.workspace = true
 clap.workspace = true
+
+irc_msg = { path = "../../proto/irc/message", package = "proto-irc-msg", features = [
+	"json",
+] }
 
 argon2 = { version = "^1.0", package = "rust-argon2" }
 uuid = { version = "^1.2", features = ["v4", "fast-rng"] }

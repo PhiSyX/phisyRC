@@ -49,6 +49,7 @@ pub struct App {
 pub enum AppContext {
 	InputFromTUI(String),
 	Quit,
+	IRC(irc_msg::Message),
 }
 
 #[derive(Debug)]
@@ -127,6 +128,9 @@ impl App {
 
 						| AppContext::InputFromTUI(msg) => {
 							logger::warn!("TODO: parser la ligne: {msg}");
+						}
+						| AppContext::IRC(msg) => {
+							logger::debug!("irc msg {}", msg.json());
 						}
 					}
 				}

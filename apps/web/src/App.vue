@@ -85,7 +85,7 @@ function write_socket(message: string) {
 }
 
 function write_socket_from_input() {
-	write_socket(`PRIVMSG #room ${input.value}`);
+	write_socket(`PRIVMSG #room :${input.value}`);
 	input.value = "";
 }
 

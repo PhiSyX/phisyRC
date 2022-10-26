@@ -8,7 +8,8 @@ use std::collections::HashMap;
 
 use crate::{
 	session::{self, Session as AppSession, SessionID as AppSessionID},
-	AppContextWriter, NetworkServer, NetworkSession, NetworkSessionInterface,
+	AppContext, AppContextWriter, NetworkServer, NetworkSession,
+	NetworkSessionInterface,
 };
 
 // --------- //
@@ -43,12 +44,13 @@ impl Server {
 
 #[network::async_trait]
 impl network::server::Interface for Server {
+	type Argument = AppContext;
 	type Session = session::Actor;
 
 	async fn accept(
 		&mut self,
 		socket: network::Socket,
-		addr: std::net::SocketAddr,
+		_addr: std::net::SocketAddr,
 	) -> network::Result<
 		NetworkSession<<Self::Session as NetworkSessionInterface>::ID>,
 	> {
@@ -65,6 +67,19 @@ impl network::server::Interface for Server {
 		id: <Self::Session as network::session::Interface>::ID,
 	) -> network::Result<()> {
 		self.sessions.remove(&id);
+		Ok(())
+	}
+
+	async fn notify(
+		&mut self,
+		argument: Self::Argument,
+	) -> network::Result<()> {
+		// TODO(phisyx): gérer les autres cas...
+
+		if let irc @ AppContext::IRC(_) = argument {
+			_ = self.ctx.send(irc);
+		}
+
 		Ok(())
 	}
 }

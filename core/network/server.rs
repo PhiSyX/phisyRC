@@ -23,6 +23,8 @@ pub type IncomingReader<T> = mpsc::UnboundedReceiver<Incoming<T>>;
 pub type IncomingWriter<T> = mpsc::UnboundedSender<Incoming<T>>;
 pub type OutgoingReader<T> = mpsc::UnboundedReceiver<Outgoing<T>>;
 pub type OutgoingWriter<T> = mpsc::UnboundedSender<Outgoing<T>>;
+pub type NotifierReader<T> = mpsc::UnboundedReceiver<T>;
+pub type NotifierWriter<T> = mpsc::UnboundedSender<T>;
 
 // --------- //
 // Interface //
@@ -30,6 +32,7 @@ pub type OutgoingWriter<T> = mpsc::UnboundedSender<Outgoing<T>>;
 
 #[async_trait::async_trait]
 pub trait Interface: Send {
+	type Argument: Send;
 	type Session: session::Interface;
 
 	async fn accept(
@@ -42,6 +45,8 @@ pub trait Interface: Send {
 		&mut self,
 		id: <Self::Session as session::Interface>::ID,
 	) -> Result<()>;
+
+	async fn notify(&mut self, argument: Self::Argument) -> Result<()>;
 }
 
 // --------- //
@@ -55,6 +60,7 @@ where
 {
 	incoming: IncomingWriter<I>,
 	outgoing: OutgoingWriter<I>,
+	notifier: NotifierWriter<I::Argument>,
 }
 
 pub struct Incoming<I>
@@ -88,6 +94,7 @@ where
 {
 	pub incoming: IncomingReader<I>,
 	pub outgoing: OutgoingReader<I>,
+	pub notifier: NotifierReader<I::Argument>,
 	pub server_instance: Server<I>,
 	pub user_instance: I,
 }
@@ -109,10 +116,12 @@ where
 	) -> Result<Self> {
 		let (incoming_sender, incoming_receiver) = mpsc::unbounded_channel();
 		let (outgoing_sender, outgoing_receiver) = mpsc::unbounded_channel();
+		let (notifier_sender, notifier_receiver) = mpsc::unbounded_channel();
 
 		let this = Self {
 			incoming: incoming_sender.clone(),
 			outgoing: outgoing_sender,
+			notifier: notifier_sender,
 		};
 
 		let instance = ctor(this.clone());
@@ -120,6 +129,7 @@ where
 		let actor = Actor {
 			incoming: incoming_receiver,
 			outgoing: outgoing_receiver,
+			notifier: notifier_receiver,
 			server_instance: this.clone(),
 			user_instance: instance.clone(),
 		};
@@ -202,7 +212,7 @@ where
 		reader.await.unwrap()
 	}
 
-	async fn close(
+	pub fn close(
 		&self,
 		session_id: <I::Session as session::Interface>::ID,
 		reason: Result<Option<Reason>, Error>,
@@ -211,6 +221,10 @@ where
 			id: session_id,
 			reason,
 		})
+	}
+
+	pub fn notify(&self, argument: I::Argument) {
+		_ = self.notifier.send(argument);
 	}
 }
 
@@ -235,7 +249,7 @@ where
 					let server = self.server_instance.clone();
 					async move {
 						let reason = session.close().await;
-						server.close(session.id, reason).await;
+						server.close(session.id, reason);
 					}
 				});
 			}
@@ -258,6 +272,9 @@ where
 					},
 				}
 			}
+			Some(argument) = self.notifier.recv() => {
+				self.user_instance.notify(argument).await?
+			}
 			}
 		}
 	}
@@ -275,6 +292,7 @@ where
 		Self {
 			incoming: self.incoming.clone(),
 			outgoing: self.outgoing.clone(),
+			notifier: self.notifier.clone(),
 		}
 	}
 }

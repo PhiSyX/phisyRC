@@ -157,6 +157,7 @@ where
 	Ok(obj)
 }
 
+/// Supprime un fichier de configuration.
 pub fn delete(path: impl AsRef<Path>) -> io::Result<()> {
 	let mut cfg = config_dir();
 	cfg.push(path);

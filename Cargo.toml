@@ -12,6 +12,7 @@ members = [
 	"core/setup",
 	"core/terminal",
 	"macro",
+	"proto/irc/message",
 	"tools/license",
 	"tools/readme",
 ]
@@ -31,6 +32,7 @@ constants = { path = "./constants", package = "phisyrc-constants" }
 database = { path = "./core/database", package = "phisyrc-database" }
 env = { path = "./core/env", package = "phisyrc-env" }
 helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
+lang = { git = "https://github.com/PhiSyX/lang" }
 logger = { path = "./core/logger", package = "phisyrc-logger" }
 network = { path = "./core/network", package = "phisyrc-network" }
 setup = { path = "./core/setup", package = "phisyrc-setup" }

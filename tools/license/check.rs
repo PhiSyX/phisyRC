@@ -56,16 +56,28 @@ fn main() -> ExitCode {
 
 fn check_license(directory: &'static Dir, append_files: &mut Vec<&Path>) {
 	for dir in directory.dirs() {
-		let entries = dir.find("**/*.rs").expect("?");
+		let mut rs_entries: Vec<_> = dir.find("**/*.rs").expect("?").collect();
+		let js_entries = dir.find("**/*.ts").expect("?");
+		rs_entries.extend(js_entries);
+		let entries = rs_entries;
 		for entry in entries {
 			if let Some(file) = entry.as_file() {
+				let path = file.path().to_string_lossy();
+				if path.contains("node_modules") || path.contains("wasm.") {
+					continue;
+				}
 				check_file(file, append_files);
 			}
 		}
 	}
 
 	for file in directory.files() {
-		if file.path().extension().filter(|ext| *ext == "rs").is_none() {
+		if file
+			.path()
+			.extension()
+			.filter(|ext| *ext == "rs" || *ext == "ts")
+			.is_none()
+		{
 			continue;
 		}
 		check_file(file, append_files);

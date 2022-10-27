@@ -7,9 +7,13 @@
 
 .phisyrc/*
 
+dist
+dist-ssr
+node_modules/
 target/
 
 *.lock
+*-lock.yaml
 
 .env
 .env.local

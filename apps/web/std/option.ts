@@ -4,9 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/// <reference path="../types/std.d.ts" />
-/// <reference path="../types/types.d.ts" />
-
 // ----------- //
 // Énumération //
 // ----------- //
@@ -39,7 +36,7 @@ class Option<T> {
 	// ----------- //
 	// Constructor //
 	// ----------- //
-	constructor(public type: Variant, private value?: unsafe<T>) {}
+	constructor(public type: Variant, private value?: unsafe<T>) { }
 
 	expect(msg: str): safety<T> {
 		if (this.is_some()) {

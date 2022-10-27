@@ -4,10 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/// <reference path="../types/vite-env.d.ts" />
-/// <reference path="../types/std.d.ts" />
-
-import "design/style.css";
+import "design/style.scss";
 
 import { ExitCode } from "../std/process";
 

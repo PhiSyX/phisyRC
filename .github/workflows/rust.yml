@@ -41,3 +41,6 @@ jobs:
 
     - name: tests unitaires
       run: cargo test --all --verbose
+
+    - name: vérifie les licences
+      run: cargo run --release --bin check-license

@@ -81,7 +81,7 @@ pub trait Escape: AsRef<str> {
 			excludes_char,
 		);
 
-		let chars_to_escape = Regex::new(&format!("[{}]", regexp)).unwrap();
+		let chars_to_escape = Regex::new(&format!("[{regexp}]")).unwrap();
 
 		chars_to_escape
 			.replace_all(self.as_ref(), format!("{}$0", Self::ESCAPED_WITH))

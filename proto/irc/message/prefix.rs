@@ -219,7 +219,7 @@ impl fmt::Display for Prefix {
 			| Self::Server { origin } => output.push_str(origin),
 		};
 
-		write!(f, "{}", output)
+		write!(f, "{output}")
 	}
 }
 

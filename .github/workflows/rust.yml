@@ -36,12 +36,8 @@ jobs:
       run: |
         cargo fmt -- --check
         # dead_code : il est possible qu'il y ait du code non utilisé, ça n'a
-        #    pas d'importance.
-        #    Le build enlève tout code mort de toute façon.
-        #
-        # clippy::uninlined-format-args : c'est quoi cette règle à la noix?
-        #    Je n'ai pas forcément envie de la respecter, pour l'instant.
-        cargo clippy -- -D warnings -A dead_code -A clippy::uninlined-format-args
+        #    pas d'importance. Le build enlève tout code mort de toute façon.
+        cargo clippy --workspace --all-targets -- -D warnings -A dead_code
 
     - name: tests unitaires
       run: cargo test --all --verbose

@@ -160,7 +160,7 @@ impl fmt::Display for Tags {
 			output.push(';');
 		});
 
-		write!(f, "{}", output)
+		write!(f, "{output}")
 	}
 }
 

@@ -99,7 +99,7 @@ impl<'d> Row<'d> {
 						)
 					};
 
-					row.push_str(&format!("{}{}", style.vertical, pad));
+					row.push_str(&format!("{}{pad}", style.vertical));
 				};
 
 				lines

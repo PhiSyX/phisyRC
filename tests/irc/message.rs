@@ -123,7 +123,7 @@ fn prefix_is(w: &mut IrcWorld, expected_prefix: String) {
 	if let Ok(msg) = maybe_msg {
 		if let Some(prefix) = &msg.prefix {
 			let expected_prefix =
-				prefix::Prefix::parse_from_str(format!("{} ", expected_prefix))
+				prefix::Prefix::parse_from_str(format!("{expected_prefix} "))
 					.unwrap();
 			assert!(expected_prefix.eq(prefix));
 		}

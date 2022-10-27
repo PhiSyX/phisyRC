@@ -61,7 +61,7 @@ fn include_file(line: &str) -> String {
 
 	let maybe_file = File::open(&relative_filename);
 	if maybe_file.is_err() {
-		eprintln!("Le fichier « {} » ne peut pas être lu.", relative_filename);
+		eprintln!("Le fichier « {relative_filename} » ne peut pas être lu.");
 		return line.to_owned();
 	}
 

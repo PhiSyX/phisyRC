@@ -17,6 +17,7 @@
 	"tasks": {
 		"dev": "cd apps/web && deno run -A --unstable --node-modules-dir npm:vite",
 		"build": "cd apps/web && deno run -A --unstable --node-modules-dir npm:vite build",
-		"lint": "cd apps/web && deno lint --ignore=node_modules,.vite,dist"
+		"lint": "cd apps/web && deno lint --ignore=node_modules,.vite,dist",
+		"clean": "cd apps/web && rm -rf node_modules/"
 	}
 }

@@ -4,8 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use std::fmt::Arguments;
-
 use chrono::Local;
 use log::{
 	max_level, set_boxed_logger, set_logger, set_max_level, Level, LevelFilter,
@@ -13,13 +11,7 @@ use log::{
 };
 use terminal::{format::color::Interface, layout::GridLayout};
 
-use crate::{builder::Builder, echo::Echo, FilterFn, NO};
-
-// ---- //
-// Type //
-// ---- //
-
-pub(super) type FormatFn = fn(&mut Echo, &Arguments, &Record) -> String;
+use crate::{builder::Builder, echo::Echo, FilterFn, FormatFn, NO};
 
 // --------- //
 // Structure //

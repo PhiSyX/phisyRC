@@ -4,24 +4,22 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use chrono::{DateTime, Local};
 use log::{Level, LevelFilter, Record};
-use terminal::{
-	layout::GridLayout,
-	tui::style::{Color, Style},
-};
-use tokio::sync::mpsc;
 
 // --------- //
 // Structure //
 // --------- //
 
 pub struct Echo<'a> {
-	pub(super) time: Option<DateTime<Local>>,
+	#[cfg(any(feature = "stdout", feature = "tui"))]
+	pub(super) time: Option<chrono::DateTime<chrono::Local>>,
 	pub(super) delimiter: String,
 	pub(super) level: String,
 	pub(super) record_level: Level,
-	pub(super) table: &'a mut GridLayout<'a>,
+	#[cfg(any(feature = "stdout", feature = "tui"))]
+	pub(super) table: &'a mut terminal::layout::GridLayout<'a>,
+	#[cfg(feature = "wasm")]
+	pub(super) _marker: std::marker::PhantomData<&'a ()>,
 }
 
 #[derive(Debug)]
@@ -35,14 +33,17 @@ pub struct Entry {
 // Type //
 // ---- //
 
-pub type LoggerWriter = mpsc::UnboundedSender<Entry>;
-pub type LoggerReader = mpsc::UnboundedReceiver<Entry>;
+#[cfg(any(feature = "stdout", feature = "tui"))]
+pub type LoggerWriter = tokio::sync::mpsc::UnboundedSender<Entry>;
+#[cfg(any(feature = "stdout", feature = "tui"))]
+pub type LoggerReader = tokio::sync::mpsc::UnboundedReceiver<Entry>;
 
 // -------------- //
 // Implémentation //
 // -------------- //
 
 impl Echo<'_> {
+	#[cfg(feature = "stdout")]
 	/// [Stdout]: Affichage du log.
 	pub(super) fn log(self, text: String) {
 		if self.record_level == LevelFilter::Error {
@@ -54,8 +55,11 @@ impl Echo<'_> {
 }
 
 impl Entry {
+	#[cfg(feature = "tui")]
 	/// [TUI]: le style d'un log.
-	pub(super) fn style(&self) -> Style {
+	pub(super) fn style(&self) -> terminal::tui::style::Style {
+		use terminal::tui::style::{Color, Style};
+
 		match self.level {
 			| LevelFilter::Off => Style::default(),
 			| LevelFilter::Error => Style::default().fg(Color::Red),

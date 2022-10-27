@@ -6,4 +6,5 @@
 
 pub use log::*;
 
+#[cfg(any(feature = "stdout", feature = "tui"))]
 pub use crate::echo::{LoggerReader, LoggerWriter};

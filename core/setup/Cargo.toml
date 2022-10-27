@@ -23,6 +23,6 @@ config.workspace = true
 constants.workspace = true
 database.workspace = true
 helpers.workspace = true
-logger.workspace = true
+logger = { workspace = true, default-features = true }
 terminal = { workspace = true, optional = true }
 tokio.workspace = true

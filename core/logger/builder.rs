@@ -4,20 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use std::io;
-
 use log::{LevelFilter, SetLoggerError};
-use terminal::{
-	format::color::Interface,
-	layout::{Alignment, Cell},
-	EventLoop,
-};
-use tokio::sync::mpsc;
 
-use crate::{
-	stdout::{self, FormatFn},
-	tui, FilterFn,
-};
+use crate::{FilterFn, FormatFn};
+
+// --------- //
+// Structure //
+// --------- //
 
 #[derive(Default)]
 pub struct Builder {
@@ -65,8 +58,16 @@ impl Builder {
 		self
 	}
 
+	#[cfg(feature = "stdout")]
 	/// Construction du logger (normal)
 	pub fn build_stdout(self) -> Result<(), SetLoggerError> {
+		use terminal::{
+			format::color::Interface,
+			layout::{Alignment, Cell},
+		};
+
+		use crate::stdout;
+
 		stdout::Logger {
 			colorized: self.colorized,
 			timestamp: self.timestamp,
@@ -105,14 +106,17 @@ impl Builder {
 		.apply()
 	}
 
+	#[cfg(feature = "tui")]
 	/// Construction du logger (tui).
 	pub async fn build_tui<Ctx>(
 		self,
-		ctx: mpsc::UnboundedSender<Ctx>,
-	) -> io::Result<()>
+		ctx: tokio::sync::mpsc::UnboundedSender<Ctx>,
+	) -> std::io::Result<()>
 	where
-		Ctx: EventLoop,
+		Ctx: terminal::EventLoop,
 	{
+		use crate::tui;
+
 		let (tx, rx) = tokio::sync::mpsc::unbounded_channel();
 		tui::Logger {
 			colorized: self.colorized,
@@ -127,5 +131,33 @@ impl Builder {
 		tokio::spawn(tui::Tui::launch(ctx, rx));
 
 		Ok(())
+	}
+
+	#[cfg(feature = "wasm")]
+	pub fn build_wasm(self) -> Result<(), SetLoggerError> {
+		use std::fmt::Arguments;
+
+		use log::Record;
+
+		use crate::{echo::Echo, wasm};
+
+		wasm::Logger {
+			colorized: self.colorized,
+			format_fn: self.format_fn.unwrap_or_else(|| {
+				|echo: &mut Echo, message: &Arguments, record: &Record| {
+					format!(
+						"{} {} %c{} (line {})%c:\n\n\t{}\n",
+						echo.level,
+						echo.delimiter,
+						record.file().unwrap_or_else(|| record.target()),
+						record.line().unwrap_or(0),
+						message
+					)
+				}
+			}),
+			filters_fn: self.filters_fn,
+			level: self.level,
+		}
+		.apply()
 	}
 }

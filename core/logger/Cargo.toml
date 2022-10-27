@@ -9,12 +9,20 @@ publish.workspace = true
 [lib]
 path = "./lib.rs"
 
+[features]
+default = ["stdout", "tui"]
+stdout = ["chrono", "futures", "tokio"]
+tui = ["terminal", "async-trait", "futures", "tokio"]
+wasm = ["wasm-bindgen", "web-sys"]
+
 [dependencies]
-terminal.workspace = true
-
-chrono.workspace = true
-futures.workspace = true
-tokio.workspace = true
-
-async-trait = "^0.1"
 log = { version = "^0.4", features = ["std"] }
+
+terminal = { workspace = true, optional = true }
+chrono = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+
+async-trait = { version = "^0.1", optional = true }
+wasm-bindgen = { version = "^0.2", optional = true }
+web-sys = { version = "^0.3", optional = true, features = ["console"] }

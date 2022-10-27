@@ -7,8 +7,17 @@
 mod builder;
 mod echo;
 mod export;
+#[cfg(feature = "stdout")]
 pub mod stdout;
+#[cfg(feature = "tui")]
 pub mod tui;
+
+#[cfg(feature = "wasm")]
+pub mod wasm;
+
+use std::fmt::Arguments;
+
+use echo::Echo;
 
 pub use self::export::*;
 
@@ -16,6 +25,7 @@ pub use self::export::*;
 // Type //
 // ---- //
 
+pub(crate) type FormatFn = fn(&mut Echo, &Arguments, &Record) -> String;
 pub(crate) type FilterFn = dyn Fn(&log::Metadata) -> bool + Send + Sync;
 
 // --------- //

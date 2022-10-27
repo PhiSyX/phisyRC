@@ -1,9 +1,35 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
 /// <reference path="../types/vite-env.d.ts" />
+/// <reference path="../types/std.d.ts" />
 
-import { createApp } from "vue";
+import "design/style.css";
 
-import "./style.css";
+import { ExitCode } from "../std/process";
 
-import App from "./App.vue";
+import Vue from "../vue/app";
 
-createApp(App).mount("#🆔");
+async function main<T>(argv?: Vec<T>): Future<ExitCode> {
+	// TODO(phisyx): utiliser un logger.
+
+	let app = new Vue();
+
+	return app
+		.mount()
+		.map((_) => ExitCode.SUCCESS)
+		.unwrap_or(ExitCode.FAILURE);
+}
+
+main()
+	.then((code) => {
+		if (code === ExitCode.FAILURE) {
+			throw new Error("error: exit failure");
+		}
+
+		console.log("let's go.");
+	})
+	.catch(console.error);

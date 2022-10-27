@@ -25,6 +25,11 @@ const DEFAULT_SELECTOR: Selector = "#🆔";
 // Énumération //
 // ----------- //
 
+// NOTE(phisyx): on pourrait avoir plusieurs UI. Qui sait?
+const enum UI {
+	Vue = "vue",
+}
+
 enum System {
 	Store,
 	Router,
@@ -100,6 +105,6 @@ class App<T extends SetupInterface> {
 
 export type { SetupInterface, Selector };
 
-export { System };
+export { UI, System };
 
 export default App;

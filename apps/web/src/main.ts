@@ -6,20 +6,31 @@
 
 import "design/style.scss";
 
+import {
+	wasm_initialize_logger,
+} from "./assets/wasm/phisyrc_wasm";
+
 import { ExitCode } from "../std/process";
+import { error, info, trace, warn, LogLevel, dbg } from "./logger"
 
 import { UI } from "./app";
 import Vue from "../vue/app";
 
+const LOG_LEVEL: LogLevel = import.meta.env.DEV
+	? LogLevel.Trace
+	: LogLevel.Warn;
+
 // TODO(phisyx): utiliser un logger.
-async function main<T>(...argv: Vec<T>): Future<ExitCode> {
-	if (argv.length !== 1) {
+async function main(...argv: Vec<str>): Future<ExitCode> {
+	if (argv.length !== 2) {
 		return ExitCode.FAILURE;
 	}
 
 	// SAFETY: on peut se permettre de déstructurer, car la condition ci-haut
 	// permet d'être certain qu'il y a les arguments nécessaires.
-	let [ui] = argv;
+	let [ui, level] = argv;
+
+	wasm_initialize_logger(level);
 
 	switch (ui) {
 		case UI.Vue: {
@@ -35,11 +46,19 @@ async function main<T>(...argv: Vec<T>): Future<ExitCode> {
 	return ExitCode.FAILURE;
 }
 
-main(UI.Vue).then((code) => {
+main(UI.Vue, LOG_LEVEL).then((code) => {
 	if (code === ExitCode.FAILURE) {
-		throw new Error("error: exit failure");
+		throw new Error("exit failure");
 	}
 
-	console.log("let's go.");
+	if (import.meta.env.DEV) {
+		console.groupCollapsed("Test");
+		dbg("Test");
+		info("Test");
+		warn("Test");
+		error("Test");
+		trace("Test");
+		console.groupEnd();
+	}
 })
 	.catch(console.error);

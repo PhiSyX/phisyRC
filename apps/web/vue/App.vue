@@ -44,7 +44,9 @@ function handle_open_connection(evt: Event) {
 
 function handle_close_connection(evt: CloseEvent | MouseEvent) {
 	write_output(Output.Disconnected);
-	websocket.value!.close();
+	if (websocket.value) {
+		websocket.value!.close();
+	}
 	websocket.value = null;
 }
 

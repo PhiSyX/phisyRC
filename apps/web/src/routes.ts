@@ -22,6 +22,9 @@ const ROUTES: Route = {
 	// TODO(phisyx): Page de login
 	// "/login": { name: "login" },
 	//
+	// Page de Chat,
+	"/chat": { name: "chat" },
+
 	// Page d'accueil
 	"/": { name: "home" },
 };

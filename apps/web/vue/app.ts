@@ -74,9 +74,17 @@ class Framework implements SetupInterface {
 		let vue_routes: RouteRecordRaw[] = [
 			{
 				path: "/",
-				component: () => import("~vue/App.vue"),
+				component: () => import("~vue/pages/home.vue"),
 				strict: true,
 				name: routes["/"]["name"],
+				children: [
+					{
+						path: "", // FIXME: à changer.
+						component: () => import("~vue/pages/chat.vue"),
+						strict: true,
+						name: routes["/chat"]["name"],
+					},
+				]
 			},
 		];
 		this.routes.push(...vue_routes);

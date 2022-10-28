@@ -1,8 +1,9 @@
-<script setup>
+<script lang="ts">
+export default {
+	name: "DefaultLayout",
+};
 </script>
 
 <template>
-	<div id="default-layout">
-		<RouterView />
-	</div>
+	<RouterView />
 </template>

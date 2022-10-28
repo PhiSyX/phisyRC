@@ -4,12 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "vendor/normalize";
+.window {
+	width: 100%;
+	height: 100%;
+}
 
-@import "functions";
-@import "mixins";
-
-@import "variables";
-@import "bases";
-
-@import "app/mod";
+.window\@body {
+	width: 100%;
+	height: 100%;
+}

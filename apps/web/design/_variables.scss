@@ -1,0 +1,27 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "variables/colors";
+
+:root {
+	--font-size: 16px;
+	--space: clamp(0.25rem, 2.2vw, 0.5rem);
+
+	@include --export-colors;
+	@include --theme using ($name) {
+		@if $name == light {
+			--default-background: var(--color-white);
+			--default-background-opacity: 0.25;
+			--default-text-color: var(--color-black);
+			--default-border-color: var(--color-white);
+		} @else if $name == dark {
+			--default-background: var(--color-black);
+			--default-background-opacity: 0.25;
+			--default-text-color: var(--color-snow);
+			--default-border-color: var(--color-black);
+		}
+	}
+}

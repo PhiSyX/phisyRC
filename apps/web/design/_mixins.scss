@@ -4,12 +4,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "vendor/normalize";
-
-@import "functions";
-@import "mixins";
-
-@import "variables";
-@import "bases";
-
-@import "app/mod";
+@import "mixins/theme";

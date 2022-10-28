@@ -4,12 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "vendor/normalize";
-
-@import "functions";
-@import "mixins";
-
-@import "variables";
+@import "themes";
 @import "bases";
 
-@import "app/mod";
+@import "window";

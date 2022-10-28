@@ -1,0 +1,30 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+// Thèmes supportés
+$themes: (light, dark) !default;
+
+@mixin --theme {
+	@each $theme in $themes {
+		@if $theme == light OR $theme == dark {
+			@media (prefers-color-scheme: #{$theme}) {
+				& {
+					@content ($theme);
+				}
+			}
+		}
+
+		@if & {
+			[data-theme*="#{$theme}"] & {
+				@content ($theme);
+			}
+		} @else {
+			[data-theme*="#{$theme}"] {
+				@content ($theme);
+			}
+		}
+	}
+}

@@ -1,0 +1,112 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@use "sass:math";
+
+@function escape_selector($selector) {
+	$escape_chars: (
+		"!",
+		'"',
+		"#",
+		"$",
+		"%",
+		"&",
+		"'",
+		"(",
+		")",
+		"*",
+		"+",
+		".",
+		"/",
+		":",
+		";",
+		"<",
+		"=",
+		">",
+		"?",
+		"@",
+		"[",
+		"]",
+		"^",
+		"\`",
+		"{",
+		"|",
+		"}",
+		"~"
+	);
+
+	@each $escape_char in $escape_chars {
+		$selector: str_replace($selector, $escape_char, "\\#{$escape_char}");
+	}
+
+	@return $selector;
+}
+
+@function hex2hsl($hex_color) {
+	@return "#{hue($hex_color)},#{saturation($hex_color)},#{lightness($hex_color)}";
+}
+
+@function hex2rgb($hex_color) {
+	@return "#{red($hex_color)},#{green($hex_color)},#{blue($hex_color)}";
+}
+
+@function str_replace($string, $search, $replace: "") {
+	$index: str-index($string, $search);
+	@if $index {
+		@return str-slice($string, 1, $index - 1) + $replace +
+			str_replace(
+				str-slice($string, $index + str-length($search)),
+				$search,
+				$replace
+			);
+	}
+	@return $string;
+}
+
+@function strip_unit($number) {
+	@if type-of($number) == "number" and not unitless($number) {
+		@return math.div($number, ($number * 0 + 1));
+	}
+
+	@return $number;
+}
+
+@function svg_encode($svg) {
+	$len: str-length($svg) + 1;
+
+	$encode: (
+		'"': "%22",
+		"#": "%23",
+		"%": "%25",
+		"<": "%3C",
+		">": "%3E",
+		"{": "%7B",
+		"}": "%7D",
+	);
+
+	$string: "";
+	$character: "";
+
+	@for $i from 1 to $len {
+		$character: str-slice($svg, $i, $i);
+
+		@if index(map-keys($encode), $character) {
+			$character: map-get($encode, $character);
+		}
+
+		$string: $string + $character;
+	}
+
+	@return "data:image/svg+xml," + $string;
+}
+
+@function space($space, $bypass: false) {
+	@if (type-of($space) == "string" or $space <= 20) or $bypass == true {
+		@return calc(var(--space) * $space);
+	}
+	$div: math.round(math.div($space, 8));
+	@return calc(var(--space) * $div);
+}

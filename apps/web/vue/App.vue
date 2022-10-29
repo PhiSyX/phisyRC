@@ -109,13 +109,92 @@ function write_output(state: Output, ...args: FIXME) {
 			<button type="button" @click.once="handle_click_close">Fermer la connexion</button>
 		</div>
 
-		<output>
-			<p if="output.length > 0" v-for="[state, item] in output">[ {{ state }} ]: {{ item }}</p>
-		</output>
+		<div class="history">
+			<output>
+				<p if="output.length > 0" v-for="[state, item] in output">
+					<span>[ {{ state }} ]</span>: {{ item }}
+				</p>
+			</output>
 
-		<div class="form-group" v-if="websocket">
-			<input v-model="input" type="text">
-			<button type="submit">Envoie du message au serveur</button>
+			<div class="form-group" v-show="websocket">
+				<input v-model="input" type="text">
+				<button type="submit">Envoie du message au serveur</button>
+			</div>
 		</div>
 	</form>
 </template>
+
+<style scoped lang="scss">
+form {
+	height: calc(100% - 68px);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space);
+}
+
+.history {
+	align-self: center;
+	flex-grow: 1;
+}
+
+.form-group {
+	display: flex;
+	gap: var(--space);
+	justify-content: space-between;
+}
+
+output {
+	overflow: auto;
+	display: block;
+
+	width: 80ch;
+	height: 80ch;
+
+	border-radius: 4px;
+	margin-bottom: var(--space);
+
+	&:not(:empty) {
+		border: 1px ridge var(--color-orange600);
+		padding: var(--space);
+	}
+
+	background-color: var(--default-background);
+}
+
+p {
+	margin: 0;
+
+}
+
+p span {
+	color: var(--color-grey);
+}
+
+button,
+input {
+	padding: var(--space);
+	border-radius: 4px;
+
+	border: 1px solid var(--color-grey800);
+}
+
+.history input {
+	flex-grow: 1;
+}
+
+input {
+	background-color: #3c4043;
+	transition: all 250ms ease-in-out;
+
+	&:active,
+	&:focus {
+		border: 1px solid var(--color-orange600);
+		outline: 0;
+	}
+}
+
+button {
+	background-color: var(--color-white);
+	color: var(--color-black);
+}
+</style>

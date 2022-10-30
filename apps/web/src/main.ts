@@ -9,7 +9,7 @@ import "design/style.scss";
 import { wasm_initialize_logger } from "assets/wasm/phisyrc_wasm";
 
 import { ExitCode } from "../std/process";
-import { error, info, trace, warn, LogLevel, dbg } from "./logger"
+import { error, info, trace, warn, LogLevel, dbg } from "./logger";
 
 import { UI } from "./app";
 import Vue from "../vue/app";
@@ -44,19 +44,20 @@ async function main(...argv: Vec<str>): Future<ExitCode> {
 	return ExitCode.FAILURE;
 }
 
-main(UI.Vue, LOG_LEVEL).then((code) => {
-	if (code === ExitCode.FAILURE) {
-		throw new Error("exit failure");
-	}
+main(UI.Vue, LOG_LEVEL)
+	.then((code) => {
+		if (code === ExitCode.FAILURE) {
+			throw new Error("exit failure");
+		}
 
-	if (import.meta.env.DEV) {
-		console.groupCollapsed("Test");
-		dbg("Test");
-		info("Test");
-		warn("Test");
-		error("Test");
-		trace("Test");
-		console.groupEnd();
-	}
-})
+		if (import.meta.env.DEV) {
+			console.groupCollapsed("Test");
+			dbg("Test");
+			info("Test");
+			warn("Test");
+			error("Test");
+			trace("Test");
+			console.groupEnd();
+		}
+	})
 	.catch(console.error);

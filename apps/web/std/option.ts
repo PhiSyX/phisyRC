@@ -36,7 +36,7 @@ class Option<T> {
 	// ----------- //
 	// Constructor //
 	// ----------- //
-	constructor(public type: Variant, private value?: unsafe<T>) { }
+	constructor(public type: Variant, private value?: unsafe<T>) {}
 
 	expect(msg: str): safety<T> {
 		if (this.is_some()) {

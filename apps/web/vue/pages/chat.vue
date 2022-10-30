@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import App from "~vue/App.vue"
+import App from "~vue/App.vue";
 </script>
 
 <template>

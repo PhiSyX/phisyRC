@@ -22,7 +22,7 @@ const enum LogLevel {
 	Info = "INFO",
 	Debug = "DEBUG",
 	Trace = "TRACE",
-};
+}
 
 // -------- //
 // Fonction //
@@ -42,8 +42,8 @@ function dbg<T extends unknown[]>(...args: T): T {
 	if (!import.meta.env.DEV) {
 		warn(
 			"Utilisation de la fonction `dbg!()` dans un environnement dans un" +
-			"environnement autre que `DEV`."
-		)
+				"environnement autre que `DEV`.",
+		);
 		return args;
 	}
 

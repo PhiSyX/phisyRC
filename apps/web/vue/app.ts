@@ -84,7 +84,7 @@ class Framework implements SetupInterface {
 						strict: true,
 						name: routes["/chat"]["name"],
 					},
-				]
+				],
 			},
 		];
 		this.routes.push(...vue_routes);

@@ -19,6 +19,7 @@ export default defineConfig({
 		alias: [
 			{ find: /^~vue/, replacement: path.resolve("vue") },
 			{ find: /^~/, replacement: path.resolve("src") },
+			{ find: /^assets/, replacement: path.resolve("assets") },
 			{ find: /^design/, replacement: path.resolve("design") },
 			{ find: /^std/, replacement: path.resolve("std") },
 		],

@@ -9,8 +9,8 @@ import {
 	logger_error,
 	logger_info,
 	logger_trace,
-	logger_warn
-} from "./assets/wasm/phisyrc_wasm";
+	logger_warn,
+} from "assets/wasm/phisyrc_wasm";
 
 // ----------- //
 // Énumération //

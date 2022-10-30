@@ -1,7 +1,7 @@
 [workspace]
 members = [
 	"apps/messenger",
-	# "apps/web/wasm",
+	# "apps/web/wasm", # décommenté car l'IDE semble faire n'importe quoi avec.
 	"config",
 	"constants",
 	"core/cli",

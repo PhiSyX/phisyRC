@@ -8,7 +8,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "pnpm run wasm:build && vue-tsc && vite build",
-		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../src/assets/wasm"
+		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../assets/wasm",
 	},
 	"dependencies": {
 		"pinia": "^2.0.23",

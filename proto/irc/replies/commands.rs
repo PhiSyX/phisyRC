@@ -16,6 +16,7 @@ macro_rules! text {
 	) => {
 	#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 	#[derive(Debug)]
+	#[derive(PartialEq, Eq)]
 	pub enum $incoming_cmd_enum {
 		$(
 		$(#[$attr])*
@@ -147,6 +148,7 @@ macro_rules! numeric {
 	) => {
 	#[derive(Clone)]
 	#[derive(Debug)]
+	#[derive(PartialEq, Eq)]
 	#[allow(non_camel_case_types)]
 	pub enum $numeric_enum {
 		$(

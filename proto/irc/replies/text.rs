@@ -51,3 +51,58 @@ text! { impl Command
 	<- USER { user, mode, _unused, realname }
 		| ERR_NEEDMOREPARAMS | ERR_ALREADYREGISTRED
 }
+
+// ---- //
+// Test //
+// ---- //
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use crate::IncomingCommand;
+
+	#[test]
+	fn unregistered_command() {
+		let text_cmd = irc_msg::Command::Text {
+			command: "HELLO".into(),
+			parameters: irc_msg::Parameters(["world".into()].to_vec()),
+		};
+		let r: crate::Result<CommandUnregistered> = text_cmd.is_valid();
+		assert!(r.is_err());
+
+		let text_cmd = irc_msg::Command::Text {
+			command: "NICK".into(),
+			parameters: irc_msg::Parameters(["PhiSyX".into()].to_vec()),
+		};
+		let r: crate::Result<CommandUnregistered> = text_cmd.is_valid();
+		assert_eq!(
+			r,
+			Ok(CommandUnregistered::NICK {
+				parameters: ["PhiSyX".into()].into(),
+			})
+		);
+	}
+
+	#[test]
+	fn registered_command() {
+		let text_cmd = irc_msg::Command::Text {
+			command: "HELLO".into(),
+			parameters: irc_msg::Parameters(["world".into()].to_vec()),
+		};
+		let r: crate::Result<Command> = text_cmd.is_valid();
+		assert!(r.is_err());
+
+		let text_cmd = irc_msg::Command::Text {
+			command: "NICK".into(),
+			parameters: irc_msg::Parameters(["PhiSyX".into()].to_vec()),
+		};
+		let r: crate::Result<Command> = text_cmd.is_valid();
+		assert_eq!(
+			r,
+			Ok(Command::NICK {
+				parameters: [].into(),
+				nickname: "PhiSyX".into(),
+			})
+		);
+	}
+}

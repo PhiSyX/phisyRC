@@ -12,8 +12,9 @@ use core::fmt;
 use std::str::{Chars, FromStr};
 
 use lang::stream::{InputStream, InputStreamError};
+pub use parameters::Parameters;
 
-use self::{builder::CommandBuilder, parameters::Parameters};
+use self::builder::CommandBuilder;
 
 // --------- //
 // Structure //

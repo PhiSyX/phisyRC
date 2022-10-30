@@ -16,7 +16,11 @@ use lang::{
 	stream::{ByteStream, InputStream, InputStreamError, StreamIterator},
 };
 
-pub use self::{command::Command, prefix::Prefix, tags::Tags};
+pub use self::{
+	command::{Command, Parameters},
+	prefix::Prefix,
+	tags::Tags,
+};
 
 // --------- //
 // Structure //

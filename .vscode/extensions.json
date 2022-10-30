@@ -6,6 +6,6 @@
 		"tamasfe.even-better-toml",
 		"serayuzgur.crates",
 		"Vue.volar",
-		"esbenp.prettier-vscode"
+		"rome.rome"
 	]
 }

@@ -76,7 +76,9 @@ function process(raw: NonNullable<ArrayBuffer>) {
 	if (!websocket.value) {
 		return;
 	}
-	write_output(Output.Received, raw);
+	let decoder = new TextDecoder();
+	let s = decoder.decode(raw);
+	write_output(Output.Received, s);
 }
 
 function write_socket(message: string) {
@@ -112,7 +114,7 @@ function write_output(state: Output, ...args: FIXME) {
 		<div class="history">
 			<output>
 				<p if="output.length > 0" v-for="[state, item] in output">
-					<span>[ {{ state }} ]</span>: {{ item }}
+					<span>[{{ state }}]</span>: {{ item }}
 				</p>
 			</output>
 
@@ -148,7 +150,7 @@ output {
 	display: block;
 
 	width: 80ch;
-	height: 80ch;
+	height: 50ch;
 
 	border-radius: 4px;
 	margin-bottom: var(--space);
@@ -183,13 +185,29 @@ input {
 }
 
 input {
-	background-color: #3c4043;
 	transition: all 250ms ease-in-out;
 
 	&:active,
 	&:focus {
-		border: 1px solid var(--color-orange600);
 		outline: 0;
+	}
+
+
+	@media (prefers-color-scheme: dark) {
+		background-color: #3c4043;
+
+		&:active,
+		&:focus {
+			border: 1px solid var(--color-orange600);
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+
+		&:active,
+		&:focus {
+			border: 1px solid var(--color-orange600);
+		}
 	}
 }
 

@@ -16,6 +16,7 @@ macro_rules! text {
 	) => {
 	#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
 	#[derive(Debug)]
+	#[derive(Clone)]
 	#[derive(PartialEq, Eq)]
 	pub enum $incoming_cmd_enum {
 		$(
@@ -28,6 +29,23 @@ macro_rules! text {
 			$($($field: String),*)?
 		}
 		),*
+	}
+
+	impl $incoming_cmd_enum {
+		pub fn params(&self) -> Vec<String> {
+			match self {
+				$(
+					| Self::$command {
+						parameters,
+						$($( $field ),*)?
+					}=> {
+						let mut new_params = vec![$($( $field.to_owned() ),*)?];
+						new_params.extend(parameters.clone());
+						return new_params;
+					}
+				),*
+			}
+		}
 	}
 
 	impl $crate::IncomingCommand<$incoming_cmd_enum> for ::irc_msg::Command

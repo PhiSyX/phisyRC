@@ -58,12 +58,15 @@ pub enum AppContext {
 	/// Message IRC.
 	// IRC(irc_msg::Message),
 
-	/// Commande Numeric
-	Reply {
-		id: Option<SessionID>,
+	/// Server communique avec client : commande numérique
+	ReplyNumeric {
+		id: SessionID,
 		prefix: String,
 		numeric: irc_replies::Numeric,
 	},
+
+	/// Répondre à toutes les session : command textuelle
+	BroadcastCommand { command: irc_replies::Command },
 }
 
 #[derive(Debug)]
@@ -155,7 +158,10 @@ impl App {
 						// 	logger::debug!("irc msg {}", msg.json());
 						// }
 
-						| x @ AppContext::Reply { .. } => {
+						| x @ AppContext::ReplyNumeric { .. } => {
+							server.notify(x);
+						}
+						| x @ AppContext::BroadcastCommand { .. } => {
 							server.notify(x);
 						}
 					}

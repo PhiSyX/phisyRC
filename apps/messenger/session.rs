@@ -105,7 +105,7 @@ impl Session {
 	}
 
 	/// Adresse IRC de l'utilisateur basée sur la réponse.
-	fn addr_based_on_reply<'a>(
+	fn addr_based_on_numeric<'a>(
 		&'a self,
 		numeric: &'a irc_replies::Numeric,
 	) -> Cow<str> {
@@ -118,13 +118,38 @@ impl Session {
 		} else if let Numeric::ERR_NICKNAMEINUSE { nick } = numeric {
 			Cow::from(nick)
 		} else {
-			Cow::from(self.to_string())
+			Cow::from(self.addr())
+		}
+	}
+
+	pub fn addr_based_on_command<'a>(
+		&'a self,
+		command: &'a irc_replies::Command,
+	) -> Cow<str> {
+		use irc_replies::Command;
+		if let Command::NICK { .. } = &command {
+			Cow::from(self.old_addr())
+		} else {
+			Cow::from(self.addr())
 		}
 	}
 
 	/// Adresse IRC de l'utilisateur.
-	fn addr(&self) -> String {
-		self.to_string()
+	pub fn addr(&self) -> String {
+		let h = &self.host;
+		if let Some((n, u)) = self.nick.as_ref().zip(self.user.as_ref()) {
+			return format!("{n}!{u}@{h}");
+		}
+		h.to_string()
+	}
+
+	/// Adresse IRC de l'utilisateur.
+	pub fn old_addr(&self) -> String {
+		let h = &self.host;
+		if let Some((n, u)) = self.old_nick.as_ref().zip(self.user.as_ref()) {
+			return format!("{n}!{u}@{h}");
+		}
+		h.to_string()
 	}
 }
 
@@ -269,9 +294,9 @@ impl Session {
 		let replies = [welcome_001, yourhost_002, created_003];
 
 		for reply in replies {
-			self.server.notify(AppContext::Reply {
-				id: Some(self.id),
-				prefix: self.addr_based_on_reply(&reply).to_string(),
+			self.server.notify(AppContext::ReplyNumeric {
+				id: self.id,
+				prefix: self.addr_based_on_numeric(&reply).to_string(),
 				numeric: reply,
 			});
 		}
@@ -329,12 +354,11 @@ impl network::session::Interface for Session {
 		let bytes_stream = ByteStream::from(bytes);
 
 		// Vérifie que le message est de type IRC
-		if let Ok(message) = irc_msg::Message::parse_from(bytes_stream) {
+		match irc_msg::Message::parse_from(bytes_stream) {
 			// Non enregistré...
-			if !self.is_registered {
-				let r = message
-					.command
-					.is_valid()
+			| Ok(message) if !self.is_registered => {
+				let r = message.command.is_valid();
+				let r = r
 					.and_then(|_: IrcCommandUnregistered| {
 						let real_command: irc_replies::Result<IrcCommand> =
 							message.command.is_valid();
@@ -353,12 +377,12 @@ impl network::session::Interface for Session {
 					});
 
 				if let Err(irc_replies::Error::Numeric(numeric)) = r {
-					let reply_id = Some(self.id);
+					let reply_id = self.id;
 					let reply_prefix =
-						self.addr_based_on_reply(&numeric).to_string();
+						self.addr_based_on_numeric(&numeric).to_string();
 					let reply_numeric = numeric;
 
-					self.server.notify(AppContext::Reply {
+					self.server.notify(AppContext::ReplyNumeric {
 						id: reply_id,
 						prefix: reply_prefix,
 						numeric: reply_numeric,
@@ -368,35 +392,40 @@ impl network::session::Interface for Session {
 				return Ok(());
 			}
 
-			// Enregistré ...
+			| Ok(message) => {
+				let r =
+					message.command.is_valid().and_then(
+						|command| match command {
+							| IrcCommand::PASS { .. } => {
+								self.handle_pass_command(&command)
+							}
+							| IrcCommand::NICK { .. } => {
+								self.handle_nick_command(&command)
+							}
+							| IrcCommand::USER { .. } => {
+								self.handle_user_command(&command)
+							}
+						},
+					);
 
-			let r =
-				message
-					.command
-					.is_valid()
-					.and_then(|command| match command {
-						| IrcCommand::PASS { .. } => {
-							self.handle_pass_command(&command)
-						}
-						| IrcCommand::NICK { .. } => {
-							self.handle_nick_command(&command)
-						}
-						| IrcCommand::USER { .. } => {
-							self.handle_user_command(&command)
-						}
+				if let Err(irc_replies::Error::Numeric(numeric)) = r {
+					let reply_id = self.id;
+					let reply_prefix =
+						self.addr_based_on_numeric(&numeric).to_string();
+					let reply_numeric = numeric;
+
+					self.server.notify(AppContext::ReplyNumeric {
+						id: reply_id,
+						prefix: reply_prefix,
+						numeric: reply_numeric,
 					});
+				}
+			}
 
-			if let Err(irc_replies::Error::Numeric(numeric)) = r {
-				let reply_id = Some(self.id);
-				let reply_prefix =
-					self.addr_based_on_reply(&numeric).to_string();
-				let reply_numeric = numeric;
-
-				self.server.notify(AppContext::Reply {
-					id: reply_id,
-					prefix: reply_prefix,
-					numeric: reply_numeric,
-				});
+			| Err(err) => {
+				logger::warn!(
+					"Il ne s'agit pas d'un message de type IRC: {err}"
+				);
 			}
 		}
 
@@ -423,10 +452,6 @@ impl fmt::Display for Host {
 
 impl fmt::Display for Session {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let h = &self.host;
-		if let Some((n, u)) = self.nick.as_ref().zip(self.user.as_ref()) {
-			return write!(f, "{n}!{u}@{h}");
-		}
-		write!(f, "{h}")
+		write!(f, "{}", self.addr())
 	}
 }

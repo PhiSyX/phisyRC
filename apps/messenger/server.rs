@@ -63,6 +63,17 @@ impl Server {
 			false
 		})
 	}
+
+	pub fn reply_to(&self, session_id: AppSessionID, msg: impl ToString) {
+		let session = self
+			.sessions
+			.iter()
+			.find_map(
+				|(sid, ses)| if session_id.eq(sid) { Some(ses) } else { None },
+			)
+			.expect("Whaaaaat?");
+		session.text(msg.to_string())
+	}
 }
 
 // -------------- //
@@ -102,37 +113,28 @@ impl network::server::Interface for Server {
 		argument: Self::Argument,
 	) -> network::Result<()> {
 		match argument {
-			| AppContext::Reply {
+			| AppContext::ReplyNumeric {
 				id,
 				prefix,
 				numeric,
 			} => {
 				let msg = format!(
-					":{} {} {prefix} {numeric}",
+					"@sid={id} :{} {} {prefix} {numeric}",
 					self.config.name,
 					numeric.code()
 				);
-				if let Some(id) = id {
-					let session = self
-						.sessions
-						.iter()
-						.find_map(
-							|(sid, ses)| {
-								if id.eq(sid) {
-									Some(ses)
-								} else {
-									None
-								}
-							},
-						)
-						.unwrap();
-					let msg = format!("@sid={id} {msg}");
-					session.text(msg);
-				} else {
-					for (id, session) in self.sessions.iter() {
-						let msg = format!("@sid={id} {msg}");
-						session.text(msg);
-					}
+				self.reply_to(id, msg);
+			}
+
+			| AppContext::BroadcastCommand { command } => {
+				for (id, session) in self.sessions.iter() {
+					let params = command.params().join(" ");
+					let prefix = session.addr_based_on_command(&command);
+					let msg = format!(
+						"@sid={id} :{} {prefix} {command} :{params}",
+						self.config.name,
+					);
+					self.reply_to(*id, msg);
 				}
 			}
 

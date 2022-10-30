@@ -1,0 +1,25 @@
+[package]
+name = "proto-irc-replies"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license-file.workspace = true
+publish.workspace = true
+
+[lib]
+path = "./lib.rs"
+
+[features]
+default = []
+json = ["serde_json"]
+
+[dependencies]
+lang.workspace = true
+logger.workspace = true
+
+serde.workspace = true
+
+irc_msg = { path = "../message", package = "proto-irc-msg", features = [
+	"json",
+] }
+serde_json = { version = "^1.0", optional = true }

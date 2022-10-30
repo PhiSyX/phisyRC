@@ -227,7 +227,22 @@ where
 
 impl From<bytes::BytesMut> for IncomingPacket {
 	fn from(b: bytes::BytesMut) -> Self {
-		Self::Bin(b.to_vec())
+		if b.ends_with(b"\r\n") {
+			Self::Bin(b.to_vec())
+		} else if b.ends_with(b"\n") {
+			let mut v = b.to_vec();
+			v.last_mut().map(|l| {
+				*l = b'\r';
+				l
+			});
+			v.push(b'\n');
+			return Self::Bin(v);
+		} else {
+			let mut v = b.to_vec();
+			v.push(b'\r');
+			v.push(b'\n');
+			return Self::Bin(b.to_vec());
+		}
 	}
 }
 
@@ -277,6 +292,14 @@ impl From<tungstenite::Message> for IncomingPacket {
 				Self::Bin(vec![])
 			}
 		}
+	}
+}
+
+impl From<String> for OutgoingPacket {
+	fn from(text: String) -> Self {
+		let s = text.trim_end_matches('\r').trim_end_matches('\n');
+		let bytes = format!("{s}\r\n");
+		Self::Bin(bytes.as_bytes().to_vec())
 	}
 }
 

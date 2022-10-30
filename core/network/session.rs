@@ -38,10 +38,7 @@ pub trait Interface: Send + Sync {
 // --------- //
 
 #[derive(Debug)]
-pub struct Session<I>
-where
-	I: Clone,
-{
+pub struct Session<I> {
 	pub id: I,
 	packet_writer: OutgoingPacketWriter,
 	outgoing: Arc<Mutex<Option<DisconnectedReader>>>,
@@ -101,9 +98,9 @@ where
 		_ = self.packet_writer.send(OutgoingPacket::Bin(bytes));
 	}
 
-	pub fn text(&self, s: String) {
-		let bytes = s.as_bytes();
-		_ = self.packet_writer.send(OutgoingPacket::Bin(bytes.to_vec()));
+	pub fn text(&self, i: impl Into<OutgoingPacket>) {
+		let o: OutgoingPacket = i.into();
+		_ = self.packet_writer.send(o);
 	}
 }
 

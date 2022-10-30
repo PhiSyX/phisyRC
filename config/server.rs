@@ -12,6 +12,7 @@ use crate::Port;
 
 /// Configuration de serveur.
 #[derive(Debug)]
+#[derive(Clone)]
 #[derive(serde::Deserialize, serde::Serialize)]
 #[derive(phisyrc::Prompt)]
 pub struct ServerConfig {

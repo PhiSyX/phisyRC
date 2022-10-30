@@ -4,9 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-pub mod algorithms;
-mod export;
-pub mod lang;
-pub mod string;
+mod sha1;
 
-pub use self::export::*;
+pub use sha1::*;

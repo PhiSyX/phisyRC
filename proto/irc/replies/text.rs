@@ -6,7 +6,7 @@
 
 use crate::text;
 
-text! { impl UnregisteredCommand
+text! { impl CommandUnregistered
 	<- PASS
 	<- NICK
 	<- USER

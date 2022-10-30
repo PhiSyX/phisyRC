@@ -32,7 +32,7 @@ pub type NotifierWriter<T> = mpsc::UnboundedSender<T>;
 
 #[async_trait::async_trait]
 pub trait Interface: Send {
-	type Argument: Send;
+	type Argument: Send + core::fmt::Debug;
 	type Session: session::Interface;
 
 	async fn accept(

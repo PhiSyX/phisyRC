@@ -58,7 +58,7 @@ where
 }
 
 // -------------- //
-// Implémentation //
+// Implémentation // -> API Publique
 // -------------- //
 
 impl<I> Session<I>
@@ -66,13 +66,10 @@ where
 	I: Send,
 	I: Clone,
 {
-	pub fn create<U>(
-		socket: Socket,
-		id: I,
-		ctor: impl FnOnce(Self) -> U,
-	) -> Self
+	pub fn create<U>(socket: Socket, id: I, ctor: impl FnOnce(Self) -> U) -> U
 	where
 		U: 'static,
+		U: Clone,
 		U: Interface<ID = I>,
 	{
 		let (packet_sender, packet_receiver) = mpsc::unbounded_channel();
@@ -84,20 +81,29 @@ where
 			outgoing: Arc::new(Mutex::new(Some(outgoing_receiver))),
 		};
 
-		let instance = ctor(this.clone());
+		let instance = ctor(this);
 
-		let actor = Actor::new(instance, id, socket, packet_receiver);
+		let actor = Actor::new(instance.clone(), id, socket, packet_receiver);
 		tokio::spawn(async move {
 			let reason = actor.run().await;
 			outgoing_sender.send(reason).unwrap()
 		});
-		this
+		instance
 	}
 
 	pub(crate) async fn close(&self) -> Result<Option<Reason>> {
 		let mut outgoing = self.outgoing.lock().await;
 		let reason = outgoing.take().unwrap();
 		reason.await.unwrap()
+	}
+
+	pub fn binary(&self, bytes: Vec<u8>) {
+		_ = self.packet_writer.send(OutgoingPacket::Bin(bytes));
+	}
+
+	pub fn text(&self, s: String) {
+		let bytes = s.as_bytes();
+		_ = self.packet_writer.send(OutgoingPacket::Bin(bytes.to_vec()));
 	}
 }
 

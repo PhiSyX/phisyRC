@@ -16,6 +16,7 @@ pub(crate) use network::{
 	session::Interface as NetworkSessionInterface, Server as NetworkServer,
 	Session as NetworkSession,
 };
+use session::SessionID;
 use tokio::sync::mpsc;
 
 pub use self::{cli::cli_app, env::env_app};
@@ -55,7 +56,14 @@ pub enum AppContext {
 	/// Entrée utilisateur envoyé depuis le terminal (stdout / TUI)
 	InputFromTUI(String),
 	/// Message IRC.
-	IRC(irc_msg::Message),
+	// IRC(irc_msg::Message),
+
+	/// Commande Numeric
+	Reply {
+		id: Option<SessionID>,
+		prefix: String,
+		numeric: irc_replies::Numeric,
+	},
 }
 
 #[derive(Debug)]
@@ -125,10 +133,12 @@ impl App {
 	) -> Result<()> {
 		let cfg = config::load::<ServerConfig>(constants::CONFIG_SERVER)?;
 
-		let _server = NetworkServer::create(
+		let server = NetworkServer::create(
 			(cfg.ip.to_owned(), cfg.port.into()),
-			(cfg.ip, cfg.websocket_port.into()),
-			|instance: NetworkServer<AppServer>| AppServer::new(ctx, instance),
+			(cfg.ip.to_owned(), cfg.websocket_port.into()),
+			|instance: NetworkServer<AppServer>| {
+				AppServer::new(ctx, instance, cfg)
+			},
 		)
 		.await?;
 
@@ -141,8 +151,12 @@ impl App {
 						| AppContext::InputFromTUI(msg) => {
 							logger::warn!("TODO: parser la ligne: {msg}");
 						}
-						| AppContext::IRC(msg) => {
-							logger::debug!("irc msg {}", msg.json());
+						// | AppContext::IRC(msg) => {
+						// 	logger::debug!("irc msg {}", msg.json());
+						// }
+
+						| x @ AppContext::Reply { .. } => {
+							server.notify(x);
 						}
 					}
 				}

@@ -5,10 +5,12 @@
  */
 
 use crate::{
+	algorithms::SHA1,
 	lang::WildcardMatching,
 	string::{Escape, Slugify},
 };
 
 impl<T: AsRef<str>> Escape for T {}
 impl<T: AsRef<str>> WildcardMatching for T {}
+impl<T: AsRef<str>> SHA1 for T {}
 impl<T: AsRef<str>> Slugify for T {}

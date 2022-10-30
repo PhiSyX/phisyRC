@@ -44,7 +44,7 @@ pub(super) struct Analyzer {
 pub(super) enum Error<'a> {
 	/// La structure utilisateur n'est pas une structure de champs nommés.
 	IsNotNamedStruct(Span),
-	/// L'attribut #[prompt] est requis.
+	/// L'attribut `#[prompt]` est requis.
 	PromptAttributeIsRequired(&'a Field, Span),
 	/// Le format de l'attribut est invalide.
 	FormatAttributInvalid(&'a Field, Span),

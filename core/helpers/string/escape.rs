@@ -69,7 +69,7 @@ pub trait Escape: AsRef<str> {
 		self.escape_all_regexp_chars_excludes([])
 	}
 
-	/// Voir [Self::escape_regexp()]
+	/// Voir [Self::escape_all_chars_with_excepts_or_excludes()]
 	fn escape_all_regexp_chars_excludes<const E: usize>(
 		&self,
 		excludes_char: [char; E],

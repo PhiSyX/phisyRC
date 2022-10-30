@@ -209,7 +209,7 @@ impl<'a, 'b> CommandBuilder<'a, 'b> {
 }
 
 impl<'a, 'b> CommandBuilder<'a, 'b> {
-	/// Méthode de construction de la structure [MessageCommand]
+	/// Méthode de construction de la structure [Command]
 	pub(super) fn finish(self) -> Result<Command, command::Error> {
 		match self.state {
 			// Être dans état est impossible.

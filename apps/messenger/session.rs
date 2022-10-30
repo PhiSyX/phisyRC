@@ -42,15 +42,25 @@ pub type SessionID = uuid::Uuid;
 #[derive(Clone)]
 pub struct Session {
 	pub inner: NetworkSession<SessionID>,
+	/// ID de la session.
 	pub id: SessionID,
+	/// Serveur sur lequel la session est connectée.
 	pub server: AppServer,
+	/// Hôte de la session. (Base sur [SocketAddr] et [IpAddr])
 	pub host: Host,
+	/// Mot de passe reçu par la commande PASS.
 	pub pass: Option<String>,
+	/// Ancien pseudonyme de la session.
 	pub old_nick: Option<String>,
+	/// Pseudonyme courant de la session.
 	pub nick: Option<String>,
+	/// Identifiant de la session.
 	pub user: Option<String>,
+	/// TODO(phisyx): Les modes utilisateur de la session.
 	pub mode: Option<String>,
+	/// TODO(phisyx): Le nom réel de l'utilisateur.
 	pub realname: Option<String>,
+	/// La session est enregistrée au serveur?
 	pub is_registered: bool,
 }
 
@@ -67,15 +77,12 @@ pub struct Host {
 	pub virtual_host: Option<String>,
 }
 
-// ----------- //
-// Énumération //
-// ----------- //
-
 // -------------- //
 // Implémentation //
 // -------------- //
 
 impl Session {
+	/// Crée une nouvelle session.
 	pub fn new(
 		server_instance: AppServer,
 		session_instance: NetworkSession<uuid::Uuid>,
@@ -97,7 +104,8 @@ impl Session {
 		}
 	}
 
-	fn prefix_based_on_reply<'a>(
+	/// Adresse IRC de l'utilisateur basée sur la réponse.
+	fn addr_based_on_reply<'a>(
 		&'a self,
 		numeric: &'a irc_replies::Numeric,
 	) -> Cow<str> {
@@ -112,6 +120,11 @@ impl Session {
 		} else {
 			Cow::from(self.to_string())
 		}
+	}
+
+	/// Adresse IRC de l'utilisateur.
+	fn addr(&self) -> String {
+		self.to_string()
 	}
 }
 
@@ -258,7 +271,7 @@ impl Session {
 		for reply in replies {
 			self.server.notify(AppContext::Reply {
 				id: Some(self.id),
-				prefix: self.prefix_based_on_reply(&reply).to_string(),
+				prefix: self.addr_based_on_reply(&reply).to_string(),
 				numeric: reply,
 			});
 		}
@@ -342,7 +355,7 @@ impl network::session::Interface for Session {
 				if let Err(irc_replies::Error::Numeric(numeric)) = r {
 					let reply_id = Some(self.id);
 					let reply_prefix =
-						self.prefix_based_on_reply(&numeric).to_string();
+						self.addr_based_on_reply(&numeric).to_string();
 					let reply_numeric = numeric;
 
 					self.server.notify(AppContext::Reply {
@@ -376,7 +389,7 @@ impl network::session::Interface for Session {
 			if let Err(irc_replies::Error::Numeric(numeric)) = r {
 				let reply_id = Some(self.id);
 				let reply_prefix =
-					self.prefix_based_on_reply(&numeric).to_string();
+					self.addr_based_on_reply(&numeric).to_string();
 				let reply_numeric = numeric;
 
 				self.server.notify(AppContext::Reply {

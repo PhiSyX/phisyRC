@@ -181,7 +181,7 @@ impl App {
 // -------------- //
 
 impl App {
-	/// [CLI] Génère un mot de passe haché avec l'algorithme de hachage choisi
+	/// `CLI`: Génère un mot de passe haché avec l'algorithme de hachage choisi
 	/// par le choix utilisateur.
 	fn handle_make_password_command(
 		&self,

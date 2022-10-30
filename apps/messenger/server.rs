@@ -24,8 +24,11 @@ use crate::{
 pub struct Server {
 	inner: NetworkServer<Self>,
 	ctx: AppContextWriter,
+	/// les sessions connectées.
 	sessions: HashMap<AppSessionID, AppSession>,
+	/// Configuration du serveur.
 	pub config: ServerConfig,
+	/// Date de création du serveur.
 	pub created_at: DateTime<Utc>,
 }
 
@@ -51,6 +54,7 @@ impl Server {
 }
 
 impl Server {
+	/// Peut-on localiser un client?
 	pub fn can_locate_client(&self, nickname: &str) -> bool {
 		self.sessions.iter().any(|(_, session)| {
 			if let Some(nick) = &session.nick {

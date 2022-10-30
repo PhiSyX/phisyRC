@@ -43,7 +43,7 @@ pub fn config_dir() -> PathBuf {
 }
 
 /// Charge le fichier de configuration passé par argument et le dé-sérialise en
-/// son type [<T>] (passé par générique).
+/// son type `<T>` (passé par générique).
 pub fn load<T>(path: impl AsRef<Path>) -> Result<T, io::Error>
 where
 	T: serde::de::DeserializeOwned,
@@ -87,7 +87,7 @@ where
 }
 
 /// Charge le fichier de configuration passé par argument et le dé-sérialise en
-/// son type [<T>] (passé par générique) ou demande à l'utilisateur de générer
+/// son type `<T>` (passé par générique) ou demande à l'utilisateur de générer
 /// une nouveau fichier de configuration de manière interactive ou utiliser
 /// la configuration par défaut.
 pub fn load_or_prompt<T>(

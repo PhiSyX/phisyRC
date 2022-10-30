@@ -64,7 +64,7 @@ pub(super) enum Error<'a> {
 }
 
 enum AsyncAttribute {
-	/// Pour l'utilisation de l'attribut #[tokio::main]
+	/// Pour l'utilisation de l'attribut `#[tokio::main]`
 	Tokio,
 }
 

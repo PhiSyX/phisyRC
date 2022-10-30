@@ -22,7 +22,10 @@ pub type Result<T> = core::result::Result<T, Error>;
 // --------- //
 
 pub trait IncomingCommand<T> {
+	/// Combien de paramètre la commande PEUT/DOIT prendre.
 	fn can_take_parameters(cmd_s: impl AsRef<str>) -> usize;
+
+	/// La commande est-elle valide?
 	fn is_valid(&self) -> Result<T>;
 }
 

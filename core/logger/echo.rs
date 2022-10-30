@@ -44,7 +44,7 @@ pub type LoggerReader = tokio::sync::mpsc::UnboundedReceiver<Entry>;
 
 impl Echo<'_> {
 	#[cfg(feature = "stdout")]
-	/// [Stdout]: Affichage du log.
+	/// `Stdout`: Affichage du log.
 	pub(super) fn log(self, text: String) {
 		if self.record_level == LevelFilter::Error {
 			eprint!("{text}");
@@ -56,7 +56,7 @@ impl Echo<'_> {
 
 impl Entry {
 	#[cfg(feature = "tui")]
-	/// [TUI]: le style d'un log.
+	/// `TUI`: le style d'un log.
 	pub(super) fn style(&self) -> terminal::tui::style::Style {
 		use terminal::tui::style::{Color, Style};
 

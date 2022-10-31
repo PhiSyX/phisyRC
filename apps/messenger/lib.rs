@@ -107,26 +107,28 @@ impl App {
 
 	/// Gère les commandes de la CLI.
 	pub fn handle_command(&self) -> Result<()> {
-		match self.cli.command.as_ref() {
-			| Some(cmd) => match cmd {
-				| cli::Command::MakePassword(make_password) => {
-					self.handle_make_password_command(make_password)
-				}
-				| cli::Command::Config(config_cli) => {
-					if config_cli.options.delete {
-						config::delete(constants::CONFIG_SERVER)?;
-					} else if config_cli.options.show {
-						let cfg = config::load::<ServerConfig>(
-							constants::CONFIG_SERVER,
-						)?;
-						println!("{cfg:#?}");
-					}
+		if let Some(command) = self.cli.command.as_ref() {
+			match command {
+				| cli::Command::Config(cfg_cli) if cfg_cli.options.delete => {
+					config::delete(constants::CONFIG_SERVER)?;
 
-					Err(Error::EXIT_SUCCESS)
+					return Err(Error::EXIT_SUCCESS);
 				}
-			},
-			| None => Ok(()),
+
+				| cli::Command::Config(_) => {
+					let cfg =
+						config::load::<ServerConfig>(constants::CONFIG_SERVER)?;
+					println!("{cfg:#?}");
+					return Err(Error::EXIT_SUCCESS);
+				}
+
+				| cli::Command::MakePassword(make_password) => {
+					return self.handle_make_password_command(make_password);
+				}
+			}
 		}
+
+		Ok(())
 	}
 
 	/// Lance le serveur de Chat.
@@ -154,9 +156,6 @@ impl App {
 						| AppContext::InputFromTUI(msg) => {
 							logger::warn!("TODO: parser la ligne: {msg}");
 						}
-						// | AppContext::IRC(msg) => {
-						// 	logger::debug!("irc msg {}", msg.json());
-						// }
 
 						| x @ AppContext::ReplyNumeric { .. } => {
 							server.notify(x);
@@ -280,15 +279,9 @@ impl fmt::Display for Error {
 				"la variable d'environnement APP_SECRET_KEY n'existe pas."
 					.to_owned()
 			}
-			| Self::IO(err) => {
-				format!("IO: {err}")
-			}
-			| Self::Database(err) => {
-				format!("Base de données: {err}")
-			}
-			| Self::Network(err) => {
-				format!("Réseau: {err}")
-			}
+			| Self::IO(err) => format!("IO: {err}"),
+			| Self::Database(err) => format!("Base de données: {err}"),
+			| Self::Network(err) => format!("Réseau: {err}"),
 			| Self::EXIT_SUCCESS => "exit success".to_owned(),
 		};
 

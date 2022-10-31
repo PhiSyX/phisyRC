@@ -281,7 +281,7 @@ impl Session {
 		};
 		let yourhost_002 = IrcNumeric::RPL_YOURHOST {
 			servername: self.server.config.name.to_owned(),
-			ver: "v1.0.0".into(),
+			ver: format!("v{}", env!("CARGO_PKG_VERSION")),
 		};
 		let created_003 = IrcNumeric::RPL_CREATED {
 			date: self

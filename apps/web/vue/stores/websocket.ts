@@ -6,12 +6,12 @@
 
 import { reactive, ref } from "vue";
 
-enum State {
-	Connected = "Connecté",
-	Disconnected = "Déconnecté",
-	Error = "Erreur",
-	Send = "Envoyé",
-	Received = "Reçu",
+const enum State {
+	CLOSED = "Déconnecté",
+	CONNECTED = "Connecté",
+	ERROR = "Erreur",
+	SEND = "Envoyé",
+	RECV = "Reçu",
 }
 
 type WriteOutputFn = (_: State, ...args: unknown[]) => void;
@@ -27,13 +27,14 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 
 	function connect(url: string | URL) {
 		ws.value = new WebSocket(url);
+
 		let lws = ws.value;
 		lws.binaryType = "arraybuffer";
 		lws.addEventListener("open", handle_open_connection(write_output_fn));
 		lws.addEventListener("close", handle_close_connection(write_output_fn));
 		lws.addEventListener("message", handle_message(write_output_fn));
 		lws.addEventListener("error", handle_error(write_output_fn));
-		state.connection = lws.readyState!;
+		state.connection = lws.readyState;
 	}
 
 	function close() {
@@ -41,9 +42,9 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 		if (!lws) {
 			return;
 		}
-		lws.close();
+		lws.close(1000, "Client Quit.");
+		state.connection = lws.readyState;
 		ws.value = undefined;
-		state.connection = 0;
 	}
 
 	function write(data: string | ArrayBuffer) {
@@ -52,7 +53,8 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 			return;
 		}
 
-		write_output_fn(State.Send, data);
+		write_output_fn(State.SEND, data);
+		state.connection = lws.readyState;
 
 		let encoder = new TextEncoder();
 		let bytes = encoder.encode(`${data}\r\n`);
@@ -82,7 +84,7 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 		let cb = listener.bind({ close, socket: lws, write });
 		lws.addEventListener(event, function () {
 			cb({ close, socket: this, write });
-			state.connection = this.readyState!;
+			state.connection = this.readyState;
 		});
 	}
 
@@ -90,17 +92,16 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 }
 
 function handle_open_connection(write_output_fn: WriteOutputFn) {
-	return (evt: Event) => write_output_fn(State.Connected);
+	return (evt: Event) => write_output_fn(State.CONNECTED);
 }
 
 function handle_close_connection(write_output_fn: WriteOutputFn) {
-	return () => write_output_fn(State.Disconnected);
+	return () => write_output_fn(State.CLOSED);
 }
 
 function handle_error(write_output_fn: WriteOutputFn) {
-	return (evt: Event) => {
-		console.error(evt);
-		write_output_fn(State.Error);
+	return function (this: WebSocket, evt: Event) {
+		write_output_fn(State.ERROR);
 	};
 }
 
@@ -134,7 +135,7 @@ function process(
 ) {
 	let decoder = new TextDecoder();
 	let s = decoder.decode(raw);
-	write_output_fn(State.Received, s);
+	write_output_fn(State.RECV, s);
 }
 
 // ------ //

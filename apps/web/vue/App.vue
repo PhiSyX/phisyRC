@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { State, useWebSocketStore } from './stores/websocket';
 
 let websocket = useWebSocketStore(write_output);
@@ -8,6 +8,17 @@ let websocket_url = ref("ws://localhost:9667/");
 let input = ref("hello world");
 
 let output = ref<[State, ...Array<unknown>][]>([] as any);
+
+const connection_state_err = [
+	"la connexion n'a pas encore été établie",
+	"la communication est établie",
+	"La connexion est fermée...",
+	"Une erreur est survenue, la connexion a fermée",
+];
+
+let ws_state = computed(() => {
+	return connection_state_err[websocket.state.connection];
+});
 
 function handle_click_connect(_: MouseEvent) {
 	websocket.connect(websocket_url.value);
@@ -49,16 +60,16 @@ function write_output(state: State, ...args: Array<unknown>) {
 	<form method="post" @submit="handle_submit">
 		<div class="form-group" v-if="!websocket.state.connection">
 			<input v-model="websocket_url" type="text">
-			<button type="button" @click.once="handle_click_connect">Se connecter</button>
+			<button type="button" @click="handle_click_connect">Se connecter</button>
 		</div>
 		<div class="form-group" v-else>
-			<button type="button" @click.once="handle_click_close">Fermer la connexion</button>
+			<button type="button" @click="handle_click_close">Fermer la connexion</button>
 		</div>
 
 		<div class="history">
 			<output>
 				<p if="output.length > 0" v-for="[state, item] in output">
-					<span>[{{ state }}]</span>: {{ item }}
+					<span>[{{ state }}]</span>: {{ item || ws_state }}
 				</p>
 			</output>
 

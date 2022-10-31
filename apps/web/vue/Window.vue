@@ -1,12 +1,12 @@
-<script setup lang="ts">
-import { useRoute } from "vue-router";
-
-const route = useRoute();
+<script lang="ts">
+export default {
+	name: "Window",
+};
 </script>
 
 <template>
-	<div class="window">
-		<main role="main" class="window@body">
+	<div class="window [ size:full ]">
+		<main role="main" class="window@body [ size:full ]">
 			<RouterView />
 		</main>
 	</div>

@@ -1,0 +1,55 @@
+@mixin --use-width {
+	@include selector-class("size:full") {
+		width: 100%;
+	}
+	@include selector-class("s:full") {
+		width: 100%;
+	}
+	@include selector-class("w:full") {
+		width: 100%;
+	}
+
+	@for $size from 0 through 20 {
+		%w\=#{$size} {
+			width: space($size);
+		}
+
+		@include selector-class("w=#{$size}") {
+			@extend %w\=#{$size};
+		}
+		@include selector-class("size=#{$size}") {
+			@extend %w\=#{$size};
+		}
+		@include selector-class("s=#{$size}") {
+			@extend %w\=#{$size};
+		}
+	}
+}
+
+@mixin --use-height {
+	@include selector-class("size:full") {
+		height: 100%;
+	}
+	@include selector-class("s:full") {
+		height: 100%;
+	}
+	@include selector-class("h:full") {
+		height: 100%;
+	}
+
+	@for $size from 0 through 20 {
+		%h\=#{$size} {
+			height: space($size);
+		}
+
+		@include selector-class("h=#{$size}") {
+			@extend %h\=#{$size};
+		}
+		@include selector-class("size=#{$size}") {
+			@extend %h\=#{$size};
+		}
+		@include selector-class("s=#{$size}") {
+			@extend %h\=#{$size};
+		}
+	}
+}

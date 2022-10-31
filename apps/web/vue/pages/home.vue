@@ -9,7 +9,7 @@ import Window from "~vue/Window.vue";
 </script>
 
 <template>
-	<div class="app">
+	<div class="app [ size:full ]">
 		<Window />
 	</div>
 </template>

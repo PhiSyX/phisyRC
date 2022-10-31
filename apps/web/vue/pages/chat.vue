@@ -9,15 +9,7 @@ import App from "~vue/App.vue";
 </script>
 
 <template>
-	<div id="chat-page">
+	<div id="chat-page" class="[ size:full p=2 ]">
 		<App />
 	</div>
 </template>
-
-<style scoped>
-#chat-page {
-	width: 100%;
-	height: 100%;
-	padding: calc(var(--space) * 2);
-}
-</style>

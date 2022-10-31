@@ -14,9 +14,10 @@ use syn::{
 	},
 	punctuated::Punctuated,
 	spanned::Spanned,
-	FnArg, GenericParam, Ident, Meta, Pat, PatReference, PatTuple, Path, Type,
-	TypeParamBound, WherePredicate,
+	FnArg, Ident, Meta, Pat, PatReference, PatTuple, Path,
 };
+
+use crate::utils::generic;
 
 // ---- //
 // Type //
@@ -52,6 +53,8 @@ pub(super) enum Error<'a> {
 	MissingWhereClause(Span),
 	/// La clause where ne contient pas la générique en question.
 	WhereClauseName(&'a syn::Ident, Span),
+	/// La générique Async est manquante.
+	MissingAsyncGeneric(Span),
 	/// La générique Context est manquante.
 	MissingContextGeneric(Span),
 	/// Trop d'arguments passés à la fonction principale.
@@ -147,10 +150,17 @@ impl Analyzer {
 		let setup = setup_fn(self)?;
 
 		let async_tokens = if let Some(maybe_aa) = self.maybe_asyncness() {
-			match maybe_aa? {
-				| AsyncAttribute::Tokio => quote! {
+			// NOTE(phisyx): cette générique n'est pas obligatoire.
+			if let Err(Error::MissingAsyncGeneric(_)) = &maybe_aa {
+				quote! {
 					#[tokio::main]
-				},
+				}
+			} else {
+				match maybe_aa? {
+					| AsyncAttribute::Tokio => quote! {
+						#[tokio::main]
+					},
+				}
 			}
 		} else {
 			quote! {}
@@ -275,49 +285,20 @@ impl Analyzer {
 	fn maybe_ctx_generic(&self) -> Option<Result<&Path>> {
 		let fn_gen = &self.input.sig.generics;
 
-		let maybe_has_context = fn_gen.params.iter().find_map(|gen_par| {
-			if let GenericParam::Type(ty_param) = gen_par {
-				if ty_param.ident.eq("Context") {
-					return Some(ty_param);
+		generic::find_generic_and_clause(fn_gen, &"Context")
+			.map_err(|err| match err {
+				| generic::Error::MissingGeneric(span) => {
+					Error::MissingContextGeneric(span)
 				}
-			}
-			None
-		});
-
-		let maybe_where_clause = fn_gen.where_clause.as_ref();
-		if maybe_has_context.is_some() && maybe_where_clause.is_none() {
-			return Some(Err(Error::MissingWhereClause(
-				fn_gen.where_clause.span(),
-			)));
-		}
-
-		let has_context = maybe_has_context?;
-		let where_clause = maybe_where_clause?;
-
-		let has_clause = where_clause.predicates.iter().find_map(|wp| {
-			if let WherePredicate::Type(predicate_ty) = wp {
-				if let Type::Path(ty_path) = &predicate_ty.bounded_ty {
-					if ty_path.path.is_ident(&has_context.ident) {
-						if let Some(TypeParamBound::Trait(trait_bound)) =
-							predicate_ty.bounds.first()
-						{
-							return Some(Ok(&trait_bound.path));
-						}
-					}
+				| generic::Error::MissingWhereClause(Some(ident), span) => {
+					Error::WhereClauseName(ident, span)
 				}
-			}
-
-			None
-		});
-
-		if has_clause.is_none() {
-			return Some(Err(Error::WhereClauseName(
-				&has_context.ident,
-				fn_gen.where_clause.span(),
-			)));
-		}
-
-		has_clause
+				| generic::Error::MissingWhereClause(None, span) => {
+					Error::MissingWhereClause(span)
+				}
+			})
+			.map(Into::into)
+			.transpose()
 	}
 
 	fn maybe_asyncness(&self) -> Option<Result<AsyncAttribute>> {
@@ -328,47 +309,20 @@ impl Analyzer {
 			return Some(Ok(AsyncAttribute::Tokio));
 		}
 
-		let first_param =
-			if let Some(GenericParam::Type(ty_param)) = fn_gen.params.first() {
-				Some(ty_param)
-			} else {
-				None
-			}?;
-
-		// <Async>
-		// if !first_param.ident.eq("Async") {
-		// 	return Some(Ok(AsyncAttribute::Tokio));
-		// }
-
-		let maybe_where_clause = fn_gen.where_clause.as_ref();
-		if maybe_where_clause.is_none() {
-			panic!("{}", Error::MissingWhereClause(first_param.span()));
-		}
-		let where_clause = maybe_where_clause.unwrap();
-
-		// where
-		//   Async: path
-		if let Some(WherePredicate::Type(predicate_ty)) =
-			where_clause.predicates.first()
-		{
-			let has_same_clause = match &predicate_ty.bounded_ty {
-				| Type::Path(ty_path) => {
-					ty_path.path.is_ident(&first_param.ident)
+		generic::find_generic_and_clause(fn_gen, &"Async")
+			.map_err(|err| match err {
+				| generic::Error::MissingGeneric(span) => {
+					Error::MissingAsyncGeneric(span)
 				}
-				| _ => false,
-			};
-
-			if !has_same_clause {
-				return None;
-			}
-
-			let ty_param = predicate_ty.bounds.first()?;
-			if let TypeParamBound::Trait(bound) = ty_param {
-				return Some(Ok(AsyncAttribute::from(bound.path.get_ident()?)));
-			}
-		}
-
-		Some(Ok(AsyncAttribute::Tokio))
+				| generic::Error::MissingWhereClause(Some(ident), span) => {
+					Error::WhereClauseName(ident, span)
+				}
+				| generic::Error::MissingWhereClause(None, span) => {
+					Error::MissingWhereClause(span)
+				}
+			})
+			.map(|p| p.get_ident().map(AsyncAttribute::from))
+			.transpose()
 	}
 
 	/// Vérifie que l'identifiant de la signature de la fonction est la fonction
@@ -453,6 +407,7 @@ impl<'a> Error<'a> {
 			| Self::SecondArgumentInvalid(span)
 			| Self::MissingWhereClause(span)
 			| Self::WhereClauseName(_, span)
+			| Self::MissingAsyncGeneric(span)
 			| Self::MissingContextGeneric(span)
 			| Self::TooManyArguments(_, span)
 			| Self::Unexpected(span)
@@ -498,6 +453,9 @@ impl fmt::Display for Error<'_> {
 					"La clause where ne contient pas la générique « {} ».",
 					ident
 				)
+			}
+			| Self::MissingAsyncGeneric(_) => {
+				"La générique 'Async' est manquante.".to_owned()
 			}
 			| Self::MissingContextGeneric(_) => {
 				"La générique 'Context' est manquante.".to_owned()

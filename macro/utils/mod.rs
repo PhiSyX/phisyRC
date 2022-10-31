@@ -6,5 +6,6 @@
 
 pub mod attribute;
 pub mod field;
+pub mod generic;
 pub mod literal;
 pub mod meta;

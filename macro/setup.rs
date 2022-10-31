@@ -166,22 +166,28 @@ impl Analyzer {
 			quote! {}
 		};
 
-		let generic_for_mpsc =
-			if let Some(maybe_path) = self.maybe_ctx_generic() {
-				let path = maybe_path?;
-				quote! { #path }
+		let has_ctx_generic = if let Some(maybe_path) = self.maybe_ctx_generic()
+		{
+			// NOTE(phisyx): cette générique n'est pas obligatoire.
+			if let Err(Error::MissingContextGeneric(_)) = &maybe_path {
+				quote! {}
 			} else {
-				return Err(Error::MissingContextGeneric(
-					self.input.sig.generics.span(),
-				));
-			};
+				let generic_mpsc = maybe_path?;
+				quote! {
+					let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel::<#generic_mpsc>();
+				}
+			}
+		} else {
+			return Err(Error::MissingContextGeneric(
+				self.input.sig.generics.span(),
+			));
+		};
 
 		Ok(quote! {
 			#(#fn_attrs)*
 			#async_tokens
 			#maybe_asyncness fn main() #output_type {
-				let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel::<#generic_for_mpsc>();
-
+				#has_ctx_generic
 				#setup
 				#(#setup_by_attrs)*
 				#body_block

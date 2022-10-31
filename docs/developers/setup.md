@@ -35,7 +35,8 @@ pnpm install
 -   [ ] **Desktop**: TODO.
 -   [ ] **Mobile**: TODO.
 -   [ ] **Terminal**: TODO.
--   [x] **Web**: `pnpm web dev`
+-   [ ] **Web** : TODO.
+-   [x] Serveur **Web** de développement: `pnpm web dev`
 
 Pour ouvrir un serveur de Chat
 

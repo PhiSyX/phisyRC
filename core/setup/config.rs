@@ -4,9 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+// NOTE(phisyx): Pas fan de cette partie de code.
+
 use crate::Result;
 
-pub async fn config<C, E, Ctx>(_: (&C, &E), _: &str, _: Ctx) -> Result<()> {
+// ---- //
+// Sync //
+// ---- //
+
+pub fn config_interactive() -> Result<()> {
 	#[cfg(feature = "database")]
 	config::load_or_prompt::<config::DatabaseConfig>(
 		constants::CONFIG_DATABASE,
@@ -19,4 +25,36 @@ pub async fn config<C, E, Ctx>(_: (&C, &E), _: &str, _: Ctx) -> Result<()> {
 	)?;
 
 	Ok(())
+}
+
+// -------- //
+// Sync Alt //
+// -------- //
+
+pub fn config_interactive_1<C>(_: &C) -> Result<()> {
+	config_interactive()
+}
+pub fn config_interactive_2<C, E>(_: (&C, &E)) -> Result<()> {
+	config_interactive()
+}
+
+// --------- //
+// Async Alt //
+// --------- //
+
+pub async fn future_config_interactive() -> Result<()> {
+	config_interactive()
+}
+
+pub async fn future_config_interactive_1<C, Context>(
+	_: &C,
+	_: Context,
+) -> Result<()> {
+	config_interactive()
+}
+pub async fn future_config_interactive_2<C, E, Context>(
+	_: (&C, &E),
+	_: Context,
+) -> Result<()> {
+	config_interactive()
 }

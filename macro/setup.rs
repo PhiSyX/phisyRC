@@ -14,6 +14,7 @@ use syn::{
 	},
 	punctuated::Punctuated,
 	spanned::Spanned,
+	token::{self},
 	FnArg, Ident, Meta, Pat, PatReference, PatTuple, Path,
 };
 
@@ -66,10 +67,13 @@ pub(super) enum Error<'a> {
 	UnknownAttribute(&'a syn::Ident, Span),
 }
 
+#[derive(Copy, Clone)]
+#[derive(Default)]
 enum AsyncAttribute {
 	/// Pour l'utilisation de l'attribut `#[actix_web::main]`
 	ActixWeb,
 	/// Pour l'utilisation de l'attribut `#[tokio::main]`
+	#[default]
 	Tokio,
 }
 
@@ -127,11 +131,11 @@ impl Analyzer {
 		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
 			| syn::NestedMeta::Meta(meta) => match meta {
 				| syn::Meta::Path(path) => {
-					self.handle_path(meta, path, Default::default())
+					self.handle_attribute(meta, path, Default::default())
 				}
 				| syn::Meta::NameValue(nv) => match &nv.lit {
 					| syn::Lit::Str(lit_str) => {
-						self.handle_path(meta, &nv.path, lit_str.value())
+						self.handle_attribute(meta, &nv.path, lit_str.value())
 					}
 					| _ => Err(Error::Unexpected(meta.span())),
 				},
@@ -200,45 +204,146 @@ impl Analyzer {
 		})
 	}
 
-	fn handle_path<'a>(
-		&self,
+	fn handle_attribute<'a>(
+		&'a self,
 		meta: &'a Meta,
 		path: &'a Path,
-		arg_lit: String,
+		mut arg_lit: String,
 	) -> Result<'a, TokenStream2> {
-		let ident = path
+		let attribute_name = path
 			.get_ident()
 			.expect("Devrait être un identifiant valide");
-		if !Self::SUPPORT_ATTRIBUTES.contains(&ident.to_string().as_str()) {
-			return Err(Error::UnknownAttribute(ident, meta.span()));
+
+		if !Self::SUPPORT_ATTRIBUTES
+			.contains(&attribute_name.to_string().as_str())
+		{
+			return Err(Error::UnknownAttribute(attribute_name, meta.span()));
 		}
 
-		let args_pat = {
+		// Génère un tuple contenant les arguments passés dans la fonction
+		// principale main :
+		//
+		//     1. ()
+		//     2. (cli)
+		//     3. (cli, env)
+		let arguments_from_main_fn = {
 			let mut list = Punctuated::new();
-			if let Some(i) = self.get_first_arg_pat() {
-				list.push(i);
+			// CLI
+			if let Some(item) = self.get_first_arg_pat() {
+				list.push(item);
 			}
-			if let Some(i) = self.get_last_arg_pat() {
-				list.push(i);
+			// ENV
+			if let Some(item) = self.get_last_arg_pat() {
+				list.push(item);
 			}
 			PatTuple {
 				attrs: Default::default(),
-				paren_token: syn::token::Paren(meta.span()),
+				paren_token: token::Paren(meta.span()),
 				elems: list,
 			}
 		};
 
-		let maybe_ident = Ident::new(&format!("maybe_{ident}"), ident.span());
+		let total_arguments_from_main_fn = arguments_from_main_fn.elems.len();
+		let arguments_from_main_fn = {
+			if total_arguments_from_main_fn == 0 {
+				None
+			} else {
+				Some(arguments_from_main_fn)
+			}
+		};
+
+		// Génère un identifiant de fonction selon si l'on est en asynchrone et
+		// selon les arguments de l'attribut en question.
+		//
+		// Exemple:
+		//
+		//    - future_logger_tui (async)
+		//    - logger_stdout
+		let attribute_name_fn = {
+			if !arg_lit.is_empty() {
+				arg_lit = format!("_{arg_lit}");
+			}
+			if self.input.sig.asyncness.is_some() {
+				if total_arguments_from_main_fn > 0 {
+					Ident::new(
+						&format!("future_{attribute_name}{arg_lit}_{total_arguments_from_main_fn}"),
+						attribute_name.span(),
+					)
+				} else {
+					Ident::new(
+						&format!("future_{attribute_name}{arg_lit}"),
+						attribute_name.span(),
+					)
+				}
+			} else if total_arguments_from_main_fn > 0 {
+				Ident::new(
+  				&format!("{attribute_name}{arg_lit}_{total_arguments_from_main_fn}"),
+  				attribute_name.span(),
+  			)
+			} else {
+				Ident::new(
+					&format!("{attribute_name}{arg_lit}"),
+					attribute_name.span(),
+				)
+			}
+		};
+
+		// Génère un identifiant de variable pour stocker le résultat de la
+		// fonction générée ci-haut (attribute_name_fn).
+		let result_attribute_from_setup_fn = Ident::new(
+			&format!("maybe_{attribute_name}"),
+			attribute_name.span(),
+		);
+
+		// Génère un identifiant de variable qui correspond au contexte
+		// d'application.
+		let app_ctx = if let Some(maybe_ctx) = self.maybe_ctx_generic() {
+			if let Err(Error::MissingContextGeneric(_)) = &maybe_ctx {
+				None
+			} else {
+				let ctx = maybe_ctx?;
+				Some(Ident::new("ctx", ctx.span()))
+			}
+		} else {
+			None
+		};
+
+		let call = {
+			let optional_app_ctx =
+				if app_ctx.is_some() && total_arguments_from_main_fn > 0 {
+					Some(quote! {, #app_ctx.clone() })
+				} else if app_ctx.is_some() {
+					Some(quote! { #app_ctx.clone() })
+				} else {
+					None
+				};
+
+			let list_params = quote! {
+				( #arguments_from_main_fn #optional_app_ctx )
+			};
+
+			if self.input.sig.asyncness.is_some() {
+				quote! {
+					setup::#attribute_name_fn #list_params .await
+				}
+			} else {
+				quote! {
+					setup::#attribute_name_fn #list_params
+				}
+			}
+		};
+
 		Ok(quote! {
-			#[allow(unused_variables)]
-			let #maybe_ident = setup::#ident(#args_pat, #arg_lit, ctx.clone()).await;
-			if let Err(err) = #maybe_ident {
+			#[allow(unused_variables, unused_parens)]
+			let #result_attribute_from_setup_fn = #call;
+
+			if let Err(err) = #result_attribute_from_setup_fn {
 				use terminal::format::color::Interface;
 				eprintln!();
 				eprintln!(
 					"{}: #[phisyrc::setup({})]: quelque chose s'est mal passée -- {}",
 					"runtime error".red(),
-					stringify!(#ident),
+					stringify!(#attribute_name),
 					err
 				);
 				eprintln!();

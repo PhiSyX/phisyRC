@@ -5,8 +5,8 @@
  */
 
 #[cfg(feature = "config")]
-pub use crate::config::config;
+pub use crate::config::*;
 #[cfg(feature = "database")]
-pub use crate::database::database;
+pub use crate::database::*;
 #[cfg(feature = "logger")]
-pub use crate::logger::logger;
+pub use crate::logger::*;

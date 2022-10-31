@@ -4,64 +4,65 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-use std::str::FromStr;
+// NOTE(phisyx): Pas fan de cette partie de code.
 
 use cli::ProcessEnv;
 use helpers::lang::WildcardMatching;
-use logger::stdout;
+use logger::{stdout, tui};
 use tokio::sync::mpsc;
 
 use crate::{Result, SetupCliInterface, SetupEnvInterface};
 
-// ----------- //
-// Énumération //
-// ----------- //
+// ---- //
+// Sync //
+// ---- //
 
-#[derive(Debug)]
-#[derive(Default)]
-#[derive(Copy, Clone)]
-#[derive(PartialEq, Eq)]
-pub enum LoggerType {
-	#[default]
-	Stdout,
-	Tui,
+// Le logger par défaut utilisé est `stdout`.
+pub fn logger() -> Result<()> {
+	let level_filter = if cfg!(debug_assertions) {
+		logger::LevelFilter::Debug
+	} else {
+		logger::LevelFilter::Off
+	};
+
+	let debug_filter = "*";
+
+	let logger_builder = stdout::Logger::builder()
+		.with_color()
+		.with_level(level_filter)
+		.with_timestamp()
+		.filter(move |metadata| metadata.target().iswm(debug_filter));
+
+	Ok(logger_builder.build_stdout()?)
 }
 
-// -------------- //
-// Implémentation // -> Interface
-// -------------- //
+pub fn logger_1<C>(args: &C) -> Result<()>
+where
+	C: SetupCliInterface,
+{
+	let cli_args = args;
 
-impl FromStr for LoggerType {
-	type Err = ();
+	let level_filter = match &cli_args.process_env() {
+		| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
+		| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
+		| ProcessEnv::TEST => logger::LevelFilter::Trace,
+	};
 
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(match s {
-			| "tui" => Self::Tui,
-			| _ => Self::Stdout,
-		})
-	}
+	let debug_filter = "*";
+
+	let logger_builder = stdout::Logger::builder()
+		.with_color()
+		.with_level(level_filter)
+		.with_timestamp()
+		.filter(move |metadata| metadata.target().iswm(debug_filter));
+
+	Ok(logger_builder.build_stdout()?)
 }
 
-impl<'a> From<&'a str> for LoggerType {
-	fn from(s: &'a str) -> Self {
-		s.parse().unwrap_or_default()
-	}
-}
-
-// FIXME(phisyx): dépendant de tokio (mpsc).
-//
-// FIXME(phisyx): le stdout étant changé lorsqu'on utilise TUI il y a un léger
-// souci avec la configuration interactive si l'attribut setup::config n'est
-// jamais appelé.
-pub async fn logger<C, E, Ctx>(
-	args: (&C, &E),
-	ty: impl Into<LoggerType>,
-	ctx: mpsc::UnboundedSender<Ctx>,
-) -> Result<()>
+pub fn logger_2<C, E>(args: (&C, &E)) -> Result<()>
 where
 	C: SetupCliInterface,
 	E: SetupEnvInterface,
-	Ctx: terminal::EventLoop,
 {
 	let (cli_args, env_args) = args;
 
@@ -71,18 +72,151 @@ where
 		| ProcessEnv::TEST => logger::LevelFilter::Trace,
 	};
 
-	let logger_type = ty.into();
-
 	let debug_filter = env_args.debug_filter();
+
 	let logger_builder = stdout::Logger::builder()
 		.with_color()
 		.with_level(level_filter)
 		.with_timestamp()
 		.filter(move |metadata| metadata.target().iswm(&debug_filter));
 
-	if LoggerType::Tui == logger_type {
-		return Ok(logger_builder.build_tui(ctx).await?);
-	}
-
 	Ok(logger_builder.build_stdout()?)
+}
+
+// ----- //
+// Async //
+// ----- //
+
+pub async fn future_logger_tui<Context>(
+	ctx: mpsc::UnboundedSender<Context>,
+) -> Result<()>
+where
+	Context: terminal::EventLoop,
+{
+	let level_filter = if cfg!(debug_assertions) {
+		logger::LevelFilter::Debug
+	} else {
+		logger::LevelFilter::Off
+	};
+
+	let debug_filter = "*";
+
+	let logger_builder = tui::Logger::builder()
+		.with_color()
+		.with_level(level_filter)
+		.with_timestamp()
+		.filter(move |metadata| metadata.target().iswm(debug_filter));
+	Ok(logger_builder.build_tui(ctx).await?)
+}
+
+pub async fn future_logger_tui_1<C, Context>(
+	args: &C,
+	ctx: mpsc::UnboundedSender<Context>,
+) -> Result<()>
+where
+	C: SetupCliInterface,
+	Context: terminal::EventLoop,
+{
+	let cli_args = args;
+
+	let level_filter = match &cli_args.process_env() {
+		| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
+		| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
+		| ProcessEnv::TEST => logger::LevelFilter::Trace,
+	};
+
+	let debug_filter = "*";
+
+	let logger_builder = tui::Logger::builder()
+		.with_color()
+		.with_level(level_filter)
+		.with_timestamp()
+		.filter(move |metadata| metadata.target().iswm(debug_filter));
+	Ok(logger_builder.build_tui(ctx).await?)
+}
+
+pub async fn future_logger_tui_2<C, E, Context>(
+	args: (&C, &E),
+	ctx: mpsc::UnboundedSender<Context>,
+) -> Result<()>
+where
+	C: SetupCliInterface,
+	E: SetupEnvInterface,
+	Context: terminal::EventLoop,
+{
+	let (cli_args, env_args) = args;
+
+	let level_filter = match &cli_args.process_env() {
+		| ProcessEnv::DEVELOPMENT => logger::LevelFilter::Debug,
+		| ProcessEnv::PRODUCTION => logger::LevelFilter::Off,
+		| ProcessEnv::TEST => logger::LevelFilter::Trace,
+	};
+
+	let debug_filter = env_args.debug_filter();
+
+	let logger_builder = tui::Logger::builder()
+		.with_color()
+		.with_level(level_filter)
+		.with_timestamp()
+		.filter(move |metadata| metadata.target().iswm(&debug_filter));
+
+	Ok(logger_builder.build_tui(ctx).await?)
+}
+
+// -------- //
+// Sync Alt //
+// -------- //
+
+pub fn logger_stdout() -> Result<()> {
+	logger()
+}
+pub fn logger_stdout_1<C>(args: &C) -> Result<()>
+where
+	C: SetupCliInterface,
+{
+	logger_1(args)
+}
+pub fn logger_stdout_2<C, E>(args: (&C, &E)) -> Result<()>
+where
+	C: SetupCliInterface,
+	E: SetupEnvInterface,
+{
+	logger_2(args)
+}
+
+// --------- //
+// Async Alt //
+// --------- //
+
+pub async fn future_logger() -> Result<()> {
+	logger()
+}
+pub async fn future_logger_1<C>(args: &C) -> Result<()>
+where
+	C: SetupCliInterface,
+{
+	logger_1(args)
+}
+pub async fn future_logger_2<C, E>(args: (&C, &E)) -> Result<()>
+where
+	C: SetupCliInterface,
+	E: SetupEnvInterface,
+{
+	logger_2(args)
+}
+pub async fn future_logger_stdout() -> Result<()> {
+	logger()
+}
+pub async fn future_logger_stdout_1<C>(args: &C) -> Result<()>
+where
+	C: SetupCliInterface,
+{
+	logger_1(args)
+}
+pub async fn future_logger_stdout_2<C, E>(args: (&C, &E)) -> Result<()>
+where
+	C: SetupCliInterface,
+	E: SetupEnvInterface,
+{
+	logger_2(args)
 }

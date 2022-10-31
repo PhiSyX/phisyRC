@@ -4,5 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "mixins/selector";
-@import "mixins/theme";
+@mixin --use-flexibility {
+	%flex-grow {
+		flex-grow: 1;
+	}
+
+	@include selector-class("flex:full") {
+		@extend %flex-grow;
+	}
+	@include selector-class("f:full") {
+		@extend %flex-grow;
+	}
+}

@@ -1,0 +1,37 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin extend-flex {
+	&,
+	&\! {
+		@extend %flex;
+		@content;
+	}
+
+	&\* {
+		@extend %inline-flex;
+		@content;
+	}
+
+	&\! {
+		@extend %flex-column;
+		@content;
+	}
+}
+
+@mixin --use-containers {
+	%flex {
+		display: flex;
+	}
+
+	%inline-flex {
+		display: inline-flex;
+	}
+
+	.flex {
+		@include extend-flex;
+	}
+}

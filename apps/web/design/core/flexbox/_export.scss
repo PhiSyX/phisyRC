@@ -1,0 +1,11 @@
+@import "alignment";
+@import "containers";
+@import "flexibility";
+@import "ordering-orientation";
+
+@mixin --use-flexbox {
+	@include --use-alignment;
+	@include --use-containers;
+	@include --use-flexibility;
+	@include --use-ordering-orientation;
+}

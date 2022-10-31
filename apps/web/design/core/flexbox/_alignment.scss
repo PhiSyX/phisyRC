@@ -1,0 +1,35 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-alignment {
+	$align-items: (start, center, end);
+
+	@each $item in $align-items {
+		@include selector-class("f:#{$item}") {
+			align-items: #{$item};
+		}
+
+		@include selector-class("fs:#{$item}") {
+			align-self: #{$item};
+		}
+	}
+
+	@include selector-class("f:center") {
+		justify-content: center;
+
+		@supports not (justify-content: center) {
+			margin: 0 auto;
+		}
+	}
+
+	@include selector-class("fs:center") {
+		justify-self: center;
+
+		@supports not (justify-self: center) {
+			margin: 0 auto;
+		}
+	}
+}

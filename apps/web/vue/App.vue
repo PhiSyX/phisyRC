@@ -57,7 +57,7 @@ function write_output(state: State, ...args: Array<unknown>) {
 <template>
 	<h1>Test communication WebSocket</h1>
 
-	<form method="post" @submit="handle_submit">
+	<form method="post" @submit="handle_submit" class="[ flex! ]">
 		<div class="form-group" v-if="!websocket.state.connection">
 			<input v-model="websocket_url" type="text">
 			<button type="button" @click="handle_click_connect">Se connecter</button>
@@ -66,7 +66,7 @@ function write_output(state: State, ...args: Array<unknown>) {
 			<button type="button" @click="handle_click_close">Fermer la connexion</button>
 		</div>
 
-		<div class="history">
+		<div class="history [ f:full fs:center ]">
 			<output>
 				<p if="output.length > 0" v-for="[state, item] in output">
 					<span>[{{ state }}]</span>: {{ item || ws_state }}
@@ -74,7 +74,7 @@ function write_output(state: State, ...args: Array<unknown>) {
 			</output>
 
 			<div class="form-group" v-show="websocket.state.connection">
-				<input v-model="input" type="text">
+				<input v-model="input" type="text" class="[ flex:full ]">
 				<button type="submit">Envoie du message au serveur</button>
 			</div>
 		</div>
@@ -82,21 +82,17 @@ function write_output(state: State, ...args: Array<unknown>) {
 </template>
 
 <style scoped lang="scss">
+@import "design/functions";
+@import "design/mixins";
+
 form {
 	height: calc(100% - 68px);
-	display: flex;
-	flex-direction: column;
-	gap: var(--space);
-}
-
-.history {
-	align-self: center;
-	flex-grow: 1;
+	gap: space(1);
 }
 
 .form-group {
 	display: flex;
-	gap: var(--space);
+	gap: space(1);
 	justify-content: space-between;
 }
 
@@ -120,7 +116,6 @@ output {
 
 p {
 	margin: 0;
-
 }
 
 p span {
@@ -129,14 +124,10 @@ p span {
 
 button,
 input {
-	padding: var(--space);
+	padding: space(1);
 	border-radius: 4px;
 
 	border: 1px solid var(--color-grey800);
-}
-
-.history input {
-	flex-grow: 1;
 }
 
 input {
@@ -145,23 +136,12 @@ input {
 	&:active,
 	&:focus {
 		outline: 0;
+		border: 1px solid var(--color-orange600);
 	}
 
-
-	@media (prefers-color-scheme: dark) {
-		background-color: #3c4043;
-
-		&:active,
-		&:focus {
-			border: 1px solid var(--color-orange600);
-		}
-	}
-
-	@media (prefers-color-scheme: light) {
-
-		&:active,
-		&:focus {
-			border: 1px solid var(--color-orange600);
+	@include --theme using ($name) {
+		@if $name==dark {
+			background-color: #3c4043;
 		}
 	}
 }

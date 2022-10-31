@@ -4,5 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "mixins/selector";
-@import "mixins/theme";
+@mixin --use-ordering-orientation {
+	%flex-column {
+		flex-direction: column !important;
+		// flex-wrap: wrap;
+	}
+}

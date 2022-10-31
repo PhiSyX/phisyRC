@@ -4,5 +4,14 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "mixins/selector";
-@import "mixins/theme";
+@mixin selector-id($selector) {
+	##{escape_selector($selector)} {
+		@content;
+	}
+}
+
+@mixin selector-class($selector) {
+	.#{escape_selector($selector)} {
+		@content;
+	}
+}

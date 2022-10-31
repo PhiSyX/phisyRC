@@ -4,10 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "align/export";
-@import "box/export";
-@import "flexbox/export";
+@import "gap";
 
-@include --use-align;
-@include --use-box;
-@include --use-flexbox;
+@mixin --use-align {
+	@include --use-gap;
+}

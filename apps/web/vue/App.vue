@@ -55,7 +55,7 @@ function write_output(state: State, ...args: Array<unknown>) {
 <template>
 	<h1>Test communication WebSocket</h1>
 
-	<form method="post" @submit="handle_submit" class="[ flex! ]">
+	<form method="post" @submit="handle_submit" class="[ flex! gap=1 ]">
 		<div class="form-group" v-if="!ws_connected">
 			<input v-model="websocket_url" type="text">
 			<button type="button" @click="handle_click_connect">Se connecter</button>
@@ -85,7 +85,6 @@ function write_output(state: State, ...args: Array<unknown>) {
 
 form {
 	height: calc(100% - 68px);
-	gap: space(1);
 }
 
 .form-group {

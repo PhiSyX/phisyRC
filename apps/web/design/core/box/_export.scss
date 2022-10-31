@@ -4,8 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "box/export";
-@import "flexbox/export";
+@import "margin-padding";
 
-@include --use-box;
-@include --use-flexbox;
+@mixin --use-box {
+	@include --use-margin;
+	@include --use-padding;
+}

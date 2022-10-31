@@ -1,0 +1,165 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-margin {
+	%margin {
+		--mgn: 0;
+		margin: space(var(--mgn)) !important;
+	}
+
+	%margin-top {
+		--mgn-t: 0;
+		margin-top: space(var(--mgn-t)) !important;
+	}
+
+	%margin-right {
+		--mgn-r: 0;
+		margin-right: space(var(--mgn-r)) !important;
+	}
+
+	%margin-bottom {
+		--mgn-b: 0;
+		margin-bottom: space(var(--mgn-b)) !important;
+	}
+
+	%margin-left {
+		--mgn-l: 0;
+		margin-left: space(var(--mgn-l)) !important;
+	}
+
+	%margin-inline {
+		--mgn-iln: 0;
+		margin-inline: space(var(--mgn-iln)) !important;
+
+		@supports not (margin-inline: 0px) {
+			margin-left: space(var(--mgn-iln)) !important;
+			margin-right: space(var(--mgn-iln)) !important;
+		}
+	}
+
+	%margin-block {
+		--mgn-blk: 0;
+		margin-block: space(var(--mgn-blk)) !important;
+
+		@supports not (margin-block: 0px) {
+			margin-top: space(var(--mgn-blk)) !important;
+			margin-bottom: space(var(--mgn-blk)) !important;
+		}
+	}
+
+	@include selector-class("m:center") {
+		margin: 0 auto;
+	}
+
+	@for $idx from 0 through 20 {
+		@include selector-class("m=#{$idx}") {
+			--mgn: #{$idx};
+			@extend %margin;
+		}
+		@include selector-class("mt=#{$idx}") {
+			--mgn-t: #{$idx};
+			@extend %margin-top;
+		}
+		@include selector-class("mr=#{$idx}") {
+			--mgn-r: #{$idx};
+			@extend %margin-right;
+		}
+		@include selector-class("mb=#{$idx}") {
+			--mgn-b: #{$idx};
+			@extend %margin-bottom;
+		}
+		@include selector-class("ml=#{$idx}") {
+			--mgn-l: #{$idx};
+			@extend %margin-left;
+		}
+		@include selector-class("mx=#{$idx}") {
+			--mgn-iln: #{$idx};
+			@extend %margin-inline;
+		}
+		@include selector-class("my=#{$idx}") {
+			--mgn-blk: #{$idx};
+			@extend %margin-block;
+		}
+	}
+}
+
+@mixin --use-padding {
+	%padding {
+		--pdng: 0;
+		padding: space(var(--pdng)) !important;
+	}
+
+	%padding-top {
+		--pdng-t: 0;
+		padding-top: space(var(--pdng-t)) !important;
+	}
+
+	%padding-right {
+		--pdng-r: 0;
+		padding-right: space(var(--pdng-r)) !important;
+	}
+
+	%padding-bottom {
+		--pdng-b: 0;
+		padding-bottom: space(var(--pdng-b)) !important;
+	}
+
+	%padding-left {
+		--pdng-l: 0;
+		padding-left: space(var(--pdng-l)) !important;
+	}
+
+	%padding-inline {
+		--pdng-iln: 0;
+		padding-inline: space(var(--pdng-iln)) !important;
+
+		@supports not (padding-inline: 0px) {
+			padding-left: space(var(--pdng-iln)) !important;
+			padding-right: space(var(--pdng-iln)) !important;
+		}
+	}
+
+	%padding-block {
+		--pdng-blk: 0;
+		padding-block: space(var(--pdng-blk)) !important;
+
+		@supports not (padding-block: 0px) {
+			padding-top: space(var(--pdng-blk)) !important;
+			padding-bottom: space(var(--pdng-blk)) !important;
+		}
+	}
+
+	@for $idx from 0 through 20 {
+		@include selector-class("p=#{$idx}") {
+			--pdng: #{$idx};
+			@extend %padding;
+		}
+		@include selector-class("pt=#{$idx}") {
+			--pdng-t: #{$idx};
+			@extend %padding-top;
+		}
+		@include selector-class("pr=#{$idx}") {
+			--pdng-r: #{$idx};
+			@extend %padding-right;
+		}
+		@include selector-class("pb=#{$idx}") {
+			--pdng-b: #{$idx};
+			@extend %padding-bottom;
+		}
+		@include selector-class("pl=#{$idx}") {
+			--pdng-l: #{$idx};
+			@extend %padding-left;
+		}
+		@include selector-class("px=#{$idx}") {
+			--pdng-iln: #{$idx};
+			@extend %padding-inline;
+		}
+		@include selector-class("py=#{$idx}") {
+			--pdng-blk: #{$idx};
+			@extend %padding-block;
+		}
+	}
+}

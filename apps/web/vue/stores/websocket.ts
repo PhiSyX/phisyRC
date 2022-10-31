@@ -92,7 +92,7 @@ function useWebSocketStore(write_output_fn: WriteOutputFn) {
 }
 
 function handle_open_connection(write_output_fn: WriteOutputFn) {
-	return (evt: Event) => write_output_fn(State.CONNECTED);
+	return () => write_output_fn(State.CONNECTED);
 }
 
 function handle_close_connection(write_output_fn: WriteOutputFn) {
@@ -100,9 +100,7 @@ function handle_close_connection(write_output_fn: WriteOutputFn) {
 }
 
 function handle_error(write_output_fn: WriteOutputFn) {
-	return function (this: WebSocket, evt: Event) {
-		write_output_fn(State.ERROR);
-	};
+	return () => write_output_fn(State.ERROR);
 }
 
 function handle_message(write_output_fn: WriteOutputFn) {
@@ -142,4 +140,4 @@ function process(
 // Export //
 // ------ //
 
-export { useWebSocketStore, State };
+export { useWebSocketStore, State as State };

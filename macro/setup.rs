@@ -67,6 +67,8 @@ pub(super) enum Error<'a> {
 }
 
 enum AsyncAttribute {
+	/// Pour l'utilisation de l'attribut `#[actix_web::main]`
+	ActixWeb,
 	/// Pour l'utilisation de l'attribut `#[tokio::main]`
 	Tokio,
 }
@@ -157,6 +159,9 @@ impl Analyzer {
 				}
 			} else {
 				match maybe_aa? {
+					| AsyncAttribute::ActixWeb => quote! {
+						#[actix_web::main]
+					},
 					| AsyncAttribute::Tokio => quote! {
 						#[tokio::main]
 					},
@@ -428,9 +433,10 @@ impl<'a> Error<'a> {
 
 impl From<&syn::Ident> for AsyncAttribute {
 	fn from(ident: &syn::Ident) -> Self {
-		if ident.eq("tokio") {
-			return Self::Tokio;
+		if ident.eq("actix_web") {
+			return Self::ActixWeb;
 		}
+
 		Self::Tokio
 	}
 }

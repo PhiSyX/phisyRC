@@ -74,6 +74,10 @@ impl Server {
 			.expect("Whaaaaat?");
 		session.text(msg.to_string())
 	}
+
+	pub fn reply_command_to_all(&self, command: irc_replies::Command) {
+		self.notify(AppContext::BroadcastCommand { command });
+	}
 }
 
 // -------------- //

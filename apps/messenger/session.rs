@@ -241,6 +241,7 @@ impl Session {
 			// TODO(phisyx): valider le pseudonyme.
 			self.old_nick.replace(nickname.to_owned());
 			self.nick.replace(nickname.to_owned());
+			self.server.reply_command_to_all(command.clone());
 		}
 
 		Ok(())

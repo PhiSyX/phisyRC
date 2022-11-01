@@ -1,0 +1,50 @@
+┌───(PhiSyX@フィジックスPC)-[phisyRC]
+│  main [✘!?⇡]
+└─ λ cargo deny check licenses
+error[rejected]: failed to satisfy license requirements
+  ┌─ synthez 0.2.0 (registry+https://github.com/rust-lang/crates.io-index):4:12
+  │
+4 │ license = "BlueOak-1.0.0"
+  │            ^^^^^^^^^^^^^
+  │            │
+  │            license expression retrieved via Cargo.toml `license`
+  │            rejected: not explicitly allowed
+  │
+  = synthez v0.2.0
+    └── cucumber-codegen v0.15.2
+        └── cucumber v0.15.2
+            └── (dev) phisyrc-tests v1.0.0
+
+error[rejected]: failed to satisfy license requirements
+  ┌─ synthez-codegen 0.2.0 (registry+https://github.com/rust-lang/crates.io-index):4:12
+  │
+4 │ license = "BlueOak-1.0.0"
+  │            ^^^^^^^^^^^^^
+  │            │
+  │            license expression retrieved via Cargo.toml `license`
+  │            rejected: not explicitly allowed
+  │
+  = synthez-codegen v0.2.0
+    └── synthez v0.2.0
+        └── cucumber-codegen v0.15.2
+            └── cucumber v0.15.2
+                └── (dev) phisyrc-tests v1.0.0
+
+error[rejected]: failed to satisfy license requirements
+  ┌─ synthez-core 0.2.0 (registry+https://github.com/rust-lang/crates.io-index):4:12
+  │
+4 │ license = "BlueOak-1.0.0"
+  │            ^^^^^^^^^^^^^
+  │            │
+  │            license expression retrieved via Cargo.toml `license`
+  │            rejected: not explicitly allowed
+  │
+  = synthez-core v0.2.0
+    ├── synthez v0.2.0
+    │   └── cucumber-codegen v0.15.2
+    │       └── cucumber v0.15.2
+    │           └── (dev) phisyrc-tests v1.0.0
+    └── synthez-codegen v0.2.0
+        └── synthez v0.2.0 (*)
+
+licenses FAILED

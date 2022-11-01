@@ -1,0 +1,73 @@
+┌───(PhiSyX@フィジックスPC)-[phisyRC]
+│  main [✘!?⇡]
+└─ λ cargo deny check advisories
+error[vulnerability]: Potential segfault in the time crate
+    ┌─ /home/phisyx/software/phisyRC/Cargo.lock:226:1
+    │
+226 │ time 0.1.44 registry+https://github.com/rust-lang/crates.io-index
+    │ ----------------------------------------------------------------- security vulnerability detected
+    │
+    = ID: RUSTSEC-2020-0071
+    = Advisory: https://rustsec.org/advisories/RUSTSEC-2020-0071
+    = ### Impact
+
+      Unix-like operating systems may segfault due to dereferencing a dangling pointer in specific circumstances. This requires an environment variable to be set in a different thread than the affected functions. This may occur without the user's knowledge, notably in a third-party library.
+
+      The affected functions from time 0.2.7 through 0.2.22 are:
+
+      - `time::UtcOffset::local_offset_at`
+      - `time::UtcOffset::try_local_offset_at`
+      - `time::UtcOffset::current_local_offset`
+      - `time::UtcOffset::try_current_local_offset`
+      - `time::OffsetDateTime::now_local`
+      - `time::OffsetDateTime::try_now_local`
+
+      The affected functions in time 0.1 (all versions) are:
+
+      - `at`
+      - `at_utc`
+      - `now`
+
+      Non-Unix targets (including Windows and wasm) are unaffected.
+
+      ### Patches
+
+      Pending a proper fix, the internal method that determines the local offset has been modified to always return `None` on the affected operating systems. This has the effect of returning an `Err` on the `try_*` methods and `UTC` on the non-`try_*` methods.
+
+      Users and library authors with time in their dependency tree should perform `cargo update`, which will pull in the updated, unaffected code.
+
+      Users of time 0.1 do not have a patch and should upgrade to an unaffected version: time 0.2.23 or greater or the 0.3 series.
+
+      ### Workarounds
+
+      No workarounds are known.
+    = Announcement: https://github.com/time-rs/time/issues/293
+    = Solution: Upgrade to >=0.2.23
+    = time v0.1.44
+      └── chrono v0.4.22
+          ├── phisyrc-logger v1.0.0
+          │   ├── phisyrc-config v1.0.0
+          │   │   ├── phisyrc-database v1.0.0
+          │   │   │   ├── phisyrc-messenger v1.0.0
+          │   │   │   └── phisyrc-setup v1.0.0
+          │   │   │       ├── (dev) phisyrc-macro v1.0.0
+          │   │   │       │   ├── phisyrc-config v1.0.0 (*)
+          │   │   │       │   └── phisyrc-messenger v1.0.0 (*)
+          │   │   │       └── phisyrc-messenger v1.0.0 (*)
+          │   │   ├── phisyrc-messenger v1.0.0 (*)
+          │   │   └── phisyrc-setup v1.0.0 (*)
+          │   ├── phisyrc-database v1.0.0 (*)
+          │   ├── (dev) phisyrc-macro v1.0.0 (*)
+          │   ├── phisyrc-messenger v1.0.0 (*)
+          │   ├── phisyrc-network v1.0.0
+          │   │   └── phisyrc-messenger v1.0.0 (*)
+          │   ├── phisyrc-setup v1.0.0 (*)
+          │   ├── proto-irc-msg v1.0.0
+          │   │   ├── phisyrc-messenger v1.0.0 (*)
+          │   │   ├── (dev) phisyrc-tests v1.0.0
+          │   │   └── proto-irc-replies v1.0.0
+          │   │       └── phisyrc-messenger v1.0.0 (*)
+          │   └── proto-irc-replies v1.0.0 (*)
+          └── phisyrc-messenger v1.0.0 (*)
+
+advisories FAILED

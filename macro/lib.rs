@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#![feature(let_chains)]
+
 /// Macro derivable `Env`
 mod env;
 /// Macro derivable `Prompt`

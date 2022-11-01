@@ -145,21 +145,19 @@ impl Analyzer {
 	) -> Result<TokenStream2> {
 		let field_ident = field.ident.as_ref();
 
-		if let syn::Type::Path(type_path) = &field.ty {
-			if let Some(first_ident) =
-				type_path.path.segments.first().map(|fs| &fs.ident)
-			{
-				if first_ident == "Option" {
-					if let Some(def) = default_prop {
-						return Ok(quote! {
-							#field_ident: Some(terminal::io::prompt_default(#title, #def))
-						});
-					}
-					return Ok(quote! {
-						#field_ident: terminal::io::prompt_optional(#title)
-					});
-				}
+		if let syn::Type::Path(type_path) = &field.ty &&
+		   let Some(first_ident) = type_path.path.segments.first()
+		                                            .map(|fs| &fs.ident) &&
+		   first_ident == "Option"
+		{
+			if let Some(def) = default_prop {
+				return Ok(quote! {
+					#field_ident: Some(terminal::io::prompt_default(#title, #def))
+				});
 			}
+			return Ok(quote! {
+				#field_ident: terminal::io::prompt_optional(#title)
+			});
 		}
 
 		if let Some(def) = default_prop {

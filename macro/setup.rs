@@ -15,7 +15,7 @@ use syn::{
 	punctuated::Punctuated,
 	spanned::Spanned,
 	token::{self},
-	FnArg, Ident, Meta, Pat, PatReference, PatTuple, Path,
+	FnArg, Ident, Lit, Meta, NestedMeta, Pat, PatReference, PatTuple, Path,
 };
 
 use crate::utils::generic;
@@ -106,6 +106,7 @@ impl Analyzer {
 }
 
 impl<'a> Error<'a> {
+	/// Erreur de compilation.
 	pub(super) fn compile_error(self) -> TokenStream {
 		let error_s = self.to_string();
 		let tokens = quote_spanned! {
@@ -120,7 +121,9 @@ impl<'a> Error<'a> {
 // -------------- //
 
 impl Analyzer {
+	/// Les attributs supportés.
 	const SUPPORT_ATTRIBUTES: [&str; 3] = ["config", "logger", "database"];
+	/// Le nombre d'argument attendu dans la fonction principale main.
 	const TOTAL_ARGUMENTS_EXPECTED: usize = 2;
 
 	/// Construit la fonction principale.
@@ -128,26 +131,30 @@ impl Analyzer {
 		&'a self,
 		setup_fn: fn(&'a Self) -> Result<'a, TokenStream2>,
 	) -> Result<'a, TokenStream2> {
-		let maybe_attrs = self.attrs.iter().map(|meta| match meta {
-			| syn::NestedMeta::Meta(meta) => match meta {
-				| syn::Meta::Path(path) => {
-					self.handle_attribute(meta, path, Default::default())
+		let maybe_attrs = self.attrs.iter().map(|nested_meta| {
+			if let NestedMeta::Meta(meta) = nested_meta {
+				if let Meta::Path(path) = meta {
+					return self.handle_attribute(
+						meta,
+						path,
+						Default::default(),
+					);
 				}
-				| syn::Meta::NameValue(nv) => match &nv.lit {
-					| syn::Lit::Str(lit_str) => {
-						self.handle_attribute(meta, &nv.path, lit_str.value())
-					}
-					| _ => Err(Error::Unexpected(meta.span())),
-				},
-				| _ => Err(Error::Unexpected(meta.span())),
-			},
-			| _ => Err(Error::Unexpected(meta.span())),
+
+				if let Meta::NameValue(nv) = meta &&
+				   let Lit::Str(lit_str) = &nv.lit {
+					return self.handle_attribute(
+						meta,
+						&nv.path,
+						lit_str.value(),
+					);
+				}
+			}
+
+			Err(Error::Unexpected(nested_meta.span()))
 		});
 
-		let mut setup_by_attrs = Vec::with_capacity(maybe_attrs.len());
-		for attr in maybe_attrs {
-			setup_by_attrs.push(attr?);
-		}
+		let setup_by_attrs: Vec<_> = maybe_attrs.collect::<Result<_>>()?;
 
 		let fn_attrs = &self.input.attrs;
 		let maybe_asyncness = self.input.sig.asyncness;
@@ -492,9 +499,9 @@ impl Analyzer {
 
 		let (pat, ty) = inputs
 			.last()
-			.filter(|arg| matches!(arg, syn::FnArg::Typed(_)))
+			.filter(|arg| matches!(arg, FnArg::Typed(_)))
 			.and_then(|arg| match arg {
-				| syn::FnArg::Typed(typed) => Some((&typed.pat, &typed.ty)),
+				| FnArg::Typed(typed) => Some((&typed.pat, &typed.ty)),
 				| _ => None,
 			})
 			.ok_or_else(|| Error::SecondArgumentInvalid(self.input.span()))?;

@@ -32,10 +32,9 @@ where
 	Ident: PartialEq<I>,
 {
 	generic.params.iter().find_map(|gen_par| {
-		if let GenericParam::Type(ty_param) = gen_par {
-			if ty_param.ident.eq(generic_name) {
-				return Some(ty_param);
-			}
+		if let GenericParam::Type(ty_param) = gen_par &&
+		   ty_param.ident.eq(generic_name) {
+			return Some(ty_param);
 		}
 		None
 	})
@@ -49,16 +48,12 @@ where
 	Ident: PartialEq<I>,
 {
 	where_clause.predicates.iter().find_map(|wp| {
-		if let WherePredicate::Type(predicate_ty) = wp {
-			if let Type::Path(ty_path) = &predicate_ty.bounded_ty {
-				if ty_path.path.is_ident(generic_name) {
-					if let Some(TypeParamBound::Trait(trait_bound)) =
-						predicate_ty.bounds.first()
-					{
-						return Some(&trait_bound.path);
-					}
-				}
-			}
+		if let WherePredicate::Type(predicate_ty) = wp &&
+		   let Type::Path(ty_path) = &predicate_ty.bounded_ty &&
+		   ty_path.path.is_ident(generic_name) &&
+		   let Some(TypeParamBound::Trait(trait_bound)) = predicate_ty.bounds.first()
+		{
+			return Some(&trait_bound.path);
 		}
 		None
 	})

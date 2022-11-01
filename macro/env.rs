@@ -128,30 +128,28 @@ impl Analyzer {
 	) -> Result<TokenStream2> {
 		let field_ident = &field.ident;
 
-		if let syn::Type::Path(type_path) = &field.ty {
-			if let Some(first_ident) =
-				type_path.path.segments.first().map(|fs| &fs.ident)
-			{
-				if first_ident == "Option" {
-					let struct_ident = &self.input.ident;
+		if let syn::Type::Path(type_path) = &field.ty &&
+		   let Some(first_ident) = type_path.path.segments.first()
+		                                            .map(|fs| &fs.ident) &&
+		   first_ident == "Option"
+		{
+			let struct_ident = &self.input.ident;
 
-					return Ok(quote! {
-						#field_ident: #struct_ident::get_optional_var(#token_stream)?
-					});
-				}
-			}
+			return Ok(quote! {
+				#field_ident: #struct_ident::get_optional_var(#token_stream)?
+			});
 		}
 
 		let struct_ident = &self.input.ident;
 		if let Some(default) = maybe_lit {
-			Ok(quote! {
+			return Ok(quote! {
 				#field_ident: #struct_ident::get_default_var(#token_stream, #default)?
-			})
-		} else {
-			Ok(quote! {
-				#field_ident: #struct_ident::get_var(#token_stream)?
-			})
+			});
 		}
+
+		Ok(quote! {
+			#field_ident: #struct_ident::get_var(#token_stream)?
+		})
 	}
 
 	fn parse_field<'a>(&'a self, field: &'a Field) -> Result<'_, TokenStream2> {
@@ -167,13 +165,13 @@ impl Analyzer {
 				attr.parse_meta()
 					.and_then(|meta| {
 						if let syn::Meta::List(list) = meta {
-							Ok(list.nested)
-						} else {
-							Err(syn::Error::new(
-								attr.span(),
-								"une liste est attendue",
-							))
+							return Ok(list.nested);
 						}
+
+						Err(syn::Error::new(
+							attr.span(),
+							"une liste est attendue",
+						))
 					})
 					.map_err(|_| {
 						Error::IsNotContainsLiteral(field, attr.span())
@@ -191,8 +189,7 @@ impl Analyzer {
 		field: &Field,
 		nested_list: &Punctuated<NestedMeta, Comma>,
 	) -> TokenStream2 {
-		let key_attr = attribute::get_prop_in_list(nested_list, "key");
-		match key_attr {
+		match attribute::get_prop_in_list(nested_list, "key") {
 			| Some(val) => quote! { #val },
 			| None => field::token_upper(field),
 		}

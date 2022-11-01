@@ -183,7 +183,8 @@ impl Analyzer {
 			} else {
 				let generic_mpsc = maybe_path?;
 				quote! {
-					let (ctx, mut crx) = tokio::sync::mpsc::unbounded_channel::<#generic_mpsc>();
+					// NOTE(phisyx): on peut laisser choisir d'où provient le `mpsc`.
+					let (ctx, mut crx) = mpsc::unbounded_channel::<#generic_mpsc>();
 				}
 			}
 		} else {

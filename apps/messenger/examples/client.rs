@@ -7,6 +7,8 @@
 
 use std::io::{self, BufRead};
 
+use tokio::sync::mpsc;
+
 struct AppClient {
 	inner: network::Client<Self>,
 }

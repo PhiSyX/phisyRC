@@ -5,6 +5,7 @@
  */
 
 use app::App;
+use tokio::sync::mpsc;
 
 #[phisyrc::setup(config = "interactive", logger = "tui", database = "postgres")]
 async fn main<Async, Context>(

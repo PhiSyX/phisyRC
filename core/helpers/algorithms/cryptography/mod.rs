@@ -4,6 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-mod sha1;
+mod sha_2;
 
-pub use sha1::*;
+pub use sha_2::*;

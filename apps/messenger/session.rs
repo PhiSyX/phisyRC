@@ -11,7 +11,7 @@ use std::{
 	ops::{self, RangeFrom},
 };
 
-use helpers::algorithms::SHA1;
+use helpers::algorithms::SHA2;
 use irc_replies::{
 	Command as IrcCommand, CommandUnregistered as IrcCommandUnregistered,
 	Error as IrcError, IncomingCommand as IrcIncomingCommand,
@@ -332,12 +332,12 @@ impl Host {
 				if rng.contains(&idx) {
 					let parsed: Result<u8, _> = part.parse();
 					if parsed.is_err() {
-						Cow::Owned(part.sha1_sliced(10..14))
+						Cow::Owned(part.sha2_sliced(10..14))
 					} else {
 						Cow::Borrowed(part)
 					}
 				} else {
-					Cow::Owned(part.sha1_sliced(2..10))
+					Cow::Owned(part.sha2_sliced(2..10))
 				}
 			})
 			.collect::<Vec<Cow<str>>>()

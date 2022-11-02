@@ -17,6 +17,12 @@ enum AppContext {
 	Quit,
 }
 
+impl AppContext {
+	fn mpsc() -> (mpsc::UnboundedSender<Self>, mpsc::UnboundedReceiver<Self>) {
+		mpsc::unbounded_channel()
+	}
+}
+
 impl terminal::EventLoop for AppContext {
 	fn input(input: String) -> Self {
 		Self::Input(input)

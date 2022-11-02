@@ -181,6 +181,12 @@ impl App {
 	}
 }
 
+impl AppContext {
+	pub fn mpsc() -> (AppContextWriter, AppContextReader) {
+		mpsc::unbounded_channel()
+	}
+}
+
 // -------------- //
 // Implémentation // -> Privée
 // -------------- //

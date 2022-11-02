@@ -7,8 +7,6 @@
 
 use std::io::{self, BufRead};
 
-use tokio::sync::mpsc;
-
 struct AppClient {
 	inner: network::Client<Self>,
 }
@@ -21,13 +19,8 @@ impl network::client::Interface for AppClient {
 	}
 }
 
-type Test = ();
-
 #[phisyrc::setup]
-async fn main<Context>()
-where
-	Context: Test,
-{
+async fn main() {
 	let cfg = config::load::<config::ServerConfig>(constants::CONFIG_SERVER)
 		.expect("La configuration serveur.");
 

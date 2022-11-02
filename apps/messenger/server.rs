@@ -23,9 +23,9 @@ use crate::{
 #[derive(Clone)]
 pub struct Server {
 	inner: NetworkServer<Self>,
-	ctx: AppContextWriter,
+	pub ctx: AppContextWriter,
 	/// les sessions connectées.
-	sessions: HashMap<AppSessionID, AppSession>,
+	pub sessions: HashMap<AppSessionID, AppSession>,
 	/// Configuration du serveur.
 	pub config: ServerConfig,
 	/// Date de création du serveur.

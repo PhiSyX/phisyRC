@@ -191,7 +191,7 @@ impl Analyzer {
 				let generic_mpsc = maybe_path?;
 				quote! {
 					// NOTE(phisyx): on peut laisser choisir d'où provient le `mpsc`.
-					let (ctx, mut crx) = mpsc::unbounded_channel::<#generic_mpsc>();
+					let (ctx, mut crx) = #generic_mpsc::mpsc();
 				}
 			}
 		} else {

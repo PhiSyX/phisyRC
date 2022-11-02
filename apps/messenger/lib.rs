@@ -11,7 +11,6 @@ mod server;
 mod session;
 
 use core::fmt;
-use std::fmt::format;
 
 use commands::ServerCommand;
 use config::ServerConfig;

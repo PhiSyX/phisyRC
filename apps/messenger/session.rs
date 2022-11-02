@@ -46,6 +46,15 @@ pub struct Session {
 	pub id: SessionID,
 	/// Serveur sur lequel la session est connectée.
 	pub server: AppServer,
+	/// La session est enregistrée au serveur?
+	pub is_registered: bool,
+	/// Le client, l'utilisateur, la session.
+	pub user: User,
+}
+
+#[derive(Debug)]
+#[derive(Clone)]
+pub struct User {
 	/// Hôte de la session. (Base sur [SocketAddr] et [IpAddr])
 	pub host: Host,
 	/// Mot de passe reçu par la commande PASS.
@@ -55,13 +64,11 @@ pub struct Session {
 	/// Pseudonyme courant de la session.
 	pub nick: Option<String>,
 	/// Identifiant de la session.
-	pub user: Option<String>,
+	pub ident: Option<String>,
 	/// TODO(phisyx): Les modes utilisateur de la session.
 	pub mode: Option<String>,
 	/// TODO(phisyx): Le nom réel de l'utilisateur.
 	pub realname: Option<String>,
-	/// La session est enregistrée au serveur?
-	pub is_registered: bool,
 }
 
 #[derive(Debug)]
@@ -93,13 +100,15 @@ impl Session {
 			inner: session_instance,
 			server: server_instance,
 			id,
-			host: Host::new(addr.ip()),
-			pass: Default::default(),
-			old_nick: Default::default(),
-			nick: Default::default(),
-			user: Default::default(),
-			mode: Default::default(),
-			realname: Default::default(),
+			user: User {
+				host: Host::new(addr.ip()),
+				pass: Default::default(),
+				old_nick: Default::default(),
+				nick: Default::default(),
+				ident: Default::default(),
+				mode: Default::default(),
+				realname: Default::default(),
+			},
 			is_registered: Default::default(),
 		}
 	}
@@ -114,7 +123,7 @@ impl Session {
 		| Numeric::RPL_YOURHOST { .. }
 		| Numeric::RPL_CREATED { .. } = &numeric
 		{
-			Cow::from(unsafe { self.nick.as_ref().unwrap_unchecked() })
+			Cow::from(unsafe { self.user.nick.as_ref().unwrap_unchecked() })
 		} else if let Numeric::ERR_NICKNAMEINUSE { nick } = numeric {
 			Cow::from(nick)
 		} else {
@@ -136,8 +145,10 @@ impl Session {
 
 	/// Adresse IRC de l'utilisateur.
 	pub fn addr(&self) -> String {
-		let h = &self.host;
-		if let Some((n, u)) = self.nick.as_ref().zip(self.user.as_ref()) {
+		let h = &self.user.host;
+		if let Some((n, u)) =
+			self.user.nick.as_ref().zip(self.user.ident.as_ref())
+		{
 			return format!("{n}!{u}@{h}");
 		}
 		h.to_string()
@@ -145,8 +156,10 @@ impl Session {
 
 	/// Adresse IRC de l'utilisateur.
 	pub fn old_addr(&self) -> String {
-		let h = &self.host;
-		if let Some((n, u)) = self.old_nick.as_ref().zip(self.user.as_ref()) {
+		let h = &self.user.host;
+		if let Some((n, u)) =
+			self.user.old_nick.as_ref().zip(self.user.ident.as_ref())
+		{
 			return format!("{n}!{u}@{h}");
 		}
 		h.to_string()
@@ -167,7 +180,7 @@ impl Session {
 		}
 
 		if let IrcCommand::PASS { password, .. } = command {
-			self.pass.replace(password.to_owned());
+			self.user.pass.replace(password.to_owned());
 		}
 
 		Ok(())
@@ -186,8 +199,8 @@ impl Session {
 				}));
 			}
 
-			self.old_nick.replace(nickname.clone());
-			self.nick.replace(nickname.to_owned());
+			self.user.old_nick.replace(nickname.clone());
+			self.user.nick.replace(nickname.to_owned());
 		}
 
 		self.complete_registration();
@@ -208,9 +221,9 @@ impl Session {
 			..
 		} = command
 		{
-			self.user.replace(user.to_owned());
-			self.mode.replace(mode.to_owned());
-			self.realname.replace(realname.to_owned());
+			self.user.ident.replace(user.to_owned());
+			self.user.mode.replace(mode.to_owned());
+			self.user.realname.replace(realname.to_owned());
 		}
 
 		self.complete_registration();
@@ -239,8 +252,8 @@ impl Session {
 			}
 
 			// TODO(phisyx): valider le pseudonyme.
-			self.old_nick.replace(nickname.to_owned());
-			self.nick.replace(nickname.to_owned());
+			self.user.old_nick.replace(nickname.to_owned());
+			self.user.nick.replace(nickname.to_owned());
 			self.server.reply_command_to_all(command.clone());
 		}
 
@@ -255,17 +268,26 @@ impl Session {
 	}
 
 	fn complete_registration(&mut self) {
-		match self.nick.as_ref().zip(self.user.as_ref()) {
+		match self.user.nick.as_ref().zip(self.user.ident.as_ref()) {
 			| Some((n, u)) => {
 				if n.is_empty() || u.is_empty() {
 					return;
 				}
+
+				self.server.notify(AppContext::RegisterClient {
+					id: self.id,
+					user: self.user.to_owned(),
+				});
 			}
 			| _ => return,
 		}
 
-		if let Some((from_cfg, from_cmd)) =
-			self.server.config.password.as_ref().zip(self.pass.as_ref())
+		if let Some((from_cfg, from_cmd)) = self
+			.server
+			.config
+			.password
+			.as_ref()
+			.zip(self.user.pass.as_ref())
 		{
 			logger::warn!(
 				"{from_cfg} == {from_cmd} ? {}",
@@ -273,12 +295,10 @@ impl Session {
 			);
 		}
 
-		self.is_registered = true;
-
 		let welcome_001 = IrcNumeric::RPL_WELCOME {
-			nick: self.nick.to_owned().unwrap(),
-			user: self.user.to_owned().unwrap(),
-			host: self.host.to_string(),
+			nick: self.user.nick.to_owned().unwrap(),
+			user: self.user.ident.to_owned().unwrap(),
+			host: self.user.host.to_string(),
 		};
 		let yourhost_002 = IrcNumeric::RPL_YOURHOST {
 			servername: self.server.config.name.to_owned(),

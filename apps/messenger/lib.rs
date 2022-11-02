@@ -67,6 +67,11 @@ pub enum AppContext {
 
 	/// Répondre à toutes les session : command textuelle
 	BroadcastCommand { command: irc_replies::Command },
+	RegisterClient {
+		id: SessionID,
+		user: User,
+	},
+
 }
 
 #[derive(Debug)]
@@ -157,12 +162,7 @@ impl App {
 							logger::warn!("TODO: parser la ligne: {msg}");
 						}
 
-						| x @ AppContext::ReplyNumeric { .. } => {
-							server.notify(x);
-						}
-						| x @ AppContext::BroadcastCommand { .. } => {
-							server.notify(x);
-						}
+						| _ => continue,
 					}
 				}
 			}

@@ -57,7 +57,7 @@ impl Server {
 	/// Peut-on localiser un client?
 	pub fn can_locate_client(&self, nickname: &str) -> bool {
 		self.sessions.iter().any(|(_, session)| {
-			if let Some(nick) = &session.nick {
+			if let Some(nick) = &session.user.nick {
 				return nick.to_lowercase() == nickname.to_lowercase();
 			}
 			false
@@ -71,7 +71,7 @@ impl Server {
 			.find_map(
 				|(sid, ses)| if session_id.eq(sid) { Some(ses) } else { None },
 			)
-			.expect("Whaaaaat?");
+			.expect("?");
 		session.text(msg.to_string())
 	}
 
@@ -139,6 +139,15 @@ impl network::server::Interface for Server {
 						self.config.name,
 					);
 					self.reply_to(*id, msg);
+				}
+			}
+
+			| AppContext::RegisterClient { id, user } => {
+				if let Some((_, session)) =
+					self.sessions.iter_mut().find(|(sid, _)| id.eq(sid))
+				{
+					session.is_registered = true;
+					session.user = user;
 				}
 			}
 

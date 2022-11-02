@@ -5,18 +5,21 @@
  */
 
 mod cli;
+mod commands;
 mod env;
 mod server;
 mod session;
 
 use core::fmt;
+use std::fmt::format;
 
+use commands::ServerCommand;
 use config::ServerConfig;
 pub(crate) use network::{
 	session::Interface as NetworkSessionInterface, Server as NetworkServer,
 	Session as NetworkSession,
 };
-use session::SessionID;
+use session::{SessionID, User};
 use tokio::sync::mpsc;
 
 pub use self::{cli::cli_app, env::env_app};
@@ -66,12 +69,16 @@ pub enum AppContext {
 	},
 
 	/// Répondre à toutes les session : command textuelle
-	BroadcastCommand { command: irc_replies::Command },
+	BroadcastCommand {
+		command: irc_replies::Command,
+	},
+
 	RegisterClient {
 		id: SessionID,
 		user: User,
 	},
 
+	SessionsList,
 }
 
 #[derive(Debug)]
@@ -83,6 +90,10 @@ pub enum Error {
 	Database(database::Error),
 	/// Erreur liée au réseau (serveur / client).
 	Network(network::Error),
+	/// Erreur liée au message IRC
+	IrcMessage(irc_msg::Error),
+	/// Erreur liée au réponse IRC
+	IrcReplies(irc_replies::Error),
 	/// Génération du hachage de mot de passe invalide.
 	BadGenerationPassword,
 	/// La variable d'environnement APP_SECRET_KEY n'est pas définie.
@@ -158,8 +169,15 @@ impl App {
 					Some(app_ctx) = crx.recv() => match app_ctx {
 						| AppContext::Quit => break,
 
-						| AppContext::InputFromTUI(msg) => {
-							logger::warn!("TODO: parser la ligne: {msg}");
+						| AppContext::InputFromTUI(input) => {
+							match ServerCommand::parse(&input) {
+								| Ok(command) => {
+									command.handle(&server);
+								}
+								| Err(err) => {
+									logger::error!("Commande serveur invalide: {err}");
+								}
+							}
 						}
 
 						| _ => continue,
@@ -275,6 +293,18 @@ impl From<network::Error> for Error {
 	}
 }
 
+impl From<irc_msg::Error> for Error {
+	fn from(err: irc_msg::Error) -> Self {
+		Self::IrcMessage(err)
+	}
+}
+
+impl From<irc_replies::Error> for Error {
+	fn from(err: irc_replies::Error) -> Self {
+		Self::IrcReplies(err)
+	}
+}
+
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let err_s = match self {
@@ -288,6 +318,8 @@ impl fmt::Display for Error {
 			| Self::IO(err) => format!("IO: {err}"),
 			| Self::Database(err) => format!("Base de données: {err}"),
 			| Self::Network(err) => format!("Réseau: {err}"),
+			| Self::IrcMessage(err) => format!("message irc: {err}"),
+			| Self::IrcReplies(err) => format!("réponse irc: {err}"),
 			| Self::EXIT_SUCCESS => "exit success".to_owned(),
 		};
 

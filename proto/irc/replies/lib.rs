@@ -9,6 +9,8 @@ mod export;
 mod numeric;
 mod text;
 
+use core::fmt;
+
 pub use self::export::*;
 
 // ---- //
@@ -41,4 +43,20 @@ pub enum Reply {
 #[derive(PartialEq, Eq)]
 pub enum Error {
 	Numeric(Numeric),
+}
+
+// -------------- //
+// Implémentation // -> Interface
+// -------------- //
+
+impl fmt::Display for Error {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let err_s = match self {
+			| Self::Numeric(n) => {
+				format!("Erreur commande numérique: {n}")
+			}
+		};
+
+		write!(f, "{err_s}")
+	}
 }

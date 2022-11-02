@@ -25,13 +25,13 @@ numeric! { impl Numeric
 	// Erreurs //
 	// ------- //
 
-	/// Renvoyé à un client enregistré pour indiquer que la commande  envoyée
+	/// Renvoyé à un client enregistré pour indiquer que la commande envoyée
 	/// est inconnue du serveur.
 	| 421 <-> ERR_UNKNOWNCOMMAND { command }
 		=> "{command} :Unknown command"
 
 	/// Renvoyé quand un paramètre de surnom (`nickname`) attendu pour une
-	/// commande et n'est pas trouvé.
+	/// commande n'est pas trouvé.
 	| 431 <-> ERR_NONICKNAMEGIVEN
 		=> ":No nickname given"
 
@@ -45,9 +45,9 @@ numeric! { impl Numeric
 	| 461 <-> ERR_NEEDMOREPARAMS { command }
 		=> "{command} :Not enough parameters"
 
-	/// Renvoyé par le serveur à tout lien qui tente de modifier une partie des
-	/// données enregistrées (comme le mot de passe ou les données de
-	/// l'utilisateur à partir du deuxième message USER).
+	/// Renvoyé par le serveur à tout client qui tente de modifier une partie
+	/// des données enregistrées (comme le mot de passe (PASS) ou les données
+	/// de l'utilisateur à partir du deuxième message (USER)).
 	| 462 <-> ERR_ALREADYREGISTRED
 		=> ":Unauthorized command (already registered)"
 }

@@ -142,6 +142,15 @@ impl network::server::Interface for Server {
 				}
 			}
 
+			| AppContext::SessionsList => {
+				let sessions_id = self
+					.sessions
+					.iter()
+					.map(|(id, session)| (id, session.to_string()))
+					.collect::<Vec<_>>();
+				logger::debug!("Sessions connectés {:?}", sessions_id,);
+			}
+
 			| AppContext::RegisterClient { id, user } => {
 				if let Some((_, session)) =
 					self.sessions.iter_mut().find(|(sid, _)| id.eq(sid))

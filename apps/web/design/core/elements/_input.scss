@@ -4,17 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "button";
-@import "input";
+@mixin --use-input {
+	input {
+		font-family: Roboto, Arial, sans-serif;
+	}
 
-%reset_element {
-	border: 0;
-	outline: none;
-	color: inherit;
-	background-color: transparent;
-}
+	@include selector-class("input:reset") {
+		@extend %reset_element;
 
-@mixin --use-elements {
-	@include --use-button;
-	@include --use-input;
+		&[type="text"] {
+			cursor: text;
+		}
+	}
 }

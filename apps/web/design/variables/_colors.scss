@@ -16,7 +16,7 @@ $teal: #009688 !default;
 $green: #4caf50 !default;
 $light-green: #8bc34a !default;
 $lime: #cddc39 !default;
-$yell0w: #ffeb3b !default;
+$yellow: #ffeb3b !default;
 $amber: #ffc107 !default;
 $orange: #ff9800 !default;
 $deep-orange: #ff5722 !default;
@@ -231,7 +231,7 @@ $variants-lime: (
 	a700: #aeea00,
 ) !default;
 
-$variants-yell0w: (
+$variants-yellow: (
 	50: #fffde7,
 	100: #fff9c4,
 	200: #fff59d,
@@ -357,7 +357,7 @@ $variants: (
 	green,
 	light-green,
 	lime,
-	yell0w,
+	yellow,
 	amber,
 	orange,
 	deep-orange,
@@ -393,8 +393,8 @@ $variants: (
 			@include --add-variant($variant, $variants-light-green);
 		} @else if $variant == lime {
 			@include --add-variant($variant, $variants-lime);
-		} @else if $variant == yell0w {
-			@include --add-variant($variant, $variants-yell0w);
+		} @else if $variant == yellow {
+			@include --add-variant($variant, $variants-yellow);
 		} @else if $variant == amber {
 			@include --add-variant($variant, $variants-amber);
 		} @else if $variant == orange {

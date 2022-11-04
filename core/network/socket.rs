@@ -74,6 +74,13 @@ where
 // ----------- //
 
 #[derive(Debug)]
+#[derive(Copy, Clone)]
+pub enum SocketType {
+	TCP,
+	WS,
+}
+
+#[derive(Debug)]
 #[derive(Clone)]
 pub enum IncomingPacket {
 	Bin(Vec<u8>),

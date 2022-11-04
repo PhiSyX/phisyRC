@@ -9,6 +9,7 @@ use irc_replies::{text, IncomingCommand};
 use crate::AppContext;
 
 text! { impl ServerCommand
+	/// Liste des sessions connectés.
 	<- SESSIONS
 }
 

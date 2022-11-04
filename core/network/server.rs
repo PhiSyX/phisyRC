@@ -13,7 +13,11 @@ use tokio::{
 };
 use tokio_util::codec::{BytesCodec, Framed};
 
-use crate::{session, socket::Socket, Error, Result};
+use crate::{
+	session,
+	socket::{Socket, SocketType},
+	Error, Result,
+};
 
 // ---- //
 // Type //
@@ -39,6 +43,7 @@ pub trait Interface: Send {
 		&mut self,
 		socket: Socket,
 		addr: SocketAddr,
+		ty: SocketType,
 	) -> Result<session::Session<<Self::Session as session::Interface>::ID>>;
 
 	async fn close(
@@ -69,6 +74,7 @@ where
 {
 	socket: Socket,
 	addr: SocketAddr,
+	ty: SocketType,
 	respond: oneshot::Sender<<I::Session as session::Interface>::ID>,
 }
 
@@ -150,7 +156,7 @@ where
 						listener.accept().await?;
 					let codec = Framed::new(socket_stream, BytesCodec::new());
 					let socket = Socket::new(codec.map_err(Error::IO));
-					server.accept(socket, socket_addr).await;
+					server.accept(socket, socket_addr, SocketType::TCP).await;
 				}
 
 				#[allow(unreachable_code)]
@@ -175,7 +181,7 @@ where
 						tokio_tungstenite::accept_async(socket_stream).await?;
 					let socket =
 						Socket::new(websocket.map_err(Error::WebSocket));
-					server.accept(socket, socket_addr).await;
+					server.accept(socket, socket_addr, SocketType::WS).await;
 				}
 
 				#[allow(unreachable_code)]
@@ -202,12 +208,14 @@ where
 		&self,
 		socket: Socket,
 		addr: SocketAddr,
+		ty: SocketType,
 	) -> <I::Session as session::Interface>::ID {
 		let (writer, reader) = oneshot::channel();
 
 		_ = self.incoming.send(Incoming {
 			socket,
 			addr,
+			ty,
 			respond: writer,
 		});
 
@@ -245,9 +253,9 @@ where
 	async fn receiver_task(mut self) -> Result<()> {
 		loop {
 			tokio::select! {
-			Some(Incoming { socket, addr, respond }) = self.incoming.recv() => {
+			Some(Incoming { socket, addr, respond, ty }) = self.incoming.recv() => {
 				logger::info!("Connexion accepté: « {} »", addr);
-				let session = self.user_instance.accept(socket, addr).await?;
+				let session = self.user_instance.accept(socket, addr, ty).await?;
 				_ = respond.send(session.id.clone());
 				tokio::spawn({
 					let server = self.server_instance.clone();

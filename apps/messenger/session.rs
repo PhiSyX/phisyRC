@@ -46,6 +46,8 @@ pub struct Session {
 	pub id: SessionID,
 	/// Serveur sur lequel la session est connectée.
 	pub server: AppServer,
+	/// Le type de connexion de la session.
+	pub ty: network::SocketType,
 	/// La session est enregistrée au serveur?
 	pub is_registered: bool,
 	/// Le client, l'utilisateur, la session.
@@ -95,11 +97,13 @@ impl Session {
 		session_instance: NetworkSession<uuid::Uuid>,
 		id: SessionID,
 		addr: SocketAddr,
+		ty: network::SocketType,
 	) -> Self {
 		Self {
 			inner: session_instance,
 			server: server_instance,
 			id,
+			ty,
 			user: User {
 				host: Host::new(addr.ip()),
 				pass: Default::default(),
@@ -126,6 +130,8 @@ impl Session {
 			Cow::from(unsafe { self.user.nick.as_ref().unwrap_unchecked() })
 		} else if let Numeric::ERR_NICKNAMEINUSE { nick } = numeric {
 			Cow::from(nick)
+		} else if !self.is_registered {
+			Cow::from("*")
 		} else {
 			Cow::from(self.addr())
 		}
@@ -138,6 +144,8 @@ impl Session {
 		use irc_replies::Command;
 		if let Command::NICK { .. } = &command {
 			Cow::from(self.old_addr())
+		} else if !self.is_registered {
+			Cow::from("*")
 		} else {
 			Cow::from(self.addr())
 		}

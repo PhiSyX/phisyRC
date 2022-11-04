@@ -93,12 +93,13 @@ impl network::server::Interface for Server {
 		&mut self,
 		socket: network::Socket,
 		addr: std::net::SocketAddr,
+		ty: network::SocketType,
 	) -> network::Result<
 		NetworkSession<<Self::Session as NetworkSessionInterface>::ID>,
 	> {
 		let id = uuid::Uuid::new_v4();
 		let session = NetworkSession::create(socket, id, |instance| {
-			session::Session::new(self.clone(), instance, id, addr)
+			session::Session::new(self.clone(), instance, id, addr, ty)
 		});
 		self.sessions.insert(id, session.clone());
 		Ok(session.inner)

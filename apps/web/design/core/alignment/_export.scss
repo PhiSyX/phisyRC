@@ -6,6 +6,6 @@
 
 @import "gap";
 
-@mixin --use-align {
+@mixin --use-alignment {
 	@include --use-gap;
 }

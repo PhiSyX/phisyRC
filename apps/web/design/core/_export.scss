@@ -12,7 +12,10 @@
 @import "text/export";
 @import "sizing/export";
 
-@include --use-align;
+@include --use-alignment;
+@include --use-backgrounds;
 @include --use-box;
 @include --use-flexbox;
 @include --use-sizing;
+@include --use-elements;
+@include --use-text;

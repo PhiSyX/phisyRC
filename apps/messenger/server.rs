@@ -64,7 +64,7 @@ impl Server {
 		})
 	}
 
-	pub fn reply_to(&self, session_id: AppSessionID, msg: impl ToString) {
+	pub fn reply_to(&self, session_id: AppSessionID, msg: irc_msg::Message) {
 		let session = self
 			.sessions
 			.iter()
@@ -72,7 +72,11 @@ impl Server {
 				|(sid, ses)| if session_id.eq(sid) { Some(ses) } else { None },
 			)
 			.expect("?");
-		session.text(msg.to_string())
+
+		match session.ty {
+			| network::SocketType::TCP => session.text(msg.to_string()),
+			| network::SocketType::WS => session.text(msg.json().to_string()),
+		}
 	}
 
 	pub fn reply_command_to_all(&self, command: irc_replies::Command) {
@@ -123,22 +127,33 @@ impl network::server::Interface for Server {
 				prefix,
 				numeric,
 			} => {
-				let msg = format!(
-					"@sid={id} :{} {} {prefix} {numeric}",
-					self.config.name,
+				let msg_id = uuid::Uuid::new_v4();
+				let tags = format!("@sid={id};msgid={msg_id}");
+				let origin = &self.config.name;
+
+				let msg_raw = format!(
+					"{tags} :{origin} {} {prefix} {numeric}\r\n",
 					numeric.code()
 				);
+
+				let msg = irc_msg::Message::parse_from(msg_raw).unwrap();
+
 				self.reply_to(id, msg);
 			}
 
 			| AppContext::BroadcastCommand { command } => {
 				for (id, session) in self.sessions.iter() {
-					let params = command.params().join(" ");
+					let msg_id = uuid::Uuid::new_v4();
+					let tags = format!("@sid={id};msgid={msg_id}");
+					let origin = &self.config.name;
 					let prefix = session.addr_based_on_command(&command);
-					let msg = format!(
-						"@sid={id} :{} {prefix} {command} :{params}",
-						self.config.name,
+					let params = command.params().join(" ");
+					let msg_raw = format!(
+						"{tags} :{origin} {prefix} {command} :{params}\r\n",
 					);
+
+					let msg = irc_msg::Message::parse_from(msg_raw).unwrap();
+
 					self.reply_to(*id, msg);
 				}
 			}

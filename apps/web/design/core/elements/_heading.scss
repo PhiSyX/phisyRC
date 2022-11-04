@@ -1,0 +1,33 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-heading {
+	%h1 {
+		font-size: clamp(3.5ch, 2.5vw, 5ch);
+	}
+	%h2 {
+		font-size: clamp(3ch, 2.5vw, 4ch);
+	}
+	%h3 {
+		font-size: clamp(2.5ch, 2.5vw, 3.5ch);
+	}
+	%h4 {
+		font-size: clamp(2ch, 2.5vw, 3ch);
+	}
+	%h5 {
+		font-size: clamp(1.5ch, 2.5vw, 2.5ch);
+	}
+	%h6 {
+		font-size: 1.5ch;
+	}
+
+	@for $level from 1 through 6 {
+		h#{$level},
+		.h#{$level}-like {
+			@extend %h#{$level};
+		}
+	}
+}

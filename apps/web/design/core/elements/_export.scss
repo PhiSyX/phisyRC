@@ -5,6 +5,7 @@
  */
 
 @import "button";
+@import "heading";
 @import "input";
 
 %reset_element {
@@ -16,5 +17,6 @@
 
 @mixin --use-elements {
 	@include --use-button;
+	@include --use-heading;
 	@include --use-input;
 }

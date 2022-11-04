@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@mixin --use-alignment {
+@mixin --use-flex-align {
 	$align-items: (start, center, end);
 
 	@each $item in $align-items {

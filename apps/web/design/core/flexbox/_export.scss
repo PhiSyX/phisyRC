@@ -4,7 +4,7 @@
 @import "ordering-orientation";
 
 @mixin --use-flexbox {
-	@include --use-alignment;
+	@include --use-flex-align;
 	@include --use-containers;
 	@include --use-flexibility;
 	@include --use-ordering-orientation;

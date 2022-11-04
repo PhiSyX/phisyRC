@@ -1,0 +1,16 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-button {
+	button {
+		cursor: pointer;
+	}
+
+	@include selector-class("btn:reset") {
+		padding: calc(var(--space) / 2);
+		@extend %reset_element;
+	}
+}

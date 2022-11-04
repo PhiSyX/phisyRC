@@ -19,8 +19,8 @@ type RouteRecord = { name?: string };
 // -------- //
 
 const ROUTES: Route = {
-	// TODO(phisyx): Page de login
-	// "/login": { name: "login" },
+	// Page de login
+	"/login": { name: "login" },
 	//
 	// Page de Chat,
 	"/chat": { name: "chat" },

@@ -1,0 +1,125 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@include selector-class("login@chat<form>") {
+	form {
+		background-color: var(--bg);
+		color: var(--color);
+
+		> div:not(:last-child) {
+			@include --theme using ($name) {
+				@if $name == dark {
+					border-bottom: 1px solid var(--color-grey);
+				} @else if $name == light {
+					border-bottom: 1px solid var(--color-indigo100);
+				}
+			}
+		}
+
+		:is(label, span) {
+			width: space(32);
+		}
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: #3c4043;
+				--color: var(--color-snow);
+			} @else if $name == light {
+				--bg: var(--color-indigo50);
+				--color: var(--color-grey800);
+				filter: none;
+			}
+		}
+	}
+
+	form > div {
+		display: flex;
+		gap: space(1);
+		padding-block: space(1);
+		overflow: clip;
+	}
+
+	form svg {
+		vertical-align: top;
+	}
+
+	form input {
+		@extend .input\:reset;
+
+		flex-grow: 1;
+
+		width: 100%;
+		height: space(24);
+		padding: space(1);
+		border-radius: 2px;
+
+		&::placeholder {
+			font-size: 14px;
+
+			@include --theme using ($name) {
+				@if $name == dark {
+					color: #cfceb3;
+				}
+			}
+		}
+
+		&:-webkit-autofill,
+		&:-webkit-autofill:hover,
+		&:-webkit-autofill:focus,
+		&:-webkit-autofill:active {
+			@include --theme using ($name) {
+				@if $name == dark {
+					box-shadow: 0 0 0 1in #3c4043 inset !important;
+				}
+			}
+
+			-webkit-text-fill-color: #ef4836 !important;
+		}
+	}
+
+	form ~ button[type="submit"] {
+		@extend .btn\:reset;
+
+		transition: 250ms ease;
+		transition-property: color, background-color;
+
+		background-color: var(--bg);
+		color: var(--color);
+
+		font-size: 18px;
+		font-weight: bold;
+
+		&:not(:focus-within) {
+			opacity: 0.9;
+		}
+
+		&:focus-within,
+		&:active {
+			box-shadow: 0 0 0 3px var(--border);
+		}
+
+		&:hover {
+			background-color: var(--border);
+
+			&:focus-within,
+			&:active {
+				box-shadow: 0 0 0 3px var(--bg);
+			}
+		}
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: #ffe033;
+				--border: var(--color-yellow600);
+				--color: #31363a;
+			} @else if $name == light {
+				--bg: var(--color-indigo200);
+				--border: var(--color-indigo300);
+				--color: var(--color-black);
+			}
+		}
+	}
+}

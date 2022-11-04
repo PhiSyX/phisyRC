@@ -18,7 +18,6 @@ const LOG_LEVEL: LogLevel = import.meta.env.DEV
 	? LogLevel.Trace
 	: LogLevel.Warn;
 
-// TODO(phisyx): utiliser un logger.
 async function main(...argv: Vec<str>): Future<ExitCode> {
 	if (argv.length !== 2) {
 		return ExitCode.FAILURE;

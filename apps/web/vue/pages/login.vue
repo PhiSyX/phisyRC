@@ -11,13 +11,10 @@ import UserIcon from "~vue/assets/icons/User.vue";
 import ValidatedIcon from "~vue/assets/icons/Validated.vue";
 import VisualPasswordIcon from "~vue/assets/icons/VisualPassword.vue";
 
-import { computed, inject, ref } from "vue";
+import { computed, ref } from "vue";
 
 import { MAXLENGTH_NICKNAME, VALIDATION_NICKNAME_INFO } from "constants/login";
 import { Option } from "std/option";
-import { useWebSocket } from "~vue/hooks/websocket";
-
-let websocket = inject<ReturnType<typeof useWebSocket>>("websocket");
 
 let form_action_attribute = Option.from(
 	import.meta.env.VITE_PHISYRC_LOGIN_CHAT_URL
@@ -51,28 +48,30 @@ function handle_toggle_visual_password() {
 function handle_send_connection(evt: Event) {
 	evt.preventDefault();
 
-	if (nickname.value.trim().length === 0) {
-		has_nickname_error.value = true;
-		return;
-	}
+	console.log(nickname.value, password.value);
 
-	if (password.value) {
-		let COMMAND_PASS = computed(() => {
-			return `PASS ${password.value}`;
-		});
-		websocket?.write(COMMAND_PASS.value);
-	}
+	// if (nickname.value.trim().length === 0) {
+	// 	has_nickname_error.value = true;
+	// 	return;
+	// }
 
-	let COMMAND_NICK = computed(() => {
-		return `NICK ${nickname.value}`;
-	});
+	// if (password.value) {
+	// 	let COMMAND_PASS = computed(() => {
+	// 		return `PASS ${password.value}`;
+	// 	});
+	// 	websocket?.write(COMMAND_PASS.value);
+	// }
 
-	let COMMAND_USER = computed(() => {
-		return `USER ${nickname.value} 8 * :utilisateur websocket`;
-	});
+	// let COMMAND_NICK = computed(() => {
+	// 	return `NICK ${nickname.value}`;
+	// });
 
-	websocket?.write(COMMAND_NICK.value);
-	websocket?.write(COMMAND_USER.value);
+	// let COMMAND_USER = computed(() => {
+	// 	return `USER ${nickname.value} 8 * :utilisateur websocket`;
+	// });
+
+	// websocket?.write(COMMAND_NICK.value);
+	// websocket?.write(COMMAND_USER.value);
 }
 </script>
 
@@ -103,7 +102,10 @@ function handle_send_connection(evt: Event) {
 					v-model="nickname"
 				/>
 
-				<span class="[ t:center ]">
+				<span
+					class="[ t:center ]"
+					v-if="has_nickname_error !== undefined"
+				>
 					<CrossIcon v-if="has_nickname_error === true" />
 					<ValidatedIcon v-if="has_nickname_error === false" />
 				</span>

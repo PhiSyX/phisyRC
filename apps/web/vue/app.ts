@@ -79,7 +79,14 @@ class Framework implements SetupInterface {
 				name: routes["/"]["name"],
 				children: [
 					{
-						path: "", // FIXME: à changer.
+						path: "",
+						component: () => import("~vue/pages/login.vue"),
+						strict: true,
+						name: routes["/login"]["name"],
+					},
+
+					{
+						path: "chat",
 						component: () => import("~vue/pages/chat.vue"),
 						strict: true,
 						name: routes["/chat"]["name"],

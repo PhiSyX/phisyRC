@@ -12,7 +12,7 @@
 		> div:not(:last-child) {
 			@include --theme using ($name) {
 				@if $name == dark {
-					border-bottom: 1px solid var(--color-grey);
+					border-bottom: 1px ridge var(--color-grey800);
 				} @else if $name == light {
 					border-bottom: 1px solid var(--color-indigo100);
 				}
@@ -80,9 +80,11 @@
 		}
 	}
 
-	form ~ button[type="submit"] {
+	form button {
 		@extend .btn\:reset;
+	}
 
+	form ~ button[type="submit"] {
 		transition: 250ms ease;
 		transition-property: color, background-color;
 
@@ -122,4 +124,29 @@
 			}
 		}
 	}
+}
+
+@include selector-class("login@channel:label") {
+	--bg: var(--color-black);
+	--color: var(--color-snow);
+
+	background-color: var(--bg);
+	color: var(--color);
+	font-size: 14px;
+
+	&.is-selected {
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: var(--color-red300);
+				--color: var(--color-black);
+			} @else if $name == light {
+				--bg: var(--color-red200);
+				--color: var(--color-black);
+			}
+		}
+	}
+}
+
+@include selector-class("login@channel:input") {
+	caret-color: transparent;
 }

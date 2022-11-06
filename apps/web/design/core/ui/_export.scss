@@ -1,0 +1,5 @@
+@import "pointer-interaction";
+
+@mixin --use-ui {
+	@include --use-pointer-interaction;
+}

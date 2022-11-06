@@ -7,5 +7,5 @@ export function logger_info(a: number): void;
 export function logger_warn(a: number): void;
 export function logger_error(a: number): void;
 export function logger_trace(a: number): void;
-export function __wbindgen_export_0(a: number): number;
-export function __wbindgen_export_1(a: number, b: number, c: number): number;
+export function __wbindgen_malloc(a: number): number;
+export function __wbindgen_realloc(a: number, b: number, c: number): number;

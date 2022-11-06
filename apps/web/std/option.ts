@@ -60,6 +60,12 @@ class Option<T> {
 		return None;
 	}
 
+	unwrap() {
+		const ERROR_MESSAGE: str =
+			"La fonction `.unwrap()` est appelée sur une valeur `None`.";
+		return this.expect(ERROR_MESSAGE);
+	}
+
 	unwrap_or(def: T): T {
 		if (this.is_some()) {
 			return this.value!;

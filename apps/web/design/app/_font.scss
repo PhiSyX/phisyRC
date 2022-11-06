@@ -1,0 +1,92 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@font-face {
+	font-family: "Roboto";
+	src: local("Roboto Regular"), local("Roboto-Regular"),
+		url("assets/fonts/Roboto-Regular.woff2") format("woff2"),
+		url("assets/fonts/Roboto-Regular.woff") format("woff");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Roboto";
+	src: local("Roboto Bold Italic"), local("Roboto-BoldItalic"),
+		url("assets/fonts/Roboto-BoldItalic.woff2") format("woff2"),
+		url("assets/fonts/Roboto-BoldItalic.woff") format("woff");
+	font-weight: bold;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Roboto";
+	src: local("Roboto Bold"), local("Roboto-Bold"),
+		url("assets/fonts/Roboto-Bold.woff2") format("woff2"),
+		url("assets/fonts/Roboto-Bold.woff") format("woff");
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Roboto";
+	src: local("Roboto Italic"), local("Roboto-Italic"),
+		url("assets/fonts/Roboto-Italic.woff2") format("woff2"),
+		url("assets/fonts/Roboto-Italic.woff") format("woff");
+	font-weight: normal;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nunito";
+	src: local("Nunito Bold"), local("Nunito-Bold"),
+		url("assets/fonts/Nunito-Bold.woff2") format("woff2"),
+		url("assets/fonts/Nunito-Bold.woff") format("woff");
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nunito";
+	src: local("Nunito Bold Italic"), local("Nunito-BoldItalic"),
+		url("assets/fonts/Nunito-BoldItalic.woff2") format("woff2"),
+		url("assets/fonts/Nunito-BoldItalic.woff") format("woff");
+	font-weight: bold;
+	font-style: italic;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nunito";
+	src: local("Nunito Regular"), local("Nunito-Regular"),
+		url("assets/fonts/Nunito-Regular.woff2") format("woff2"),
+		url("assets/fonts/Nunito-Regular.woff") format("woff");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Nunito";
+	src: local("Nunito Italic"), local("Nunito-Italic"),
+		url("assets/fonts/Nunito-Italic.woff2") format("woff2"),
+		url("assets/fonts/Nunito-Italic.woff") format("woff");
+	font-weight: normal;
+	font-style: italic;
+	font-display: swap;
+}
+
+@include selector-class("f=roboto") {
+	font-family: Roboto, sans-serif;
+}
+@include selector-class("f=nunito") {
+	font-family: Nunito, sans-serif;
+}

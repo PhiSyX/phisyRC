@@ -5,7 +5,9 @@
  */
 
 @import "corners/export";
+@import "misc";
 
 @mixin --use-backgrounds {
 	@include --use-corners;
+	@include --use-misc-effects;
 }

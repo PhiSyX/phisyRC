@@ -56,10 +56,14 @@ fn main() -> ExitCode {
 
 fn check_license(directory: &'static Dir, append_files: &mut Vec<&Path>) {
 	for dir in directory.dirs() {
-		let mut rs_entries: Vec<_> = dir.find("**/*.rs").expect("?").collect();
+		let mut entries = vec![];
+		let rs_entries: Vec<_> = dir.find("**/*.rs").expect("?").collect();
 		let js_entries = dir.find("**/*.ts").expect("?");
-		rs_entries.extend(js_entries);
-		let entries = rs_entries;
+		let css_entries = dir.find("**/*.scss").expect("?");
+		entries.extend(rs_entries);
+		entries.extend(js_entries);
+		entries.extend(css_entries);
+		let entries = entries;
 		for entry in entries {
 			if let Some(file) = entry.as_file() {
 				let path = file.path().to_string_lossy();
@@ -75,7 +79,7 @@ fn check_license(directory: &'static Dir, append_files: &mut Vec<&Path>) {
 		if file
 			.path()
 			.extension()
-			.filter(|ext| *ext == "rs" || *ext == "ts")
+			.filter(|ext| *ext == "rs" || *ext == "ts" || *ext == "scss")
 			.is_none()
 		{
 			continue;

@@ -7,6 +7,7 @@
 @import "button";
 @import "heading";
 @import "input";
+@import "list";
 
 %reset_element {
 	border: 0;
@@ -19,4 +20,5 @@
 	@include --use-button;
 	@include --use-heading;
 	@include --use-input;
+	@include --use-list;
 }

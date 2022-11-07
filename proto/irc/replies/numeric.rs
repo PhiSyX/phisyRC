@@ -101,6 +101,58 @@ numeric! { impl Numeric
 	| 010 <-> RPL_BOUNCE { servername, port, info }
 		=> "{servername} {port}: {info}"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 200 <-> RPL_TRACELINK {
+		version_debuglevel, destination,
+		next_server, protocol_version,
+		link_uptime_secs, backstream_sendq, upstream_sendq
+	} => "Link {version_debuglevel} {destination} {next_server} V{protocol_version} {link_uptime_secs} {backstream_sendq} {upstream_sendq}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 201 <-> RPL_TRACECONNECTING { class, server }
+		=> "Try. {class} {server}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 202 <-> RPL_TRACEHANDSHAKE { class, server }
+		=> "H.S. {class} {server}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 203 <-> RPL_TRACEUNKNOWN { class, client_ip_address }
+		=> "???? {class} {client_ip_address}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 204 <-> RPL_TRACEOPERATOR { class, nick }
+		=> "Oper {class} {nick}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 205 <-> RPL_TRACEUSER { class, nick }
+		=> "User {class} {nick}"
+	/// **RFC 2812:** -> "Serv <class> <int>S <int>C <server> <nick!user|*!*>@<host|server> V<protocol version>"
+	///
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 206 <-> RPL_TRACESERVER {
+		class,
+		int_s, int_c,
+		server,
+		/// ( `<nick>` "!" `<user>` ) / ( "\*!\*" )
+		client_nick_user,
+		/// ( `<host>` / `<server>` )
+		host_server
+	} => "Serv {class} {int_s}S {int_c}C {server} {client_nick_user}@{host_server}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 207 <-> RPL_TRACESERVICE { class, name, trace_type, active_trace_type }
+		=> "Service {class} {name} {trace_type} {active_trace_type}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 209 <-> RPL_TRACECLASS { class, count}
+	=> "Class {class} {count}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	/// Inutilisé.
+	| 210 <-> RPL_TRACERECONNECT => ""
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 208 <-> RPL_TRACENEWTYPE { newtype, client_name }
+		=> "{newtype} 0 {client_name}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 261 <-> RPL_TRACELOG { logfile, debuglevel }
+		=> "File {logfile} {debuglevel}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
+	| 262 <-> RPL_TRACEEND { servername, version_debuglevel }
+		=> "{servername} {version_debuglevel} :End of TRACE"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

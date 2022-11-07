@@ -154,7 +154,7 @@ impl App {
 		let cfg = config::load::<ServerConfig>(constants::CONFIG_SERVER)?;
 
 		let server = NetworkServer::create(
-			(cfg.ip.to_owned(), cfg.port.into()),
+			(cfg.ip.to_owned(), cfg.tcp_port.into()),
 			(cfg.ip.to_owned(), cfg.websocket_port.into()),
 			|instance: NetworkServer<AppServer>| {
 				AppServer::new(ctx, instance, cfg)

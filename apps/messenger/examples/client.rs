@@ -25,7 +25,7 @@ async fn main() {
 		.expect("La configuration serveur.");
 
 	let client =
-		network::Client::connect((cfg.ip, cfg.port.into()), |client| {
+		network::Client::connect((cfg.ip, cfg.tcp_port.into()), |client| {
 			AppClient { inner: client }
 		})
 		.await

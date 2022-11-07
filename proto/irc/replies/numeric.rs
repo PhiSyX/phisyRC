@@ -139,7 +139,7 @@ numeric! { impl Numeric
 		=> "Service {class} {name} {trace_type} {active_trace_type}"
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
 	| 209 <-> RPL_TRACECLASS { class, count}
-	=> "Class {class} {count}"
+		=> "Class {class} {count}"
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
 	/// Inutilisé.
 	| 210 <-> RPL_TRACERECONNECT => ""
@@ -152,6 +152,53 @@ numeric! { impl Numeric
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
 	| 262 <-> RPL_TRACEEND { servername, version_debuglevel }
 		=> "{servername} {version_debuglevel} :End of TRACE"
+
+
+	/// Présente des statistiques sur une connexion. `<linkname>` identifie la
+	/// connexion particulière, `<sendq>` est la quantité de données en file
+	/// d'attente et en attente d'être envoyées `<sent_messages>` le nombre de
+	/// messages envoyés, et `<sent_kbytes>` la quantité de données envoyées, en
+	/// kbytes. `<received_messages>` et `<received_kbytes>` sont l'équivalent
+	/// de `<sent_messages>` et `<sent_kbytes>` pour les données reçues,
+	/// respectivement.  `<time_open>` indique depuis combien de temps la
+	/// connexion a été ouverte, en secondes.
+	| 211 <-> RPL_STATSLINKINFO {
+		linkname,
+		sendq, sent_messages, sent_kbytes,
+		received_messages, received_kbytes,
+		time_open
+	}
+	=> "{linkname} {sendq} {sent_messages} {sent_kbytes} {received_messages} {received_kbytes} {time_open}"
+	/// Rapporte des statistiques sur l'utilisation des commandes
+	| 212 <-> RPL_STATSCOMMANDS { command, count, byte_count, remote_count }
+		=> "{command} {count} {byte_count} {remote_count}"
+	| 213 <-> RPL_STATSCLINE { host, name, port, class }
+		=> "C {host} * {name} {port} {class}"
+	| 214 <-> RPL_STATSNLINE { host, name, port, class }
+		=> "N {host} * {name} {port} {class}"
+	| 215 <-> RPL_STATSILINE { host, port, class }
+		=> "I {host} * {host} {port} {class}"
+	| 216 <-> RPL_STATSKLINE { host, username, port, class}
+		=> "K {host} * {username} {port} {class}"
+	| 218 <-> RPL_STATSYLINE {
+		class,
+		ping_frequency, connect_frequency,
+		max_sendq
+	} => "Y {class} {ping_frequency} {connect_frequency} {max_sendq}"
+	| 219 <-> RPL_ENDOFSTATS { stats_letter }
+		=> "{stats_letter} :End of STATS report"
+	| 241 <-> RPL_STATSLLINE { hostmask, servername, maxdepth }
+		=> "L {hostmask} * {servername} {maxdepth}"
+	/// **RFC 2812:** -> ":Server Up %d days %d:%02d:%02d"
+	/// Rapporte le temps de fonctionnement du serveur.
+	| 242 <-> RPL_STATSUPTIME { days, hours, minutes, seconds }
+		=> ":Server Up {days} days {hours}:{minutes}:{seconds}"
+	/// Indique les hôtes autorisés à partir desquels les utilisateurs peuvent
+	/// devenir des opérateurs IRC.
+	| 243 <-> RPL_STATSOLINE { hostmask, name }
+		=> "O {hostmask} * {name}"
+	| 244 <-> RPL_STATSHLINE { hostmask, servername }
+		=> "H {hostmask} * {servername}"
 
 	// ------- //
 	// Erreurs //

@@ -65,13 +65,13 @@ impl Server {
 	}
 
 	pub fn reply_to(&self, session_id: AppSessionID, msg: irc_msg::Message) {
-		let session = self
-			.sessions
-			.iter()
-			.find_map(
-				|(sid, ses)| if session_id.eq(sid) { Some(ses) } else { None },
-			)
-			.expect("?");
+		let Some(session) = self.sessions.iter().find_map(|(sid, ses)| {
+			if session_id.eq(sid) {
+				Some(ses)
+			} else {
+				None
+			}
+		}) else { return; };
 
 		match session.ty {
 			| network::SocketType::TCP => session.text(msg.to_string()),

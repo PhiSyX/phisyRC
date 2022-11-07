@@ -42,7 +42,7 @@ pub enum Reply {
 #[derive(Debug)]
 #[derive(PartialEq, Eq)]
 pub enum Error {
-	Numeric(Numeric),
+	Numeric(Box<Numeric>),
 }
 
 // -------------- //

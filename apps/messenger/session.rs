@@ -202,9 +202,12 @@ impl Session {
 
 		if let IrcCommand::NICK { nickname, .. } = command {
 			if self.server.can_locate_client(nickname) {
-				return Err(IrcError::Numeric(IrcNumeric::ERR_NICKNAMEINUSE {
-					nick: nickname.to_owned(),
-				}));
+				return Err(IrcError::Numeric(
+					IrcNumeric::ERR_NICKNAMEINUSE {
+						nick: nickname.to_owned(),
+					}
+					.into(),
+				));
 			}
 
 			self.user.old_nick.replace(nickname.clone());
@@ -245,7 +248,7 @@ impl Session {
 	/// On ne peut plus envoyer cette commande une fois enregistrée.
 	fn handle_pass_command(&mut self, command: &IrcCommand) -> Result<()> {
 		assert!(matches!(command, IrcCommand::PASS { .. }));
-		Err(IrcError::Numeric(IrcNumeric::ERR_ALREADYREGISTRED))
+		Err(IrcError::Numeric(IrcNumeric::ERR_ALREADYREGISTRED.into()))
 	}
 
 	/// Gestion de la commande NICK (REGISTERED).
@@ -254,9 +257,12 @@ impl Session {
 
 		if let IrcCommand::NICK { nickname, .. } = command {
 			if self.server.can_locate_client(nickname) {
-				return Err(IrcError::Numeric(IrcNumeric::ERR_NICKNAMEINUSE {
-					nick: nickname.to_owned(),
-				}));
+				return Err(IrcError::Numeric(
+					IrcNumeric::ERR_NICKNAMEINUSE {
+						nick: nickname.to_owned(),
+					}
+					.into(),
+				));
 			}
 
 			// TODO(phisyx): valider le pseudonyme.
@@ -272,7 +278,7 @@ impl Session {
 	///
 	/// On ne peut plus envoyer cette commande une fois enregistrée.
 	fn handle_user_command(&mut self, _: &IrcCommand) -> Result<()> {
-		Err(IrcError::Numeric(IrcNumeric::ERR_ALREADYREGISTRED))
+		Err(IrcError::Numeric(IrcNumeric::ERR_ALREADYREGISTRED.into()))
 	}
 
 	fn complete_registration(&mut self) {
@@ -326,7 +332,7 @@ impl Session {
 			self.server.notify(AppContext::ReplyNumeric {
 				id: self.id,
 				prefix: self.addr_based_on_numeric(&reply).to_string(),
-				numeric: reply,
+				numeric: reply.into(),
 			});
 		}
 	}

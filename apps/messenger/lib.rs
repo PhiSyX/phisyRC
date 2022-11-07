@@ -64,7 +64,7 @@ pub enum AppContext {
 	ReplyNumeric {
 		id: SessionID,
 		prefix: String,
-		numeric: irc_replies::Numeric,
+		numeric: Box<irc_replies::Numeric>,
 	},
 
 	/// Répondre à toutes les session : command textuelle

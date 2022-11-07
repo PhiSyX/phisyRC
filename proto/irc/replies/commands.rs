@@ -66,7 +66,7 @@ macro_rules! text {
 						$crate::Error::Numeric(
 							$crate::Numeric::ERR_UNKNOWNCOMMAND {
 								command: code.to_owned()
-							},
+							}.into(),
 						)
 					)
 				}
@@ -89,7 +89,7 @@ macro_rules! text {
 								$crate::Error::Numeric(
 									$crate::Numeric::ERR_NEEDMOREPARAMS {
 										command: command.to_owned(),
-									}
+									}.into(),
 								)
 							);
 						}
@@ -107,7 +107,7 @@ macro_rules! text {
 								$crate::Error::Numeric(
 									$crate::Numeric::ERR_NEEDMOREPARAMS {
 										command: command.to_owned(),
-									}
+									}.into(),
 								)
 							);
 						}
@@ -123,9 +123,11 @@ macro_rules! text {
 					},)*
 
 						| _ => Err(
-							$crate::Error::Numeric($crate::Numeric::ERR_UNKNOWNCOMMAND {
-								command: command.to_owned()
-							})
+							$crate::Error::Numeric(
+								$crate::Numeric::ERR_UNKNOWNCOMMAND {
+									command: command.to_owned()
+								}.into(),
+							)
 						)
 					}
 				}

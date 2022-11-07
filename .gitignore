@@ -4,9 +4,6 @@
 .fleet/*
 .idea/*
 .vscode/*
-!.vscode/extensions.json
-!.vscode/launch.json
-
 .phisyrc/*
 
 dist

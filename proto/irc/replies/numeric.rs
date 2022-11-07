@@ -211,6 +211,22 @@ numeric! { impl Numeric
 	| 235 <-> RPL_SERVLISTEND { mask, serv_type }
 		=> "{mask} {serv_type} :End of service listing"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_251..255.md")]
+	| 251 <-> RPL_LUSERCLIENT { total_users, total_services, total_servers }
+		=> ":There are {total_users} users and {total_services} services on {total_servers} servers"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_251..255.md")]
+	| 252 <-> RPL_LUSEROP { total_online_operators }
+		=> "{total_online_operators} :operator(s) online"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_251..255.md")]
+	| 253 <-> RPL_LUSERUNKNOWN { total_unknown_connections }
+		=> "{total_unknown_connections} :unknown connection(s)"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_251..255.md")]
+	| 254 <-> RPL_LUSERCHANNELS { total_channels }
+		=> "{total_channels} :channels formed"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_251..255.md")]
+	| 255 <-> RPL_LUSERME { total_clients, total_servers }
+		=> ":I have {total_clients} clients and {total_servers} servers"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

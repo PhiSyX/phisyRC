@@ -11,15 +11,23 @@ numeric! { impl Numeric
 	// Réponses //
 	// -------- //
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_001-004.md")]
 	| 001 <-> RPL_WELCOME { nick, user, host }
 		=> ":Welcome to the Internet Relay Network {nick}!{user}@{host}"
 
-	| 002  <->  RPL_YOURHOST { servername, ver }
-		=> ":Your host is {servername}, running version {ver}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_001-004.md")]
+	| 002 <-> RPL_YOURHOST { servername, ver }
+	=> ":Your host is {servername}, running version {ver}"
 
-	| 003  <->  RPL_CREATED { date }
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_001-004.md")]
+	| 003 <-> RPL_CREATED { date }
 		=> ":This server was created {date}"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_001-004.md")]
+	| 004 <-> RPL_MYINFO {
+		servername, version,
+		available_user_modes, available_channel_modes
+	} => ":{servername} {version} {available_user_modes} {available_channel_modes}"
 
 	// ------- //
 	// Erreurs //

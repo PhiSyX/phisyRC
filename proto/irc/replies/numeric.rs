@@ -153,7 +153,6 @@ numeric! { impl Numeric
 	| 262 <-> RPL_TRACEEND { servername, version_debuglevel }
 		=> "{servername} {version_debuglevel} :End of TRACE"
 
-
 	/// Présente des statistiques sur une connexion. `<linkname>` identifie la
 	/// connexion particulière, `<sendq>` est la quantité de données en file
 	/// d'attente et en attente d'être envoyées `<sent_messages>` le nombre de
@@ -199,6 +198,13 @@ numeric! { impl Numeric
 		=> "O {hostmask} * {name}"
 	| 244 <-> RPL_STATSHLINE { hostmask, servername }
 		=> "H {hostmask} * {servername}"
+
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_234-235.md")]
+	| 234 <-> RPL_SERVLIST { name, server, mask, serv_type, hopcount, info }
+		=> "{name} {server} {mask} {serv_type} {hopcount} {info}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_234-235.md")]
+	| 235 <-> RPL_SERVLISTEND { mask, serv_type }
+		=> "{mask} {serv_type} :End of service listing"
 
 	// ------- //
 	// Erreurs //

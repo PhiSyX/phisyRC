@@ -227,6 +227,19 @@ numeric! { impl Numeric
 	| 255 <-> RPL_LUSERME { total_clients, total_servers }
 		=> ":I have {total_clients} clients and {total_servers} servers"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_256..259.md")]
+	| 256 <-> RPL_ADMINME { server }
+		=> "{server} :Administrative info"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_256..259.md")]
+	| 257 <-> RPL_ADMINLOC1 { info }
+		=> ":{info}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_256..259.md")]
+	| 258 <-> RPL_ADMINLOC2 { info }
+		=> ":{info}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_256..259.md")]
+	| 259 <-> RPL_ADMINEMAIL { info }
+		=> ":{info}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

@@ -199,6 +199,11 @@ numeric! { impl Numeric
 	| 244 <-> RPL_STATSHLINE { hostmask, servername }
 		=> "H {hostmask} * {servername}"
 
+	/// Pour répondre à une requête concernant le propre mode d'un client,
+	/// `RPL_UMODEIS` est renvoyé.
+	| 221 <-> RPL_UMODEIS { user_mode }
+		=> "{user_mode}"
+
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_234-235.md")]
 	| 234 <-> RPL_SERVLIST { name, server, mask, serv_type, hopcount, info }
 		=> "{name} {server} {mask} {serv_type} {hopcount} {info}"

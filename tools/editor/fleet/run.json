@@ -1,0 +1,44 @@
+{
+	"configurations": [
+		{
+			"type": "cargo",
+			"name": "Générer le README",
+			"cargoArgs": [
+				"run",
+				"--bin",
+				"generate-readme"
+			]
+		},
+		{
+			"type": "cargo",
+			"name": "Vérifier les en-têtes de licences",
+			"cargoArgs": [
+				"run",
+				"--bin",
+				"check-license"
+			]
+		},
+		{
+			"type": "cargo",
+			"name": "phisyrc-messenger",
+			"cargoArgs": ["run"]
+		},
+		{
+			"type": "cargo",
+			"name": "Exécuter tous les tests [Rust]",
+			"cargoArgs": ["test"]
+		},
+		{
+			"type": "command",
+			"name": "Lancer le serveur de developpment WEB",
+			"program": "pnpm",
+			"args": ["web", "dev"]
+		},
+		{
+			"type": "command",
+			"name": "Construire le projet WEB",
+			"program": "pnpm",
+			"args": ["web", "build"]
+		}
+	]
+}

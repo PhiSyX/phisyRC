@@ -37,8 +37,10 @@ phisyRC requiert d'avoir les exécutables suivant sur son système d'exploitatio
 
 À savoir que les versions utilisées par le mainteneur sont:
 
--   Version de Cargo: **1.64.0** || **1.66.0-nightly**
--   Version de Node et pnpm: **v16.17.1** && **7.13.2**
+-   Version de Cargo: **1.67.0-nightly**
+    -   La feature `let_chains` est malheureusement instable. Elle n'est donc
+        pas disponible en version `stable`.
+-   Version de Node et pnpm: **v19.0.1** && **7.13.2**
 
 ---
 
@@ -51,7 +53,7 @@ git clone https://github.com/PhiSyX/phisyRC
 cd phisyRC
 ```
 
-2. **Installer les dépendances**
+2. **Installer les dépendances node (npm)**
 
 ```bash
 pnpm install

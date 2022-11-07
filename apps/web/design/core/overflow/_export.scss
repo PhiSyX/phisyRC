@@ -1,0 +1,44 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-overflow {
+	@include selector-class("ov:h") {
+		overflow: clip;
+		@supports not (overflow: clip) {
+			overflow: hidden;
+		}
+	}
+
+	@include selector-class("ov:x") {
+		@extend .ov\:h;
+		overflow-x: auto !important;
+		overscroll-behavior-x: contain;
+		scroll-snap-type: x mandatory;
+	}
+
+	@include selector-class("ov:y") {
+		@extend .ov\:h;
+		overflow-y: auto !important;
+		overscroll-behavior-y: contain;
+		scroll-snap-type: y mandatory;
+	}
+
+	@include selector-class("scroll:x") {
+		width: 100%;
+		@extend .ov\:x;
+		&.scroll\:hidden {
+			margin-bottom: -1px !important;
+		}
+	}
+
+	@include selector-class("scroll:y") {
+		height: 100%;
+		@extend .ov\:y;
+		&.scroll\:hidden {
+			margin-right: -1px !important;
+		}
+	}
+}

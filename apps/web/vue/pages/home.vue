@@ -14,7 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="app [ size:full ]">
+	<div class="app [ size:full p=1 ]">
 		<Window />
 	</div>
 </template>

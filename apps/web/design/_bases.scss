@@ -25,6 +25,7 @@
 }
 
 html[lang] {
+	@extend .ov\:h;
 	box-sizing: border-box;
 	font-weight: 400;
 	font-size: var(--font-size);

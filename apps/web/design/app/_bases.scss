@@ -5,7 +5,7 @@
  */
 
 #🆔 {
-	overflow: hidden;
+	@extend .ov\:h;
 
 	width: 100vw;
 	height: 100vh;
@@ -17,12 +17,12 @@
 }
 
 #🆔 > .app {
-	overflow: hidden;
+	@extend .ov\:h;
 
 	background: var(--app-background);
 
-	box-shadow: inset 0 0 0 var(--space) var(--default-border-color),
-		inset -4px -4px calc(var(--space) + 2px)
+	box-shadow: inset 0 0 0 space(1) var(--default-border-color),
+		inset -4px -4px calc(space(1) + 2px)
 			hsla(var(--color-grey800_hsl), var(--default-background-opacity));
 
 	@include --theme using ($name) {
@@ -34,11 +34,7 @@
 				),
 				var(--color-grey50);
 		} @else if $name == dark {
-			--app-background: linear-gradient(
-					180deg,
-					#31363a 0%,
-					var(--color-black) 100%
-				),
+			--app-background: linear-gradient(180deg, #31363a 0%, #282c2f 100%),
 				#31363a;
 		}
 	}

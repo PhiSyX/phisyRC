@@ -89,6 +89,18 @@ numeric! { impl Numeric
 	| 005 <-> RPL_ISUPPORT { supports }
 		=> "{supports} :are supported by this server"
 
+	/// Envoyé au client pour le rediriger vers un autre serveur.
+	///
+	/// Le texte `info` varie selon le logiciel du serveur est les raisons de la
+	/// redirection. Comme ce `<numeric>` ne précise pas s'il faille activer le
+	/// SSL ou non, et qu'il n'est pas interprété par tous les clients, il est
+	/// recommandé de ne pas l'utiliser.
+	///
+	/// Ce `<numeric>` est également connu sous le nom de `RPL_REDIR` par
+	/// certains logiciels.
+	| 010 <-> RPL_BOUNCE { servername, port, info }
+		=> "{servername} {port}: {info}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

@@ -6,14 +6,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import AddChannelIcon from "~vue/assets/icons/Add.vue";
-import ChannelIcon from "~vue/assets/icons/Channel.vue";
-import CrossIcon from "~vue/assets/icons/Cross.vue";
-import PasswordIcon from "~vue/assets/icons/Password.vue";
-import TrashDeleteIcon from "~vue/assets/icons/TrashDelete.vue";
-import UserIcon from "~vue/assets/icons/User.vue";
-import ValidatedIcon from "~vue/assets/icons/Validated.vue";
-import VisualPasswordIcon from "~vue/assets/icons/VisualPassword.vue";
+import IconAddChannel from "~vue/assets/icons/IconAdd.vue";
+import IconChannel from "~vue/assets/icons/IconChannel.vue";
+import IconCross from "~vue/assets/icons/IconCross.vue";
+import IconPassword from "~vue/assets/icons/IconPassword.vue";
+import IconTrashDelete from "~vue/assets/icons/IconTrashDelete.vue";
+import IconUser from "~vue/assets/icons/IconUser.vue";
+import IconValidated from "~vue/assets/icons/IconValidated.vue";
+import IconVisualPassword from "~vue/assets/icons/IconVisualPassword.vue";
 
 import Waves from "~vue/components/Waves.vue";
 
@@ -97,7 +97,7 @@ function handle_send_connection(evt: Event) {
 			>
 				<div class="[ f:center ]">
 					<label for="nickname" class="[ t:center ]">
-						<UserIcon />
+						<IconUser />
 					</label>
 
 					<input
@@ -115,14 +115,14 @@ function handle_send_connection(evt: Event) {
 						class="[ t:center ]"
 						v-if="has_nickname_error !== undefined"
 					>
-						<CrossIcon v-if="has_nickname_error === true" />
-						<ValidatedIcon v-if="has_nickname_error === false" />
+						<IconCross v-if="has_nickname_error === true" />
+						<IconValidated v-if="has_nickname_error === false" />
 					</span>
 				</div>
 
 				<div class="[ f:center ]">
 					<label for="server_password" class="[ t:center ]">
-						<PasswordIcon />
+						<IconPassword />
 					</label>
 
 					<input
@@ -142,13 +142,13 @@ function handle_send_connection(evt: Event) {
 							opacity: can_show_server_password ? 0.5 : 1,
 						}"
 					>
-						<VisualPasswordIcon />
+						<IconVisualPassword />
 					</span>
 				</div>
 
 				<div class="[ f:start ]">
 					<label for="channels" class="[ t:center ]">
-						<ChannelIcon />
+						<IconChannel />
 					</label>
 
 					<ol
@@ -186,7 +186,7 @@ function handle_send_connection(evt: Event) {
 							type="button"
 							@click="add_channel_handler"
 						>
-							<AddChannelIcon />
+							<IconAddChannel />
 						</button>
 						<button
 							type="button"
@@ -197,7 +197,7 @@ function handle_send_connection(evt: Event) {
 								},
 							]"
 						>
-							<TrashDeleteIcon />
+							<IconTrashDelete />
 						</button>
 					</div>
 				</div>

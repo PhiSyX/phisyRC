@@ -7,7 +7,7 @@
 @mixin --use-text-align {
 	$text-align: (left, center, right);
 	@each $align in $text-align {
-		@include selector-class("t:#{$align}") {
+		@include selector-class("align-t:#{$align}") {
 			text-align: #{$align};
 		}
 	}

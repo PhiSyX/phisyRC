@@ -5,17 +5,5 @@
  */
 
 @mixin --use-gap {
-	@for $idx from 1 through 10 {
-		@include selector-class("gap=#{$idx}") {
-			gap: space($idx);
-		}
-	}
-
-	@supports not (gap: inherit) {
-		@for $idx from 1 through 10 {
-			@include selector-class("gap=#{$idx}") {
-				grid-gap: space($idx);
-			}
-		}
-	}
+	@include generate-space-with-alt(gap, grid-gap);
 }

@@ -54,7 +54,7 @@
 		margin: 0 auto;
 	}
 
-	@for $idx from 0 through 20 {
+	@for $idx from 0 through $for-loop-max-iterations {
 		@include selector-class("m=#{$idx}") {
 			--mgn: #{$idx};
 			@extend %margin;
@@ -132,7 +132,7 @@
 		}
 	}
 
-	@for $idx from 0 through 20 {
+	@for $idx from 0 through $for-loop-max-iterations {
 		@include selector-class("p=#{$idx}") {
 			--pdng: #{$idx};
 			@extend %padding;

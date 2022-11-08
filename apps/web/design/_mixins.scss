@@ -6,3 +6,38 @@
 
 @import "mixins/selector";
 @import "mixins/theme";
+
+$for-loop-max-iterations: 20;
+
+@mixin generate-space(
+	$prop,
+	$separator: "=",
+	$total-iteration: $for-loop-max-iterations
+) {
+	@for $idx from 1 through $total-iteration {
+		@include selector-class("#{$prop}#{$separator}#{$idx}") {
+			#{$prop}: space($idx);
+		}
+	}
+}
+
+@mixin generate-space-with-alt(
+	$prop,
+	$alt_prop,
+	$separator: "=",
+	$total-iteration: $for-loop-max-iterations
+) {
+	@for $idx from 1 through $total-iteration {
+		@include selector-class("#{$prop}#{$separator}#{$idx}") {
+			#{$prop}: space($idx);
+		}
+	}
+
+	@supports not (#{$prop}: inherit) {
+		@for $idx from 1 through $total-iteration {
+			@include selector-class("#{$prop}#{$separator}#{$idx}") {
+				#{$alt_prop}: space($idx);
+			}
+		}
+	}
+}

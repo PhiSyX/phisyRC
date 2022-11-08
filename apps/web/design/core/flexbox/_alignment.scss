@@ -8,16 +8,16 @@
 	$align-items: (start, center, end);
 
 	@each $item in $align-items {
-		@include selector-class("f:#{$item}") {
+		@include selector-class("align-i:#{$item}") {
 			align-items: #{$item};
 		}
 
-		@include selector-class("fs:#{$item}") {
+		@include selector-class("align-s:#{$item}") {
 			align-self: #{$item};
 		}
 	}
 
-	@include selector-class("f:center") {
+	@include selector-class("align-i:center") {
 		justify-content: center;
 
 		@supports not (justify-content: center) {
@@ -25,7 +25,7 @@
 		}
 	}
 
-	@include selector-class("fs:center") {
+	@include selector-class("align-s:center") {
 		justify-self: center;
 
 		@supports not (justify-self: center) {

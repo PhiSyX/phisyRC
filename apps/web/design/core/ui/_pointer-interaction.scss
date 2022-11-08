@@ -7,7 +7,7 @@
 @mixin --use-pointer-interaction {
 	$cursors: (pointer, grab, text);
 	@each $cursor in $cursors {
-		@include selector-class("c:#{$cursor}") {
+		@include selector-class("cursor:#{$cursor}") {
 			cursor: #{$cursor};
 		}
 	}

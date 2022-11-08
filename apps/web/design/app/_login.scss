@@ -79,8 +79,10 @@
 			-webkit-text-fill-color: #ef4836 !important;
 		}
 	}
+}
 
-	form button {
+@include selector-class("login@chat<button>") {
+	button {
 		@extend .btn\:reset;
 	}
 

@@ -85,18 +85,20 @@ function handle_send_connection(evt: Event) {
 	<div id="login-page" class="[ size:full scroll:y scroll:hidden ]">
 		<Waves />
 
-		<div class="login@chat<form> [ size:full p=2 flex! gap=6 pos-r ]">
-			<h1 class="[ h3-like mx=1 mt=4 mb=0 ]">Accès direct au Chat</h1>
+		<div
+			class="login@chat<form> login@chat<button> [ size:full p=2 flex! gap=6 pos-r ]"
+		>
+			<h1 class="[ heading=3 mx=1 mt=4 mb=0 ]">Accès direct au Chat</h1>
 
 			<form
 				:action="form_action_attribute"
 				method="post"
 				id="login-form"
-				class="[ flex! mx=1 px=1 border@radius=4 box:shadow ]"
+				class="[ flex! mx=1 px=1 border:radius=4 box:shadow ]"
 				@submit="handle_send_connection"
 			>
-				<div class="[ f:center ]">
-					<label for="nickname" class="[ t:center ]">
+				<div class="[ align-i:center ]">
+					<label for="nickname" class="[ align-t:center ]">
 						<IconUser />
 					</label>
 
@@ -112,7 +114,7 @@ function handle_send_connection(evt: Event) {
 					/>
 
 					<span
-						class="[ t:center ]"
+						class="[ align-t:center ]"
 						v-if="has_nickname_error !== undefined"
 					>
 						<IconCross v-if="has_nickname_error === true" />
@@ -120,8 +122,8 @@ function handle_send_connection(evt: Event) {
 					</span>
 				</div>
 
-				<div class="[ f:center ]">
-					<label for="server_password" class="[ t:center ]">
+				<div class="[ align-i:center ]">
+					<label for="server_password" class="[ align-t:center ]">
 						<IconPassword />
 					</label>
 
@@ -135,7 +137,7 @@ function handle_send_connection(evt: Event) {
 					/>
 
 					<span
-						class="[ t:center ]"
+						class="[ align-t:center ]"
 						title="Voir le mot de passe"
 						@click="handle_toggle_visual_password"
 						:style="{
@@ -146,8 +148,8 @@ function handle_send_connection(evt: Event) {
 					</span>
 				</div>
 
-				<div class="[ f:start ]">
-					<label for="channels" class="[ t:center ]">
+				<div class="[ align-i:start ]">
+					<label for="channels" class="[ align-t:center ]">
 						<IconChannel />
 					</label>
 
@@ -159,7 +161,7 @@ function handle_send_connection(evt: Event) {
 							:key="channel"
 							:class="[
 								'login@channel:label',
-								'[ p=1 c:pointer border@radius=2 f=roboto ]',
+								'[ p=1 cursor:pointer border:radius=2 f-family=roboto ]',
 								{ 'is-selected': selected_channel.includes(i) },
 							]"
 							@click="set_selected_channel_handler($event, i)"
@@ -179,7 +181,7 @@ function handle_send_connection(evt: Event) {
 						</li>
 					</ol>
 
-					<div class="[ flex! gap=1 t:center ]">
+					<div class="[ flex! gap=1 align-t:center ]">
 						<button
 							id="channels"
 							ref="$channel_list_btn"
@@ -206,7 +208,7 @@ function handle_send_connection(evt: Event) {
 			<button
 				type="submit"
 				form="login-form"
-				class="[ w:full p=2 border@radius=1 ]"
+				class="[ w:full p=2 border:radius=1 ]"
 			>
 				Accéder au Chat
 			</button>

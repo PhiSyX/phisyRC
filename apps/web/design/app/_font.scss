@@ -84,9 +84,9 @@
 	font-display: swap;
 }
 
-@include selector-class("f=roboto") {
+@include selector-class("f-family=roboto") {
 	font-family: Roboto, sans-serif;
 }
-@include selector-class("f=nunito") {
+@include selector-class("f-family=nunito") {
 	font-family: Nunito, sans-serif;
 }

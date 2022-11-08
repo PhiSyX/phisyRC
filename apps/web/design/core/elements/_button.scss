@@ -10,7 +10,7 @@
 	}
 
 	@include selector-class("btn:reset") {
-		padding: calc(var(--space) / 2);
+		padding: calc(space(1) / 2);
 		@extend %reset_element;
 	}
 }

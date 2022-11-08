@@ -83,6 +83,9 @@ class Framework implements SetupInterface {
 						component: () => import("~vue/pages/login.vue"),
 						strict: true,
 						name: routes["/login"]["name"],
+						meta: {
+							sidebar: false,
+						},
 					},
 
 					{
@@ -90,6 +93,9 @@ class Framework implements SetupInterface {
 						component: () => import("~vue/pages/chat.vue"),
 						strict: true,
 						name: routes["/chat"]["name"],
+						meta: {
+							sidebar: true,
+						},
 					},
 				],
 			},

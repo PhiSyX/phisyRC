@@ -5,8 +5,11 @@
  */
 
 @import "themes";
-@import "bases";
+@import "background";
 @import "font";
+@import "bases";
+@import "elements";
 
 @import "login";
 @import "window";
+@import "sidebar";

@@ -3,3 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
+
+@include selector-class("window@navigation") {
+	--nav-min-w: calc(#{space(5)} + 2px);
+	--nav-max-w: #{space(30, true)};
+
+	min-width: var(--nav-min-w);
+	width: var(--nav-min-w);
+	max-width: var(--nav-max-w);
+}

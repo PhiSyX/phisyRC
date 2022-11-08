@@ -5,8 +5,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import Window from "~vue/Window.vue";
+import { onMounted, ref } from "vue";
+
+import Window from "~vue/window/Window.vue";
+
+let sidebar_opened = ref(false);
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";
@@ -15,6 +18,6 @@ onMounted(() => {
 
 <template>
 	<div class="app [ size:full p=1 ]">
-		<Window />
+		<Window v-model:sidebar="sidebar_opened" />
 	</div>
 </template>

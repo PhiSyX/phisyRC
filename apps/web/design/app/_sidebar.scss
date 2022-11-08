@@ -1,0 +1,53 @@
+@include selector-class("sidebar__actions") {
+	@include --theme using ($name) {
+		@if $name == dark {
+			background-color: #31363a;
+		} @else if $name == light {
+			background-color: #fafafa;
+		}
+	}
+}
+
+@include selector-class("network<server>") {
+	> li {
+		display: grid;
+		grid-template-columns: space(3) 1fr auto;
+
+		justify-content: space-between;
+		align-items: center;
+		grid-column-gap: space(1);
+		grid-row-gap: calc(space(1) / 2);
+
+		min-height: space(6);
+		padding: space(1);
+
+		outline: none;
+
+		border-left: 2px solid transparent;
+
+		cursor: pointer;
+		user-select: none;
+	}
+}
+
+@include selector-class("network@server__actions") {
+	button {
+		padding: space(1);
+	}
+}
+
+@include selector-class("network@server@room__total-messages") {
+	padding: calc(space(1) / 2) space(1);
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			background-color: #212121;
+		} @else if $name == light {
+			background-color: #c5cae9;
+			color: var(--default-text-color);
+		}
+	}
+}
+
+@include selector-class("network@server@room__actions") {
+}

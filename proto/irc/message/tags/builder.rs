@@ -101,6 +101,10 @@ impl<'a, 'b> Builder<'a, 'b> {
 						}
 
 						| CodePoint::Whitespace(_) => {
+							if self.temporary_key.is_empty() {
+								break;
+							}
+
 							self.temporary_map.insert(
 								self.temporary_key.to_owned(),
 								true.to_string(),

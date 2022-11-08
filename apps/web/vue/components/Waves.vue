@@ -1,5 +1,5 @@
 <template>
-	<div :class="['app@waves', '[ pos-a:full s:full ]']">
+	<div class="app@waves [ pos-a:full s:full ]">
 		<svg
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
@@ -31,8 +31,9 @@
 @import "design/functions";
 @import "design/mixins";
 
-.app\@waves {
+@include selector-class("app@waves") {
 	pointer-events: none;
+
 	@include --theme using ($name) {
 		@if $name == dark {
 			--wave-1: var(--color-grey800);
@@ -44,26 +45,26 @@
 			--wave-3: var(--color-indigo400);
 		}
 	}
-}
 
-.app\@waves > svg path {
-	animation: wave-anim 30s ease-out infinite alternate-reverse;
-	opacity: 0.9;
-}
+	> svg path {
+		animation: wave-anim 30s ease-out infinite alternate-reverse;
+		opacity: 0.9;
+	}
 
-.app\@waves > svg path:nth-child(1) {
-	animation-delay: -5s;
-	animation-duration: 15s;
-}
+	> svg path:nth-child(1) {
+		animation-delay: -5s;
+		animation-duration: 15s;
+	}
 
-.app\@waves > svg path:nth-child(2) {
-	animation-delay: -5s;
-	animation-duration: 10s;
-}
+	> svg path:nth-child(2) {
+		animation-delay: -5s;
+		animation-duration: 10s;
+	}
 
-.app\@waves > svg path:nth-child(3) {
-	animation-delay: -5s;
-	animation-duration: 5s;
+	> svg path:nth-child(3) {
+		animation-delay: -5s;
+		animation-duration: 5s;
+	}
 }
 
 @keyframes wave-anim {

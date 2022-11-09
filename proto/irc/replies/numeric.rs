@@ -240,6 +240,9 @@ numeric! { impl Numeric
 	| 259 <-> RPL_ADMINEMAIL { info }
 		=> ":{info}"
 
+	/// Code numérique fictif. Non utilisé.
+	| 300 <-> RPL_NONE => ""
+
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_301-305-306.md")]
 	| 301 <-> RPL_AWAY { nick, away_message }
 		=> "{nick} :{away_message}"

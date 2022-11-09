@@ -36,6 +36,51 @@
 	}
 }
 
+a {
+	@include --theme using($name) {
+		@if $name == dark {
+			color: var(--color-orange400);
+		} @else if $name == light {
+			color: var(--color-red700);
+		}
+	}
+}
+
+code {
+	color: var(--color-pink500);
+}
+
+table {
+	border: 1px solid var(--color-grey800);
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th {
+	vertical-align: bottom;
+}
+th,
+td,
+table caption {
+	padding: 0.75rem;
+	text-align: left;
+	text-align: start;
+}
+
+td {
+	vertical-align: text-top;
+}
+
+tr:nth-child(2n) {
+	@include --theme using($name) {
+		@if $name == dark {
+			background-color: var(--color-grey900);
+		} @else if $name == light {
+			background-color: var(--color-indigo50);
+		}
+	}
+}
+
 svg {
 	vertical-align: middle;
 }

@@ -4,11 +4,15 @@ import { defineAsyncComponent } from "vue";
 const ColorsStory = defineAsyncComponent(
 	() => import("~vue/stories/Colors.vue")
 );
+const TypographyStory = defineAsyncComponent(
+	() => import("~vue/stories/Typography.vue")
+);
 
 export default {
 	name: "UI",
 	components: {
 		ColorsStory,
+		TypographyStory,
 	},
 };
 </script>
@@ -57,6 +61,10 @@ let general = [
 		icon: IconColor,
 		text: "Les couleurs",
 		link: "/ui/colors",
+	},
+	{
+		text: "Typographie",
+		link: "/ui/typography",
 	},
 ];
 

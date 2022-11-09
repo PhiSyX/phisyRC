@@ -255,6 +255,19 @@ numeric! { impl Numeric
 	/// aux clients de mieux extraire ces nombres.
 	| 265 <-> RPL_LOCALUSERS { current_local_users, max_local_users }
 		=> ":Current local users: {current_local_users}, max {max_local_users}"
+	/// Envoyé en réponse à la commande `LUSERS`.
+	/// `<current_global_users>` et `<max_global_users>` sont des entiers non
+	/// négatifs. `<current_global_users>` représente le nombre de clients
+	/// actuellement connectés à ce serveur, globalement (directement et par le
+	/// biais d'autres liens de serveurs). `<max_global_users>` représente le
+	/// nombre maximum de clients qui ont été connectés à ce serveur en une
+	/// seule fois, globalement.
+	///
+	/// Les deux paramètres facultatifs devraient être fournis pour permettre
+	/// aux clients de mieux extraire ces nombres.
+	| 266 <-> RPL_GLOBALUSERS { current_global_users, max_global_users }
+		=> ":Current global users: {current_global_users}, max {max_global_users}"
+
 	/// Code numérique fictif. Non utilisé.
 	| 300 <-> RPL_NONE => ""
 

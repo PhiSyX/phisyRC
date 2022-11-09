@@ -240,6 +240,11 @@ numeric! { impl Numeric
 	| 259 <-> RPL_ADMINEMAIL { info }
 		=> ":{info}"
 
+	/// Lorsqu'un serveur abandonne une commande sans la traiter, il doit
+	/// utiliser la réponse `RPL_TRYAGAIN` pour informer le client d'origine.
+	| 263 <-> RPL_TRYAGAIN { command }
+		=> "{command} :Please wait a while and try again."
+
 	/// Code numérique fictif. Non utilisé.
 	| 300 <-> RPL_NONE => ""
 

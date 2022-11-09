@@ -4,10 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "align";
-@import "decoration";
-
-@mixin --use-text {
-	@include --use-text-align;
-	@include --use-text-decoration;
+@mixin --use-fonts {
+	@include selector-class("text:bold") {
+		font-weight: bold;
+	}
+	@include selector-class("text:italic") {
+		font-style: italic;
+	}
 }

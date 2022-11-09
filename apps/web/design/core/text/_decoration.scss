@@ -4,10 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "align";
-@import "decoration";
-
-@mixin --use-text {
-	@include --use-text-align;
-	@include --use-text-decoration;
+@mixin --use-text-decoration {
+	@include selector-class("text:underline") {
+		text-decoration: underline;
+	}
 }

@@ -10,6 +10,7 @@
 @import "css2/export";
 @import "elements/export";
 @import "flexbox/export";
+@import "fonts/export";
 @import "overflow/export";
 @import "position/export";
 @import "sizing/export";
@@ -21,6 +22,7 @@
 @include --use-box;
 @include --use-css2;
 @include --use-flexbox;
+@include --use-fonts;
 @include --use-overflow;
 @include --use-position;
 @include --use-sizing;

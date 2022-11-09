@@ -73,6 +73,12 @@ class Framework implements SetupInterface {
 	public set_routes(routes: Route) {
 		let vue_routes: RouteRecordRaw[] = [
 			{
+				path: "/ui/:dyncomponent?",
+				component: () => import("~vue/pages/ui.vue"),
+				strict: true,
+				props: true,
+			},
+			{
 				path: "/",
 				component: () => import("~vue/pages/home.vue"),
 				strict: true,

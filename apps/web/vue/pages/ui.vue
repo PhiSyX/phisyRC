@@ -32,8 +32,10 @@ import IconColor from "~vue/assets/icons/IconColor.vue";
 import IconCross from "~vue/assets/icons/IconCross.vue";
 import IconMessage from "~vue/assets/icons/IconMessage.vue";
 import IconMessageEmpty from "~vue/assets/icons/IconMessageEmpty.vue";
+import IconMessages from "~vue/assets/icons/IconMessages.vue";
 import IconPassword from "~vue/assets/icons/IconPassword.vue";
 import IconServerConnect from "~vue/assets/icons/IconServerConnect.vue";
+import IconSettings from "~vue/assets/icons/IconSettings.vue";
 import IconTrashDelete from "~vue/assets/icons/IconTrashDelete.vue";
 import IconUser from "~vue/assets/icons/IconUser.vue";
 import IconValidated from "~vue/assets/icons/IconValidated.vue";
@@ -85,8 +87,10 @@ let icons: List[] = [
 	{ icon: IconCross, text: "Cross" },
 	{ icon: IconMessage, text: "Message" },
 	{ icon: IconMessageEmpty, text: "MessageEmpty" },
+	{ icon: IconMessages, text: "Messages" },
 	{ icon: IconPassword, text: "Password" },
 	{ icon: IconServerConnect, text: "ServerConnect" },
+	{ icon: IconSettings, text: "Settings" },
 	{ icon: IconTrashDelete, text: "TrashDelete" },
 	{ icon: IconUser, text: "User" },
 	{ icon: IconValidated, text: "Validated" },

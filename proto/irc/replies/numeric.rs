@@ -245,6 +245,16 @@ numeric! { impl Numeric
 	| 263 <-> RPL_TRYAGAIN { command }
 		=> "{command} :Please wait a while and try again."
 
+	/// Envoyé en réponse à la commande `LUSERS`.
+	/// `<current_local_users>` et `<max_local_users>` sont des entiers non
+	/// négatifs et représentent respectivement le nombre de clients actuels et
+	/// le nombre maximal de clients qui ont été connectés directement à ce
+	/// serveur en une seule fois.
+	///
+	/// Les deux paramètres facultatifs devraient être fournis pour permettre
+	/// aux clients de mieux extraire ces nombres.
+	| 265 <-> RPL_LOCALUSERS { current_local_users, max_local_users }
+		=> ":Current local users: {current_local_users}, max {max_local_users}"
 	/// Code numérique fictif. Non utilisé.
 	| 300 <-> RPL_NONE => ""
 

@@ -240,6 +240,16 @@ numeric! { impl Numeric
 	| 259 <-> RPL_ADMINEMAIL { info }
 		=> ":{info}"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_301-305-306.md")]
+	| 301 <-> RPL_AWAY { nick, away_message }
+		=> "{nick} :{away_message}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_301-305-306.md")]
+	| 305 <-> RPL_UNAWAY
+		=> ":You are no longer marked as being away"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_301-305-306.md")]
+	| 306 <-> RPL_NOWAWAY
+		=> ":You have been marked as being away"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

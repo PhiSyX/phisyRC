@@ -310,7 +310,6 @@ numeric! { impl Numeric
 	| 303 <-> RPL_ISON { nicks }
 		=> ":{nicks}"
 
-
 	/// Envoyé en réponse à la commande `WHOIS`, ce numérique indique
 	/// l'empreinte du certificat SSL/TLS utilisé par le client avec le surnom
 	/// (`nickname`). Les clients doivent recevoir ce numéro uniquement s'ils
@@ -335,6 +334,13 @@ numeric! { impl Numeric
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
 	| 319 <-> RPL_WHOISCHANNELS { nick, channels_with_status }
 		=> "{nick} :{channels_with_status}"
+
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_314-369.md")]
+	| 314 <-> RPL_WHOWASUSER { nick, user, host, realname }
+		=> "{nick} {user} {host} * :{realname}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_314-369.md")]
+	| 369 <-> RPL_ENDOFWHOWAS { nick }
+		=> "{nick} :End of WHOWAS"
 
 	// ------- //
 	// Erreurs //

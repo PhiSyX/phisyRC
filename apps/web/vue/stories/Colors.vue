@@ -50,25 +50,28 @@ const enum CopyValueType {
 
 let copy_mode = ref(CopyValueType.Var);
 
-function copy2clipboard(color_name: string, variant: string) {
+function copy2clipboard(color_name: str, variant: str) {
 	let write_str = "";
 
 	switch (copy_mode.value) {
-		case CopyValueType.Var:
+		case CopyValueType.Var: {
 			write_str = `var(--color-${color_name}${variant})`;
 			break;
+		}
 
-		case CopyValueType.ColorName:
+		case CopyValueType.ColorName: {
 			write_str = `--color-${color_name}${variant}`;
 			break;
+		}
 
-		case CopyValueType.Hexadecimal:
+		case CopyValueType.Hexadecimal: {
 			write_str = getComputedStyle(
 				document.documentElement
 			).getPropertyValue(`--color-${color_name}${variant}`);
 			break;
+		}
 
-		case CopyValueType.Rgb:
+		case CopyValueType.Rgb: {
 			write_str = getComputedStyle(document.documentElement)
 				.getPropertyValue(`--color-${color_name}${variant}_rgb`)
 				.trim();
@@ -76,8 +79,9 @@ function copy2clipboard(color_name: string, variant: string) {
 				write_str = `rgb(${write_str})`;
 			}
 			break;
+		}
 
-		case CopyValueType.Hls:
+		case CopyValueType.Hls: {
 			write_str = getComputedStyle(document.documentElement)
 				.getPropertyValue(`--color-${color_name}${variant}_hsl`)
 				.trim();
@@ -85,6 +89,7 @@ function copy2clipboard(color_name: string, variant: string) {
 				write_str = `hsl(${write_str})`;
 			}
 			break;
+		}
 	}
 
 	if (write_str.length == 0) {

@@ -268,6 +268,17 @@ numeric! { impl Numeric
 		replies
 	} => ":{replies}"
 
+	/// **RFC 1459:** -> "`:[<nick> {<space><nick>}]`"
+	///
+	/// **RFC 2812:** -> "`:*1<nick> *( " " <nick> )`"
+	///
+	/// Format de réponse utilisé par `ISON` pour lister les réponses à la liste
+	/// de requêtes.
+	///
+	/// Liste les pseudonymes qui sont présents sur le réseau.
+	| 303 <-> RPL_ISON { nicks }
+		=> ":{nicks}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

@@ -1,6 +1,5 @@
 <script lang="ts">
 import { defineAsyncComponent } from "vue";
-import { useRoute } from "vue-router";
 
 const ColorsStory = defineAsyncComponent(
 	() => import("~vue/stories/Colors.vue")
@@ -15,9 +14,25 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import IconAdd from "~vue/assets/icons/IconAdd.vue";
+import IconArrowDown from "~vue/assets/icons/IconArrowDown.vue";
+import IconArrowLeft from "~vue/assets/icons/IconArrowLeft.vue";
+import IconArrowRight from "~vue/assets/icons/IconArrowRight.vue";
+import IconArrowUp from "~vue/assets/icons/IconArrowUp.vue";
+import IconChannel from "~vue/assets/icons/IconChannel.vue";
 import IconColor from "~vue/assets/icons/IconColor.vue";
+import IconCross from "~vue/assets/icons/IconCross.vue";
+import IconMessage from "~vue/assets/icons/IconMessage.vue";
+import IconMessageEmpty from "~vue/assets/icons/IconMessageEmpty.vue";
+import IconPassword from "~vue/assets/icons/IconPassword.vue";
+import IconServerConnect from "~vue/assets/icons/IconServerConnect.vue";
+import IconTrashDelete from "~vue/assets/icons/IconTrashDelete.vue";
+import IconUser from "~vue/assets/icons/IconUser.vue";
+import IconValidated from "~vue/assets/icons/IconValidated.vue";
+import IconVisualPassword from "~vue/assets/icons/IconVisualPassword.vue";
 
 import { capitalize, computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";
@@ -34,7 +49,7 @@ const load_component = computed(() => {
 type List = {
 	icon?: unknown;
 	text: string;
-	link: string;
+	link?: string;
 };
 
 let general = [
@@ -45,10 +60,25 @@ let general = [
 	},
 ];
 
-let components: List[] = [
-];
+let components: List[] = [];
 
-let icons: List[] = [];
+let icons: List[] = [
+	{ icon: IconAdd, text: "Add" },
+	{ icon: IconArrowDown, text: "ArrowDown" },
+	{ icon: IconArrowLeft, text: "ArrowLeft" },
+	{ icon: IconArrowRight, text: "ArrowRight" },
+	{ icon: IconArrowUp, text: "ArrowUp" },
+	{ icon: IconChannel, text: "Channel" },
+	{ icon: IconCross, text: "Cross" },
+	{ icon: IconMessage, text: "Message" },
+	{ icon: IconMessageEmpty, text: "MessageEmpty" },
+	{ icon: IconPassword, text: "Password" },
+	{ icon: IconServerConnect, text: "ServerConnect" },
+	{ icon: IconTrashDelete, text: "TrashDelete" },
+	{ icon: IconUser, text: "User" },
+	{ icon: IconValidated, text: "Validated" },
+	{ icon: IconVisualPassword, text: "VisualPassword" },
+];
 
 let application: List[] = [];
 </script>
@@ -61,7 +91,7 @@ let application: List[] = [];
 			</p>
 
 			<details open>
-				<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>
+				<summary class="[ pl=1 pb=1 ]">Général</summary>
 
 				<ul class="[ flex! gap=1 list:reset ]">
 					<li
@@ -71,7 +101,7 @@ let application: List[] = [];
 							active: item.link == route.fullPath,
 						}"
 					>
-						<component :is="item.icon" />
+						<component :is="item.icon" width="20" height="20" />
 
 						<span class="[ flex:full ]">{{ item.text }}</span>
 
@@ -94,27 +124,12 @@ let application: List[] = [];
 							active: item.link == route.fullPath,
 						}"
 					>
+						<component :is="item.icon" width="20" height="20" />
+
 						<span class="[ flex:full ]">{{ item.text }}</span>
 
 						<RouterLink
-							:to="item.link"
-							class="pos-a:full"
-						></RouterLink>
-					</li>
-				</ul>
-			</details>
-
-			<details>
-				<summary class="[ pl=1 pb=1 ]">Les icônes</summary>
-
-				<ul class="[ flex! gap=1 list:reset scroll:y ]">
-					<li
-						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-						v-for="item in icons"
-					>
-						<span class="[ flex:full ]">{{ item.text }}</span>
-
-						<RouterLink
+							v-if="item.link"
 							:to="item.link"
 							class="pos-a:full"
 						></RouterLink>
@@ -133,6 +148,28 @@ let application: List[] = [];
 						<span class="[ flex:full ]">{{ item.text }}</span>
 
 						<RouterLink
+							v-if="item.link"
+							:to="item.link"
+							class="pos-a:full"
+						></RouterLink>
+					</li>
+				</ul>
+			</details>
+
+			<details>
+				<summary class="[ pl=1 pb=1 ]">Les icônes</summary>
+
+				<ul class="[ flex! gap=1 list:reset scroll:y ]">
+					<li
+						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+						v-for="item in icons"
+					>
+						<component :is="item.icon" width="20" height="20" />
+
+						<span class="[ flex:full ]">{{ item.text }}</span>
+
+						<RouterLink
+							v-if="item.link"
 							:to="item.link"
 							class="pos-a:full"
 						></RouterLink>

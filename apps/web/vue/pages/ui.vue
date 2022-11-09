@@ -106,6 +106,7 @@ let application: List[] = [];
 						<span class="[ flex:full ]">{{ item.text }}</span>
 
 						<RouterLink
+							v-if="item.link"
 							:to="item.link"
 							class="pos-a:full"
 						></RouterLink>
@@ -137,7 +138,7 @@ let application: List[] = [];
 				</ul>
 			</details>
 
-			<details>
+			<details open>
 				<summary class="[ pl=1 pb=1 ]">Application</summary>
 
 				<ul class="[ flex! gap=1 list:reset scroll:y ]">
@@ -189,13 +190,7 @@ let application: List[] = [];
 					{{ load_component }}
 				</h1>
 
-				<section class="[ flex:full ]" data-theme="dark">
-					<component :is="load_component">
-						Sélectionner un composant
-					</component>
-				</section>
-
-				<section class="[ flex:full ]" data-theme="light">
+				<section class="[ flex:full ]">
 					<component :is="load_component">
 						Sélectionner un composant
 					</component>
@@ -209,16 +204,6 @@ let application: List[] = [];
 <style lang="scss" scoped>
 @import "design/functions";
 @import "design/mixins";
-
-[data-theme="dark"] {
-	background-color: var(--color-grey900);
-	color: var(--color-white);
-}
-
-[data-theme="light"] {
-	background-color: var(--color-white);
-	color: var(--color-black);
-}
 
 main {
 	@include --theme using($name) {
@@ -282,16 +267,6 @@ li.active {
 			background: var(--color-grey900);
 		} @else if $name == light {
 			background-color: var(--color-grey800);
-		}
-	}
-}
-
-section {
-	@include --theme using($name) {
-		@if $name == dark {
-			border: 1px solid var(--color-grey);
-		} @else if $name == light {
-			border: 1px solid var(--color-grey400);
 		}
 	}
 }

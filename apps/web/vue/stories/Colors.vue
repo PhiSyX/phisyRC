@@ -144,6 +144,30 @@ function copy2clipboard(color_name: str, variant: str) {
 </template>
 
 <style lang="scss" scoped>
+@import "design/functions";
+@import "design/mixins";
+
+button {
+	padding: space(1);
+	border: 0;
+	border-radius: 2px;
+
+	color: var(--color-black);
+
+	@include --theme using($name) {
+		background-color: var(--color-blue200);
+		@if $name == dark {
+			&:focus {
+				outline: 2px solid var(--color-blue400);
+			}
+		} @else if $name == light {
+			&:focus {
+				outline: 2px solid var(--color-blue800);
+			}
+		}
+	}
+}
+
 .square:hover {
 	border-radius: 50%;
 	transform: scale(1.5);

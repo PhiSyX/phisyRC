@@ -2,14 +2,21 @@
 import { defineAsyncComponent } from "vue";
 import { useRoute } from "vue-router";
 
+const ColorsStory = defineAsyncComponent(
+	() => import("~vue/stories/Colors.vue")
+);
+
 export default {
 	name: "UI",
 	components: {
+		ColorsStory,
 	},
 };
 </script>
 
 <script lang="ts" setup>
+import IconColor from "~vue/assets/icons/IconColor.vue";
+
 import { capitalize, computed, onMounted } from "vue";
 
 onMounted(() => {
@@ -25,9 +32,18 @@ const load_component = computed(() => {
 });
 
 type List = {
+	icon?: unknown;
 	text: string;
 	link: string;
 };
+
+let general = [
+	{
+		icon: IconColor,
+		text: "Les couleurs",
+		link: "/ui/colors",
+	},
+];
 
 let components: List[] = [
 ];
@@ -43,6 +59,29 @@ let application: List[] = [];
 			<p class="[ align-t:center text:bold ]">
 				Design System pour phisyRC
 			</p>
+
+			<details open>
+				<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>
+
+				<ul class="[ flex! gap=1 list:reset ]">
+					<li
+						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+						v-for="item in general"
+						:class="{
+							active: item.link == route.fullPath,
+						}"
+					>
+						<component :is="item.icon" />
+
+						<span class="[ flex:full ]">{{ item.text }}</span>
+
+						<RouterLink
+							:to="item.link"
+							class="pos-a:full"
+						></RouterLink>
+					</li>
+				</ul>
+			</details>
 
 			<details open>
 				<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>

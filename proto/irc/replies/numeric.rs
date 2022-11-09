@@ -250,6 +250,24 @@ numeric! { impl Numeric
 	| 306 <-> RPL_NOWAWAY
 		=> ":You have been marked as being away"
 
+	/// **RFC 1459:** -> "`:[<reply>{<space><reply>}]`"
+	///
+	/// **RFC 2812:** -> "`:*1<reply> *( " " <reply> )`"
+	///
+	/// Format de réponse utilisé par `USERHOST` pour lister les réponses à la
+	/// liste des requêtes. La chaîne de caractères de la réponse est composée
+	/// comme suit:
+	///
+	/// `reply = nickname [ "*" ] "=" ( "+" / "-" ) hostname`
+	///
+	/// Le caractère '`*`' indique si le client s'est enregistré en tant
+	/// qu'opérateur. Les caractères '`-`' et '`+`' indiquent si le client a
+	/// défini respectivement un message `AWAY` ou non.
+	| 302 <-> RPL_USERHOST {
+		/// `reply = nickname [ "*" ] "=" ( "+" / "-" ) hostname`
+		replies
+	} => ":{replies}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

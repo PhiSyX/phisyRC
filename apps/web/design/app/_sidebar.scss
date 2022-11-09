@@ -42,8 +42,8 @@
 	}
 }
 
-@include selector-class("network@server@room__total-messages") {
-	padding: calc(space(1) / 2) space(1);
+@include selector-class("network@server@room__total-unread-message") {
+	font-size: 12px;
 
 	@include --theme using ($name) {
 		@if $name == dark {
@@ -53,7 +53,42 @@
 			color: var(--default-text-color);
 		}
 	}
+
+	.is-not-active:not(:hover) & {
+		display: block;
+	}
+
+	.is-not-active:hover & {
+		display: none;
+	}
+
+	.is-active & {
+		display: none;
+	}
 }
 
-@include selector-class("network@server@room__actions") {
+@include selector-class("network@server@room:close") {
+	.is-not-active:not(:hover) & {
+		display: none;
+	}
+
+	.is-active & {
+		display: block;
+	}
+}
+
+@include selector-class("network@server@room__last-message") {
+	--color: var(--default-text-color);
+	--bg: transparent;
+
+	background-color: hsla(var(--bg), 0.5);
+	color: var(--color);
+
+	@include --theme using($name) {
+		@if $name == dark {
+			--bg: var(--color-grey800_hsl);
+		} @else if $name == light {
+			--bg: var(--color-grey200_hsl);
+		}
+	}
 }

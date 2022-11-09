@@ -7,12 +7,16 @@ const ColorsStory = defineAsyncComponent(
 const TypographyStory = defineAsyncComponent(
 	() => import("~vue/stories/Typography.vue")
 );
+const SidebarStory = defineAsyncComponent(
+	() => import("~vue/stories/Sidebar.vue")
+);
 
 export default {
 	name: "UI",
 	components: {
 		ColorsStory,
 		TypographyStory,
+		SidebarStory,
 	},
 };
 </script>
@@ -40,6 +44,7 @@ import { useRoute } from "vue-router";
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";
+	document.title = "Design System | phisyRC";
 });
 
 const route = useRoute();
@@ -88,7 +93,12 @@ let icons: List[] = [
 	{ icon: IconVisualPassword, text: "VisualPassword" },
 ];
 
-let application: List[] = [];
+let application: List[] = [
+	{
+		text: "Barre latérale",
+		link: "/ui/sidebar",
+	},
+];
 </script>
 
 <template>

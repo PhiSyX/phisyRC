@@ -32,4 +32,11 @@
 			margin: 0 auto;
 		}
 	}
+
+	$justify-content: (space-between, space-around, space-evenly, stretch);
+	@each $item in $justify-content {
+		@include selector-class("align-j:#{$item}") {
+			justify-content: $item;
+		}
+	}
 }

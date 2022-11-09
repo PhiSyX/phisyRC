@@ -5,7 +5,9 @@
  */
 
 @import "pointer-interaction";
+@import "resizing";
 
 @mixin --use-ui {
 	@include --use-pointer-interaction;
+	@include --use-resizing;
 }

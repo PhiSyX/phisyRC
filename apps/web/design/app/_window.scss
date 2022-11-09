@@ -5,7 +5,7 @@
  */
 
 @include selector-class("window@navigation") {
-	--nav-min-w: calc(#{space(5)} + 2px);
+	--nav-min-w: #{space(5)};
 	--nav-max-w: #{space(30, true)};
 
 	min-width: var(--nav-min-w);

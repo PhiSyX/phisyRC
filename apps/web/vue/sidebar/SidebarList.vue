@@ -16,7 +16,7 @@ import Button from "~vue/components/Button.vue";
 
 import { ref } from "vue";
 
-import type { Server } from "./server";
+import type { Server } from "~/server";
 
 type Props = {
 	name: Server["name"];
@@ -48,10 +48,14 @@ const folded = ref(false);
 		v-show="!folded"
 		class="network@server@room app:bg=primary(:hover)"
 		v-for="room in rooms"
+		:class="{
+			'is-active': room.active,
+			'is-not-active': !room.active,
+		}"
 		:data-type="room.type"
 	>
 		<div>
-			<IconRoomMessageEmpty v-if="room.messages.length === 0" />
+			<IconRoomMessageEmpty v-if="room.last_message == null" />
 			<IconRoomMessage v-else />
 		</div>
 
@@ -61,14 +65,26 @@ const folded = ref(false);
 
 		<div class="network@server@room__actions [ flex f:center gap=1 ]">
 			<div
-				class="network@server@room__total-messages [ border:radius=3 ]"
+				v-if="room.total_unread_message"
+				class="network@server@room__total-unread-message [ h=3 px=1 align-t:center border:radius=3 ]"
 			>
-				{{ room.messages.length }}
+				{{ room.total_unread_message }}
 			</div>
 
-			<Button>
+			<Button class="network@server@room:close">
 				<IconRoomClose />
 			</Button>
+		</div>
+
+		<br />
+
+		<div
+			class="network@server@room__last-message [ border:radius=1 ]"
+			v-if="room.last_message"
+		>
+			<p class="[ scroll:y my=0 p=1 max-h=7 ]">
+				{{ room.last_message?.message }}
+			</p>
 		</div>
 	</li>
 </template>

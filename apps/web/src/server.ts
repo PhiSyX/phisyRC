@@ -4,10 +4,22 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+export type User = {
+	nick: string;
+};
+
+export type Message = {
+	type: "action" | "privmsg" | "event";
+	message: string;
+	from: User;
+};
+
 export type Room = {
 	name: string;
+	active: boolean;
 	type: "channel" | "private" | "custom-window";
-	messages: string[];
+	total_unread_message: number;
+	last_message?: Message;
 };
 
 export type Server = {

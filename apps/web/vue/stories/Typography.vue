@@ -22,12 +22,12 @@
 
 		<h2 id="heading">Heading</h2>
 
-		<p>Les en-têtes <code>&lth#></code> sont responsive.</p>
+		<p>Les en-têtes <code>&lt;h#></code> sont responsive.</p>
 
 		<table>
 			<thead>
 				<tr>
-					<th>En-tête</th>
+					<th># en-tête</th>
 					<th>Utilitaire</th>
 				</tr>
 			</thead>

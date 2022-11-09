@@ -16,7 +16,7 @@ import Button from "~vue/components/Button.vue";
 
 import { ref } from "vue";
 
-import type { Server } from "./room";
+import type { Server } from "./server";
 
 type Props = {
 	name: Server["name"];

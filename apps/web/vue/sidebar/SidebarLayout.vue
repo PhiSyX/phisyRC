@@ -14,7 +14,7 @@ import SidebarList from "./SidebarList.vue";
 
 import { computed } from "vue";
 
-import type { Server } from "./room";
+import type { Server } from "./server";
 
 type Props = {
 	toggle: boolean;
@@ -33,23 +33,7 @@ let toggle$ = computed({
 	},
 });
 
-let servers: Server[] = [
-	{
-		name: "localhost",
-		rooms: [
-			{
-				name: "#irc",
-				type: "channel",
-				messages: ["hello world"],
-			},
-			{
-				name: "PhiSyX",
-				type: "private",
-				messages: [],
-			},
-		],
-	},
-];
+let servers: Server[] = [];
 </script>
 
 <template>

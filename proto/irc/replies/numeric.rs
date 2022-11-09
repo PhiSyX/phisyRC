@@ -310,6 +310,32 @@ numeric! { impl Numeric
 	| 303 <-> RPL_ISON { nicks }
 		=> ":{nicks}"
 
+
+	/// Envoyé en réponse à la commande `WHOIS`, ce numérique indique
+	/// l'empreinte du certificat SSL/TLS utilisé par le client avec le surnom
+	/// (`nickname`). Les clients doivent recevoir ce numéro uniquement s'ils
+	/// utilisent la commande `WHOIS` sur eux-mêmes ou s'ils sont un opérateur.
+	| 276 <-> RPL_WHOISCERTFP { nickname, fingerprint }
+		=> "{nickname} :has client certificate fingerprint {fingerprint}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 311 <-> RPL_WHOISUSER { nick, user, host, realname }
+		=> "{nick} {user} {host} * :{realname}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 312 <-> RPL_WHOISSERVER { nick, server, serverinfo }
+		=> "{nick} {server} :{serverinfo}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 313 <-> RPL_WHOISOPERATOR { nick }
+		=> "{nick} :is an IRC operator"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 317 <-> RPL_WHOISIDLE { nick, integer }
+		=> "{nick} {integer} :seconds idle"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 318 <-> RPL_ENDOFWHOIS { nick }
+		=> "{nick} :End of /WHOIS list"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_311..313-317..319.md")]
+	| 319 <-> RPL_WHOISCHANNELS { nick, channels_with_status }
+		=> "{nick} :{channels_with_status}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

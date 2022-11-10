@@ -164,6 +164,7 @@
 
 	background-color: hsla(var(--bg), 0.5);
 	color: var(--color);
+	font-size: 14px;
 
 	@include --theme using($name) {
 		@if $name == dark {
@@ -171,5 +172,30 @@
 		} @else if $name == light {
 			--bg: var(--color-grey200_hsl);
 		}
+	}
+}
+
+@include selector-class("network@server@room--has-events") {
+	@include --theme using($name) {
+		@if $name == dark {
+			color: var(--color-blue);
+		} @else if $name == light {
+			color: var(--color-blue700);
+		}
+	}
+}
+
+@include selector-class("network@server@room--has-messages") {
+	color: var(--color-red);
+}
+
+@include selector-class("network@server@room--highlight") {
+	color: var(--color-green);
+	animation: blink 1s step-start 0s infinite;
+}
+
+@keyframes blink {
+	50% {
+		opacity: 0.5;
 	}
 }

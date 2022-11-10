@@ -9,16 +9,20 @@ let sidebar2 = ref(true);
 
 let rooms: Room[] = [
 	{
-		name: "#irc",
 		type: "channel",
-		total_unread_message: 154,
+		name: "#channel (message)",
 		active: false,
+		highlight: false,
+		total_unread_message: 154,
+		total_unread_event: 2,
 	},
 	{
-		active: true,
-		name: "PhiSyX",
 		type: "private",
+		name: "Private (active room)",
+		active: true,
+		highlight: false,
 		total_unread_message: 2,
+		total_unread_event: 0,
 		last_message: {
 			type: "privmsg",
 			message:
@@ -28,15 +32,32 @@ let rooms: Room[] = [
 				"doloremque dolorum delectus cupiditate provident corporis " +
 				"nemo. Officia!",
 			from: {
-				nick: "Mike",
+				nick: "Private",
 			},
 		},
 	},
 	{
-		name: "#channel",
 		type: "channel",
-		total_unread_message: 0,
+		name: "#channel (event)",
 		active: false,
+		highlight: false,
+		total_unread_event: 1,
+		total_unread_message: 0,
+	},
+	{
+		type: "private",
+		name: "Private (highlight)",
+		active: false,
+		highlight: true,
+		total_unread_event: 0,
+		total_unread_message: 1,
+		last_message: {
+			type: "privmsg",
+			message: "Bonjour Private.",
+			from: {
+				nick: "Private",
+			},
+		},
 	},
 ];
 

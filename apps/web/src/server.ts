@@ -15,9 +15,11 @@ export type Message = {
 };
 
 export type Room = {
+	type: "channel" | "private" | "custom-window";
 	name: string;
 	active: boolean;
-	type: "channel" | "private" | "custom-window";
+	highlight: boolean;
+	total_unread_event: number;
 	total_unread_message: number;
 	last_message?: Message;
 };

@@ -71,6 +71,14 @@ let folded$ = computed({
 			:class="{
 				'app:bg=primary is-active': room.active,
 				'app:bg=primary(:hover) is-not-active': !room.active,
+				'network@server@room--has-events':
+					!room.active && room.total_unread_event > 0,
+				'network@server@room--has-messages':
+					!room.active && room.total_unread_message > 0,
+				'network@server@room--highlight':
+					!room.active &&
+					room.highlight &&
+					room.total_unread_message > 0,
 			}"
 			:data-type="room.type"
 		>

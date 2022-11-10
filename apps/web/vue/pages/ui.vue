@@ -1,22 +1,22 @@
 <script lang="ts">
 import { defineAsyncComponent } from "vue";
 
-const ColorsStory = defineAsyncComponent(
+const StoryColors = defineAsyncComponent(
 	() => import("~vue/stories/StoryColors.vue")
 );
-const TypographyStory = defineAsyncComponent(
+const StoryTypography = defineAsyncComponent(
 	() => import("~vue/stories/StoryTypography.vue")
 );
-const SidebarStory = defineAsyncComponent(
+const StorySidebar = defineAsyncComponent(
 	() => import("~vue/stories/StorySidebar.vue")
 );
 
 export default {
 	name: "UI",
 	components: {
-		ColorsStory,
-		TypographyStory,
-		SidebarStory,
+		StoryColors,
+		StoryTypography,
+		StorySidebar,
 	},
 };
 </script>
@@ -54,7 +54,7 @@ const route = useRoute();
 const props = defineProps(["dyncomponent"]);
 
 const load_component = computed(() => {
-	return capitalize(props.dyncomponent) + "Story";
+	return "Story" + capitalize(props.dyncomponent);
 });
 
 type List = {

@@ -1,46 +1,47 @@
 name: Rust CI
 
 on:
-  push:
-    branches:
-        - main
-        - 'feat/**'
-  pull_request:
-    branches:
-        - main
-        - 'feat/**'
+    push:
+        branches:
+            - main
+            - "feat/**"
+    pull_request:
+        branches:
+            - main
+            - "feat/**"
 
 env:
-  CARGO_TERM_COLOR: always
+    CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+    tooling:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
 
-    - name: mise à jour de la toolchain
-      run: |
-        rustup update
-        rustup install nightly
-        rustup default nightly
-        rustup component add clippy rustfmt
+            - name: mise à jour de la toolchain
+              run: |
+                  rustup update
+                  rustup install nightly
+                  rustup default nightly
+                  rustup component add clippy rustfmt
 
-    - name: information de la toolchain
-      run: |
-        cargo --version --verbose
-        rustc --version
-        cargo clippy --version
+            - name: information de la toolchain
+              run: |
+                  cargo --version --verbose
+                  rustc --version
+                  cargo clippy --version
 
-    - name: formatage & linter
-      run: |
-        cargo fmt -- --check
-        # dead_code : il est possible qu'il y ait du code non utilisé, ça n'a
-        #    pas d'importance. Le build enlève tout code mort de toute façon.
-        cargo clippy --workspace --all-targets -- -D warnings -A dead_code
+            - name: vérifier les en-têtes de licences des fichiers du projet
+              run: cargo run --release --bin check-license
 
-    - name: tests unitaires
-      run: cargo test --all --verbose
+            - name: formatage & linter
+              run: |
+                  cargo fmt -- --check
+                  # dead_code : il est possible qu'il y ait du code non utilisé,
+                  # ça n'a pas d'importance. Le build enlève tout code mort de
+                  # toute façon.
+                  cargo clippy --workspace --all-targets -- -D warnings -A dead_code
 
-    - name: vérifie les licences
-      run: cargo run --release --bin check-license
+            - name: tests unitaires
+              run: cargo test --all --verbose

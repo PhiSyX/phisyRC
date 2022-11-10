@@ -3,6 +3,7 @@
  * https://creativecommons.org/publicdomain/zero/1.0/
  */
 
+// Renommer ce fichier en setup-003.rs
 // Cet exemple montre l'utilisation du générique Async.
 
 // Exemple provenant de https://github.com/actix/actix-web/blob/master/actix-web/examples/on-connect.rs

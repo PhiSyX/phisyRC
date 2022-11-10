@@ -15,9 +15,9 @@ syn = { version = "^1.0", features = ["full"] }
 
 [dev-dependencies]
 env = { workspace = true }
-actix-web = { version = "^4.2" }
-cli = { workspace = true }                          #logger
+# actix-web = { version = "^4.2" } # setup-003.rs-actix
+cli = { workspace = true }                          # logger
 logger = { workspace = true }                       # logger
 setup = { workspace = true, features = ["logger"] } # logger
 terminal = { workspace = true }                     # logger
-tokio = { workspace = true }
+tokio = { workspace = true }                        # tous

@@ -122,7 +122,7 @@ numeric! { impl Numeric
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
 	| 205 <-> RPL_TRACEUSER { class, nick }
 		=> "User {class} {nick}"
-	/// **RFC 2812:** -> "Serv <class> <int>S <int>C <server> <nick!user|*!*>@<host|server> V<protocol version>"
+	/// **RFC 2812:** -> `Serv <class> <int>S <int>C <server> <nick!user|*!*>@<host|server> V<protocol version>`
 	///
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_200..210-261-262.md")]
 	| 206 <-> RPL_TRACESERVER {

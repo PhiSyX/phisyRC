@@ -1,0 +1,20 @@
+::-webkit-scrollbar {
+	background: transparent;
+	cursor: pointer;
+}
+
+::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	--scrollbar_bg: #1c6a97;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #2b5974;
+}
+
+::-webkit-scrollbar-thumb:active {
+	background: #185274;
+}

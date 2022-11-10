@@ -26,10 +26,17 @@
 		scroll-snap-type: y mandatory;
 	}
 
+	@include selector-class("scroll") {
+		@include selector-class-r("scroll:hidden") {
+			margin-bottom: -1px !important;
+			margin-right: -1px !important;
+		}
+	}
+
 	@include selector-class("scroll:x") {
 		width: 100%;
 		@extend .ov\:x;
-		&.scroll\:hidden {
+		@include selector-class-r("scroll:hidden") {
 			margin-bottom: -1px !important;
 		}
 	}
@@ -37,7 +44,7 @@
 	@include selector-class("scroll:y") {
 		height: 100%;
 		@extend .ov\:y;
-		&.scroll\:hidden {
+		@include selector-class-r("scroll:hidden") {
 			margin-right: -1px !important;
 		}
 	}

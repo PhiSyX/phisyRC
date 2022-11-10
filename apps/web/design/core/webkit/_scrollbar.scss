@@ -1,0 +1,36 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-webkit-scrollbar {
+	:root {
+		--scrollbar_size: 16px;
+	}
+
+	::-webkit-scrollbar {
+		width: var(--scrollbar_size);
+		height: var(--scrollbar_size);
+	}
+
+	::-webkit-scrollbar-thumb {
+		border: calc(var(--scrollbar_size) / 3) solid
+			var(--scrollbar_border_bg, transparent);
+		border-radius: 2px;
+		background: var(--scrollbar_bg, lightgray);
+		background-clip: padding-box !important;
+	}
+
+	@include selector-class("scroll:hidden") {
+		&::-webkit-scrollbar {
+			width: 0px !important;
+			height: 0px !important;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			border: 0 !important;
+			background: transparent !important;
+		}
+	}
+}

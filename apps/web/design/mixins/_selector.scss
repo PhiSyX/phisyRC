@@ -15,3 +15,9 @@
 		@content;
 	}
 }
+
+@mixin selector-class-r($selector) {
+	&.#{escape_selector($selector)} {
+		@content;
+	}
+}

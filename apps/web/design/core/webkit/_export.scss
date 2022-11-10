@@ -4,13 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "themes";
-@import "background";
-@import "font";
-@import "bases";
 @import "scrollbar";
-@import "elements";
 
-@import "login";
-@import "window";
-@import "sidebar";
+@mixin --use-webkit {
+	@include --use-webkit-scrollbar;
+}

@@ -39,21 +39,20 @@ let toggle$ = computed({
 <template>
 	<nav
 		role="navigation"
-		class="sidebar [ flex! h:full ]"
+		class="sidebar sidebar<svg> network [ flex! h:full scroll:y scroll:hidden ]"
 		:class="{
 			'is-opened': toggle,
 			'is-collapsed': !toggle,
 		}"
 	>
-		<ul
-			class="app:bg=secondary network network<server> [ flex:full ][ scroll:y scroll:hidden list:reset ]"
-		>
+		<div class="[ flex:full scroll:y scroll:hidden ]">
 			<SidebarList
 				v-for="server in servers"
 				v-bind="server"
 				:key="server.name"
+				v-model:folded="server.is_folded"
 			/>
-		</ul>
+		</div>
 
 		<footer class="sidebar__actions [ flex h=6 px=1 ]">
 			<Button

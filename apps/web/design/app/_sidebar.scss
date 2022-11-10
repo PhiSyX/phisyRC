@@ -4,6 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+@include selector-class("sidebar<svg>") {
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
 @include selector-class("sidebar__actions") {
 	@include --theme using ($name) {
 		@if $name == dark {
@@ -33,12 +40,86 @@
 
 		cursor: pointer;
 		user-select: none;
+
+		@include --theme using($name) {
+			@if $name == dark {
+				--focused_bg: var(--color-black);
+			} @else if $name == light {
+				--focused_bg: var(--color-white);
+			}
+		}
+	}
+
+	&.is-focused li[data-type="server"] {
+		background-color: var(--focused_bg);
+	}
+
+	&.is-folded {
+		> *:not(:first-child) {
+			display: none;
+		}
 	}
 }
 
 @include selector-class("network@server__actions") {
 	button {
 		padding: space(1);
+	}
+}
+
+@include selector-class("network@server@room") {
+	transition: background-color 200ms;
+
+	@include --theme using($name) {
+		@if $name == dark {
+			&:hover {
+				background-color: var(--focused_bg);
+			}
+		} @else if $name == light {
+			&:hover {
+				background-color: var(--color-snow);
+			}
+		}
+	}
+
+	&.is-active {
+		position: relative;
+		background-color: var(--focused_bg);
+	}
+
+	&.is-active {
+		&::before,
+		&::after {
+			content: "";
+
+			position: absolute;
+			display: inline-block;
+			pointer-events: none;
+			transition: background-color 200ms ease-in-out;
+
+			height: space(2);
+			width: space(2);
+		}
+
+		&::before {
+			top: -16px;
+			right: 0;
+			background: radial-gradient(
+				circle at 0 0,
+				transparent space(2),
+				var(--focused_bg) space(2)
+			);
+		}
+
+		&::after {
+			bottom: -16px;
+			right: 0;
+			background: radial-gradient(
+				circle at 0 100%,
+				transparent space(2),
+				var(--focused_bg) space(2)
+			);
+		}
 	}
 }
 

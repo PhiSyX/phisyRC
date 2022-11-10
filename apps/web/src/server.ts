@@ -24,5 +24,7 @@ export type Room = {
 
 export type Server = {
 	name: string;
+	is_focused: boolean;
+	is_folded: boolean;
 	rooms: Room[];
 };

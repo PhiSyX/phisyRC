@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { Room, Server } from "~/server";
 
 import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
@@ -32,14 +32,22 @@ let rooms: Room[] = [
 			},
 		},
 	},
-];
-
-let servers: Server[] = [
 	{
-		name: "localhost",
-		rooms,
+		name: "#channel",
+		type: "channel",
+		total_unread_message: 0,
+		active: false,
 	},
 ];
+
+let servers: Server[] = reactive([
+	{
+		name: "localhost",
+		is_focused: true,
+		is_folded: false,
+		rooms,
+	},
+]);
 </script>
 
 <template>

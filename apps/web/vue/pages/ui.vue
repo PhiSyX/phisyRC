@@ -2,13 +2,13 @@
 import { defineAsyncComponent } from "vue";
 
 const ColorsStory = defineAsyncComponent(
-	() => import("~vue/stories/Colors.vue")
+	() => import("~vue/stories/StoryColors.vue")
 );
 const TypographyStory = defineAsyncComponent(
-	() => import("~vue/stories/Typography.vue")
+	() => import("~vue/stories/StoryTypography.vue")
 );
 const SidebarStory = defineAsyncComponent(
-	() => import("~vue/stories/Sidebar.vue")
+	() => import("~vue/stories/StorySidebar.vue")
 );
 
 export default {

@@ -105,3 +105,21 @@
 		}
 	}
 }
+
+@include selector-class("app:bg=design-system") {
+	background: conic-gradient(
+		rgba(var(--bg), 0.6) 25%,
+		rgba(var(--bg), 0.65) 0deg 50%,
+		rgba(var(--bg), 0.6) 0deg 75%,
+		rgba(var(--bg), 0.65) 0deg
+	);
+	background-size: 25px 25px;
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: var(--color-light-bluea700_rgb);
+		} @else if $name == light {
+			--bg: var(--color-light-blue900_rgb);
+		}
+	}
+}

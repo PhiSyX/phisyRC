@@ -212,7 +212,9 @@ let application: List[] = [
 					{{ load_component }}
 				</h1>
 
-				<section class="[ flex:full ]">
+				<section
+					class="app:bg=design-system [ flex:full border:radius=2 ]"
+				>
 					<component :is="load_component">
 						Sélectionner un composant
 					</component>

@@ -51,7 +51,7 @@ let servers: Server[] = reactive([
 </script>
 
 <template>
-	<section class="[ flex gap=8 ]">
+	<section class="[ flex gap=4 p=1 ]">
 		<div
 			class="window@navigation [ resizable:x ]"
 			:style="{
@@ -76,8 +76,22 @@ let servers: Server[] = reactive([
 @import "design/functions";
 @import "design/mixins";
 
-div {
+.window\@navigation {
 	max-width: 320px;
 	height: 500px;
+
+	@include --theme using($name) {
+		@if $name == dark {
+			background: linear-gradient(180deg, #31363a 0%, #282c2f 100%),
+				#31363a;
+		} @else if $name == light {
+			background: linear-gradient(
+					180deg,
+					var(--color-grey50) 0%,
+					var(--color-indigo50) 100%
+				),
+				var(--color-grey50);
+		}
+	}
 }
 </style>

@@ -10,7 +10,8 @@
 		"build": "pnpm run wasm:build && vue-tsc && vite build",
 		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../assets/wasm",
 		"check:fmt": "rome format src std types vue",
-		"test:unit": "vitest",
+		"test:unit:watch": "vitest",
+		"test:unit": "vitest run",
 		"test:unit-coverage": "vitest run --coverage"
 	},
 	"dependencies": {

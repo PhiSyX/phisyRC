@@ -7,6 +7,9 @@ const StoryColors = defineAsyncComponent(
 const StoryTypography = defineAsyncComponent(
 	() => import("~vue/stories/StoryTypography.vue")
 );
+const StoryUtilities = defineAsyncComponent(
+	() => import("~vue/stories/StoryUtilities.vue")
+);
 const StorySidebar = defineAsyncComponent(
 	() => import("~vue/stories/StorySidebar.vue")
 );
@@ -16,6 +19,7 @@ export default {
 	components: {
 		StoryColors,
 		StoryTypography,
+		StoryUtilities,
 		StorySidebar,
 	},
 };
@@ -72,6 +76,10 @@ let general = [
 	{
 		text: "Typographie",
 		link: "/ui/typography",
+	},
+	{
+		text: "Utilitaires",
+		link: "/ui/utilities",
 	},
 ];
 

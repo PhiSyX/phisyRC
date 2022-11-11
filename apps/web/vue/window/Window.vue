@@ -8,6 +8,8 @@ export default {
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
+import type { Server } from "~/server";
+
 import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
 
 let route = useRoute();
@@ -16,6 +18,7 @@ const has_meta_sidebar = route.meta["sidebar"];
 
 type Props = {
 	sidebar: boolean;
+	servers: Server[];
 };
 
 const props = defineProps<Props>();
@@ -36,17 +39,16 @@ let sidebar$ = computed({
 	<div class="window [ flex size:full border:radius=1 ]">
 		<section
 			v-if="has_meta_sidebar"
-			class="window@navigation [ scroll:y scroll:hidden ]"
+			class="window@navigation [ resizable:x ]"
 			:class="{
 				'is-opened': sidebar,
 				'is-collapsed': !sidebar,
 			}"
 			:style="{
-				// width: sidebar ? 'max-content' : 'var(--nav-min-w)',
-				width: sidebar ? '500px' : 'var(--nav-min-w)',
+				width: sidebar ? 'max-content' : 'var(--nav-min-w)',
 			}"
 		>
-			<SidebarLayout v-model:toggle="sidebar$" />
+			<SidebarLayout v-model:toggle="sidebar$" :servers="servers" />
 		</section>
 
 		<main

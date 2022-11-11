@@ -6,10 +6,11 @@
 .vscode/*
 .phisyrc/*
 
-dist
-dist-ssr
+dist/
+dist-ssr/
 node_modules/
 target/
+coverage/
 
 *.lock
 *-lock.yaml
@@ -17,3 +18,4 @@ target/
 .env
 .env.local
 .env.*.local
+

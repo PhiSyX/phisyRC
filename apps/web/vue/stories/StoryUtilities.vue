@@ -2,7 +2,7 @@
 
 <template>
 	<div id="design-system--utilities" class="[ size:full scroll:y ]">
-		<article>
+		<article class="pb=3">
 			<h1 id="utilities">Utilitaires</h1>
 
 			<p>
@@ -130,6 +130,39 @@
 			<ul>
 				<li class="border:radius=full">
 					<strong>.border:radius=</strong><code>full</code>
+				</li>
+			</ul>
+
+			<h3 id="backgrounds-box-shadow">Box shadow</h3>
+			<p>
+				Les classes utilitaires suivantes font références à la propriété
+				CSS
+				<code>box-shadow</code> (<code>.box:shadow</code>) ou
+				<code>filter: drop-shadow</code> (<code>.box-fd:shadow</code>)
+			</p>
+
+			<p>Exemples</p>
+			<ul>
+				<li class="size=15 [ box:shadow ]">.box:shadow</li>
+			</ul>
+			<ul class="list:reset gap=2 flex">
+				<li
+					class="size=20"
+					style="
+						background-image: var(--logo);
+						background-size: cover;
+					"
+				>
+					sans .box-fd:shadow
+				</li>
+				<li
+					class="size=20 [ box-fd:shadow ]"
+					style="
+						background-image: var(--logo);
+						background-size: cover;
+					"
+				>
+					avec .box-fd:shadow
 				</li>
 			</ul>
 		</article>

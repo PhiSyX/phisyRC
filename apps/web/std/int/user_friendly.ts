@@ -31,3 +31,26 @@ function to_user_friendly(n: isize): str {
 // ------ //
 
 export { to_user_friendly };
+
+// ---- //
+// Test //
+// ---- //
+
+if (import.meta.vitest) {
+	const { it, expect } = import.meta.vitest;
+
+	it("to_user_friendly", () => {
+		expect(to_user_friendly(0)).toBe("0");
+		expect(to_user_friendly(1)).toBe("1");
+		expect(to_user_friendly(150)).toBe("150");
+
+		expect(to_user_friendly(1500)).toBe("1.5k");
+		expect(to_user_friendly(1542)).toBe("1.54k");
+		expect(to_user_friendly(1549)).toBe("1.55k");
+
+		expect(to_user_friendly(15490)).toBe("15.49k");
+		expect(to_user_friendly(154900)).toBe("154.9k");
+		expect(to_user_friendly(1549000)).toBe("1.55m");
+		expect(to_user_friendly(15490000)).toBe("15.49m");
+	});
+}

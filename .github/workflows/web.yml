@@ -30,7 +30,7 @@ jobs:
             - name: Installation des dépendances
               run: pnpm install
             - name: Vérifier le formatage
-              run: pnpm run check:fmt
+              run: pnpm web check:fmt
 
     tests:
         runs-on: ubuntu-latest

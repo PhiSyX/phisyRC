@@ -29,7 +29,27 @@ function capitalize(s: str): string {
 		return algo(s);
 	}
 
-	return s.split(SEPARATOR).map(algo).join("");
+	return s.split(SEPARATOR).filter(Boolean).map(algo).join("");
 }
 
+// ------ //
+// Export //
+// ------ //
+
 export { capitalize };
+
+// ---- //
+// Test //
+// ---- //
+
+if (import.meta.vitest) {
+	const { it, expect } = import.meta.vitest;
+
+	it("capitalize", () => {
+		expect(capitalize("")).toBe("");
+		expect(capitalize("h")).toBe("H");
+		expect(capitalize("hello ")).toBe("Hello ");
+		expect(capitalize("hello world")).toBe("Hello World");
+		expect(capitalize("HELLO WORLD")).toBe("Hello World");
+	});
+}

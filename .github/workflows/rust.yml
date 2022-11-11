@@ -14,34 +14,53 @@ env:
     CARGO_TERM_COLOR: always
 
 jobs:
-    tooling:
+    check_license_source:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
 
-            - name: mise à jour de la toolchain
-              run: |
-                  rustup update
-                  rustup install nightly
-                  rustup default nightly
-                  rustup component add clippy rustfmt
-
-            - name: information de la toolchain
-              run: |
-                  cargo --version --verbose
-                  rustc --version
-                  cargo clippy --version
+            - name: configure la toolchain et le cache de Rust
+              uses: actions-rust-lang/setup-rust-toolchain@v1.3.4
 
             - name: vérifier les en-têtes de licences des fichiers du projet
-              run: cargo run --release --bin check-license
+              uses: actions-rs/cargo@v1.0.1
+              with:
+                  command: run
+                  args: --release --bin check-license
 
-            - name: formatage & linter
-              run: |
-                  cargo fmt -- --check
+    fmt_lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: configure la toolchain et le cache de Rust
+              uses: actions-rust-lang/setup-rust-toolchain@v1.3.4
+
+            - name: formatage
+              uses: actions-rs/cargo@v1.0.1
+              with:
+                  command: fmt
+                  args: --all -- --check
+
+            - name: linter
+              uses: actions-rs/cargo@v1.0.1
+              with:
+                  command: clippy
                   # dead_code : il est possible qu'il y ait du code non utilisé,
                   # ça n'a pas d'importance. Le build enlève tout code mort de
                   # toute façon.
-                  cargo clippy --workspace --all-targets -- -D warnings -A dead_code
+                  args: --workspace --all-targets -- -D warnings -A dead_code
+
+    tests:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+
+            - name: configure la toolchain et le cache de Rust
+              uses: actions-rust-lang/setup-rust-toolchain@v1.3.4
 
             - name: tests unitaires
-              run: cargo test --all --verbose
+              uses: actions-rs/cargo@v1.0.1
+              with:
+                  command: test
+                  args: --all --verbose

@@ -141,13 +141,14 @@ impl Analyzer {
 					);
 				}
 
-				if let Meta::NameValue(nv) = meta &&
-				   let Lit::Str(lit_str) = &nv.lit {
-					return self.handle_attribute(
-						meta,
-						&nv.path,
-						lit_str.value(),
-					);
+				if let Meta::NameValue(nv) = meta {
+					if let Lit::Str(lit_str) = &nv.lit {
+						return self.handle_attribute(
+							meta,
+							&nv.path,
+							lit_str.value(),
+						);
+					}
 				}
 			}
 

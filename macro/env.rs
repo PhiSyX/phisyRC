@@ -128,16 +128,18 @@ impl Analyzer {
 	) -> Result<TokenStream2> {
 		let field_ident = &field.ident;
 
-		if let syn::Type::Path(type_path) = &field.ty &&
-		   let Some(first_ident) = type_path.path.segments.first()
-		                                            .map(|fs| &fs.ident) &&
-		   first_ident == "Option"
-		{
-			let struct_ident = &self.input.ident;
+		if let syn::Type::Path(type_path) = &field.ty {
+			if let Some(first_ident) =
+				type_path.path.segments.first().map(|fs| &fs.ident)
+			{
+				if first_ident == "Option" {
+					let struct_ident = &self.input.ident;
 
-			return Ok(quote! {
-				#field_ident: #struct_ident::get_optional_var(#token_stream)?
-			});
+					return Ok(quote! {
+						#field_ident: #struct_ident::get_optional_var(#token_stream)?
+					});
+				}
+			}
 		}
 
 		let struct_ident = &self.input.ident;

@@ -97,6 +97,41 @@
 				<li class="gap=12"><strong>.gap=</strong><code>12</code></li>
 				<li class="gap=20"><strong>.gap=</strong><code>20</code></li>
 			</ul>
+
+			<h2 id="backgrounds">Arrière-plan</h2>
+
+			<h3 id="backgrounds-corners">Border radius</h3>
+			<p>
+				Les classes utilitaires suivantes font références à la propriété
+				CSS
+				<code>border-radius</code> (<code>.border:radius=#</code>). Ici
+				<code>#</code> correspond à un nombre de 0 à 20.
+			</p>
+
+			<p>Exemples:</p>
+			<ul>
+				<li class="border:radius=3">
+					<strong>.border:radius=</strong><code>3</code>
+				</li>
+				<li class="border-t:radius=6">
+					<strong>.border-t:radius=</strong><code>6</code>
+				</li>
+				<li class="border-r:radius=9">
+					<strong>.border-r:radius=</strong><code>9</code>
+				</li>
+				<li class="border-b:radius=12">
+					<strong>.border-b:radius=</strong><code>12</code>
+				</li>
+				<li class="border-l:radius=16">
+					<strong>.border-l:radius=</strong><code>16</code>
+				</li>
+			</ul>
+
+			<ul>
+				<li class="border:radius=full">
+					<strong>.border:radius=</strong><code>full</code>
+				</li>
+			</ul>
 		</article>
 	</div>
 </template>

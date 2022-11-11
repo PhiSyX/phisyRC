@@ -8,6 +8,7 @@
 use std::io::{self, BufRead};
 
 struct AppClient {
+	#[allow(dead_code)]
 	inner: network::Client<Self>,
 }
 

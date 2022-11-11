@@ -243,12 +243,12 @@ impl From<bytes::BytesMut> for IncomingPacket {
 				l
 			});
 			v.push(b'\n');
-			return Self::Bin(v);
+			Self::Bin(v)
 		} else {
 			let mut v = b.to_vec();
 			v.push(b'\r');
 			v.push(b'\n');
-			return Self::Bin(b.to_vec());
+			Self::Bin(b.to_vec())
 		}
 	}
 }

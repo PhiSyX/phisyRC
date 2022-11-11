@@ -13,7 +13,7 @@ let rooms: Room[] = [
 		name: "#channel (message)",
 		active: false,
 		highlight: false,
-		total_unread_message: 154,
+		total_unread_message: 1542,
 		total_unread_event: 2,
 	},
 	{

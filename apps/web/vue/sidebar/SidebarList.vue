@@ -17,6 +17,7 @@ import Button from "~vue/components/Button.vue";
 import { computed, ref } from "vue";
 
 import type { Server } from "~/server";
+import { to_user_friendly } from "std/int/user_friendly";
 
 type Props = {
 	name: Server["name"];
@@ -93,10 +94,14 @@ let folded$ = computed({
 
 			<div class="network@server@room__actions [ flex f:center gap=1 ]">
 				<div
-					v-if="room.total_unread_message"
+					v-if="room.total_unread_message || room.total_unread_event"
 					class="network@server@room__total-unread-message [ h=3 px=1 align-t:center border:radius=3 ]"
 				>
-					{{ room.total_unread_message }}
+					{{
+						to_user_friendly(
+							room.total_unread_message || room.total_unread_event
+						)
+					}}
 				</div>
 
 				<Button class="network@server@room:close">

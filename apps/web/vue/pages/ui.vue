@@ -116,97 +116,99 @@ let application: List[] = [
 <template>
 	<div id="ui-page" class="[ flex size:full gap=1 p=1 ]">
 		<nav class="[ flex! p=1 border:radius=1 f-family=roboto ]">
-			<p class="[ align-t:center text:bold ]">
+			<h1 class="[ heading=6 align-t:center ]">
 				Design System pour phisyRC
-			</p>
+			</h1>
 
-			<details open>
-				<summary class="[ pl=1 pb=1 ]">Général</summary>
+			<aside class="[ flex:full scroll:y scroll:hidden ]">
+				<details open>
+					<summary class="[ pl=1 pb=1 ]">Général</summary>
 
-				<ul class="[ flex! gap=1 list:reset ]">
-					<li
-						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-						v-for="item in general"
-						:class="{
-							active: item.link == route.fullPath,
-						}"
-					>
-						<component :is="item.icon" width="20" height="20" />
+					<ul class="[ flex! gap=1 list:reset ]">
+						<li
+							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+							v-for="item in general"
+							:class="{
+								active: item.link == route.fullPath,
+							}"
+						>
+							<component :is="item.icon" width="20" height="20" />
 
-						<span class="[ flex:full ]">{{ item.text }}</span>
+							<span class="[ flex:full ]">{{ item.text }}</span>
 
-						<RouterLink
-							v-if="item.link"
-							:to="item.link"
-							class="pos-a:full"
-						></RouterLink>
-					</li>
-				</ul>
-			</details>
+							<RouterLink
+								v-if="item.link"
+								:to="item.link"
+								class="pos-a:full"
+							></RouterLink>
+						</li>
+					</ul>
+				</details>
 
-			<details open>
-				<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>
+				<details open>
+					<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>
 
-				<ul class="[ flex! gap=1 list:reset ]">
-					<li
-						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-						v-for="item in components"
-						:class="{
-							active: item.link == route.fullPath,
-						}"
-					>
-						<component :is="item.icon" width="20" height="20" />
+					<ul class="[ flex! gap=1 list:reset ]">
+						<li
+							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+							v-for="item in components"
+							:class="{
+								active: item.link == route.fullPath,
+							}"
+						>
+							<component :is="item.icon" width="20" height="20" />
 
-						<span class="[ flex:full ]">{{ item.text }}</span>
+							<span class="[ flex:full ]">{{ item.text }}</span>
 
-						<RouterLink
-							v-if="item.link"
-							:to="item.link"
-							class="pos-a:full"
-						></RouterLink>
-					</li>
-				</ul>
-			</details>
+							<RouterLink
+								v-if="item.link"
+								:to="item.link"
+								class="pos-a:full"
+							></RouterLink>
+						</li>
+					</ul>
+				</details>
 
-			<details open>
-				<summary class="[ pl=1 pb=1 ]">Application</summary>
+				<details open>
+					<summary class="[ pl=1 pb=1 ]">Application</summary>
 
-				<ul class="[ flex! gap=1 list:reset scroll:y ]">
-					<li
-						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-						v-for="item in application"
-					>
-						<span class="[ flex:full ]">{{ item.text }}</span>
+					<ul class="[ flex! gap=1 list:reset scroll:y ]">
+						<li
+							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+							v-for="item in application"
+						>
+							<span class="[ flex:full ]">{{ item.text }}</span>
 
-						<RouterLink
-							v-if="item.link"
-							:to="item.link"
-							class="pos-a:full"
-						></RouterLink>
-					</li>
-				</ul>
-			</details>
+							<RouterLink
+								v-if="item.link"
+								:to="item.link"
+								class="pos-a:full"
+							></RouterLink>
+						</li>
+					</ul>
+				</details>
 
-			<details>
-				<summary class="[ pl=1 pb=1 ]">Les icônes</summary>
+				<details>
+					<summary class="[ pl=1 pb=1 ]">Les icônes</summary>
 
-				<ul class="[ flex! gap=1 list:reset scroll:y ]">
-					<li
-						class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-						v-for="item in icons"
-					>
-						<component :is="item.icon" width="20" height="20" />
+					<ul class="[ flex! gap=1 list:reset scroll:y ]">
+						<li
+							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
+							v-for="item in icons"
+						>
+							<component :is="item.icon" width="20" height="20" />
 
-						<span class="[ flex:full ]">{{ item.text }}</span>
+							<span class="[ flex:full ]">{{ item.text }}</span>
 
-						<RouterLink
-							v-if="item.link"
-							:to="item.link"
-							class="pos-a:full"
-						></RouterLink>
-					</li>
-				</ul>
-			</details>
+							<RouterLink
+								v-if="item.link"
+								:to="item.link"
+								class="pos-a:full"
+							></RouterLink>
+						</li>
+					</ul>
+				</details>
+			</aside>
 		</nav>
 
 		<main
@@ -221,7 +223,7 @@ let application: List[] = [
 				</h1>
 
 				<section
-					class="app:bg=design-system [ flex:full border:radius=2 ]"
+					class="app:bg=design-system [ flex:full scroll:y border:radius=2 ]"
 				>
 					<component :is="load_component">
 						Sélectionner un composant

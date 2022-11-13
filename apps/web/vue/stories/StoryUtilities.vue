@@ -87,8 +87,9 @@
 				CSS
 				<code>gap</code> ou <code>grid-gap</code> (<code>.gap=#</code>).
 				Ici <code>#</code> correspond à une unité (nombre) de 0 à 20.
-				Chaque unité correspond environs à <code>1rem</code>, mais cela
-				dépendra en réalité de la variable CSS <code>--space</code>.
+				Chaque unité correspond environs à <code>0.5rem</code>, mais
+				cela dépendra en réalité de la variable CSS
+				<code>--space</code>.
 			</p>
 
 			<p>Exemples:</p>
@@ -164,6 +165,22 @@
 				>
 					avec .box-fd:shadow
 				</li>
+			</ul>
+
+			<h2 id="box">Box</h2>
+			<p>
+				Les classes utilitaires suivantes font références à la propriété
+				CSS
+				<code>margin/padding</code>
+				(<code>.m=#</code>/<code>.p=#</code>). Ici
+				<code>#</code> correspond à une unité (nombre) de 0 à 20. Chaque
+				unité correspond environs à <code>0.5rem</code>, mais cela
+				dépendra en réalité de la variable CSS <code>--space</code>.
+			</p>
+
+			<ul>
+				<li class="m=4" style="background: red">m=4</li>
+				<li class="p=2" style="background: red">p=2</li>
 			</ul>
 		</article>
 	</div>

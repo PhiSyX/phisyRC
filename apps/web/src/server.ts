@@ -17,8 +17,8 @@ export type Message = {
 export type Room = {
 	type: "channel" | "private" | "custom-window";
 	name: string;
-	active: boolean;
-	highlight: boolean;
+	is_active: boolean;
+	is_highlighted: boolean;
 	total_unread_event: number;
 	total_unread_message: number;
 	last_message?: Message;

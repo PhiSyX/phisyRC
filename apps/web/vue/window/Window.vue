@@ -23,7 +23,7 @@ type Props = {
 
 const props = defineProps<Props>();
 
-let emit = defineEmits(["update:sidebar"]);
+const emit = defineEmits(["update:sidebar"]);
 
 let sidebar$ = computed({
 	get() {

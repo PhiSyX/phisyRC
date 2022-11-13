@@ -5,14 +5,14 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { Server } from "~/server";
+
+import { computed } from "vue";
+
 import IconArrowLeft from "~vue/assets/icons/IconArrowLeft.vue";
 import IconArrowRight from "~vue/assets/icons/IconArrowRight.vue";
 import IconMessages from "~vue/assets/icons/IconMessages.vue";
 import IconSettings from "~vue/assets/icons/IconSettings.vue";
-
-import { computed } from "vue";
-
-import type { Server } from "~/server";
 
 import Button from "~vue/components/Button.vue";
 import SidebarList from "./SidebarList.vue";
@@ -24,7 +24,7 @@ type Props = {
 
 const props = defineProps<Props>();
 
-let emit = defineEmits(["update:toggle"]);
+const emit = defineEmits(["update:toggle"]);
 
 let toggle$ = computed({
 	get() {

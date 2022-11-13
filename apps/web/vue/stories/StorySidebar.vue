@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
-import { Room, Server } from "~/server";
+
+import type { Room, Server } from "~/server";
 
 import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
+import SidebarItem from "~vue/sidebar/SidebarItem.vue";
 
 let sidebar1 = ref(false);
 let sidebar2 = ref(true);
@@ -73,6 +75,16 @@ let servers: Server[] = reactive([
 
 <template>
 	<section class="[ flex gap=4 p=1 ]">
+		<div class="network<server>" style="width: 200px">
+			<SidebarItem type="channel" name="#channel" />
+
+			<SidebarItem
+				type="private"
+				name="Private"
+				:last_message="servers[0].rooms[1].last_message!"
+			/>
+		</div>
+
 		<div
 			class="window@navigation [ resizable:x ]"
 			:style="{

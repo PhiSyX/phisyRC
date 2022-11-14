@@ -342,6 +342,21 @@ numeric! { impl Numeric
 	| 369 <-> RPL_ENDOFWHOWAS { nick }
 		=> "{nick} :End of WHOWAS"
 
+
+	/// Les réponses `RPL_LISTSTART`, `RPL_LIST`, `RPL_LISTEND` indiquent le
+	/// début, les réponses effectives avec des données et la fin de la réponse
+	/// du serveur à une commande `LIST`.  S'il n'y a aucun salon disponible à
+	/// retourner, seules les réponses de début et la réponse de fin doivent
+	/// être envoyées.
+	| 321 <-> RPL_LISTSTART
+		=> "Channel :Users Name"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_322-323.md")]
+	| 322 <-> RPL_LIST { channel, nb_channels_visible, topic }
+		=> "{channel} {nb_channels_visible} :{topic}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_322-323.md")]
+	| 323 <-> RPL_LISTEND
+		=> ":End of LIST"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

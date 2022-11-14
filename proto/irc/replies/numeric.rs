@@ -408,6 +408,22 @@ numeric! { impl Numeric
 	| 351 <-> RPL_VERSION { version, debuglevel, server, comments }
 		=> "{version}.{debuglevel} {server} :{comments}"
 
+	/// "`<channel> <user> <host> <server> <nick> ( "H" / "G" ) ["*"] [ ( "@" / "+" ) ] :<hopcount> <real name>`"
+	///
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_352-315.md")]
+	| 352 <-> RPL_WHOREPLY {
+		channel,
+		user, host,
+		server,
+		nick,
+		unknown,
+		hopcount,
+		real_name
+	} => "{channel} {user} {host} {server} {nick} {unknown} :{hopcount} {real_name}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_352-315.md")]
+	| 315 <-> RPL_ENDOFWHO { name }
+		=> "{name} :End of WHO list"
+
 	/// Envoyé par le serveur à un service en cas d'enregistrement réussi.
 	| 383 <-> RPL_YOURESERVICE { servicename }
 		=> "You are service {servicename}"

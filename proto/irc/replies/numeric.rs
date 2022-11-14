@@ -359,6 +359,13 @@ numeric! { impl Numeric
 	| 325 <-> RPL_UNIQOPIS { channel, nickname }
 		=> "{channel} {nickname}"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_346-347.md")]
+	| 346 <-> RPL_INVITELIST { channel, invite_mask }
+		=> "{channel} {invite_mask}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_346-347.md")]
+	| 347 <-> RPL_ENDOFINVITELIST { channel }
+		=> "{channel} :End of channel invite list"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

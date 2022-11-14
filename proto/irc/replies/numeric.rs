@@ -378,6 +378,11 @@ numeric! { impl Numeric
 	| 341 <-> RPL_INVITING { channel, nick }
 		=> "{channel} {nick}"
 
+	/// Renvoyé par un serveur répondant à un message `SUMMON` pour indiquer
+	/// qu'il convoque cet utilisateur.
+	| 342 <-> RPL_SUMMONING { user }
+		=> "{user} :Summoning user to IRC"
+
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_346-347.md")]
 	| 346 <-> RPL_INVITELIST { channel, invite_mask }
 		=> "{channel} {invite_mask}"

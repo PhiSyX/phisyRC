@@ -397,6 +397,17 @@ numeric! { impl Numeric
 	| 349 <-> RPL_ENDOFEXCEPTLIST { channel }
 		=> "{channel} :End of channel exception list"
 
+	/// Réponse du serveur indiquant les détails de sa version.
+	///
+	/// La `<version>` est la version du logiciel utilisé (y compris les
+	/// éventuelles révisions du niveau de patch) et le `<debuglevel>` est
+	/// utilisé pour indiquer si le serveur fonctionne en "mode débogage".
+	///
+	/// Le champ `<comments>` peut contenir tout commentaire sur la version ou
+	/// d'autres détails sur la version.
+	| 351 <-> RPL_VERSION { version, debuglevel, server, comments }
+		=> "{version}.{debuglevel} {server} :{comments}"
+
 	/// Envoyé par le serveur à un service en cas d'enregistrement réussi.
 	| 383 <-> RPL_YOURESERVICE { servicename }
 		=> "You are service {servicename}"

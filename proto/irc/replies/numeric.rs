@@ -356,6 +356,8 @@ numeric! { impl Numeric
 	| 323 <-> RPL_LISTEND
 		=> ":End of LIST"
 
+	| 324 <-> RPL_CHANNELMODEIS { channel, modes, modeparams }
+		=> "{channel} {modes} {modeparams}"
 	| 325 <-> RPL_UNIQOPIS { channel, nickname }
 		=> "{channel} {nickname}"
 

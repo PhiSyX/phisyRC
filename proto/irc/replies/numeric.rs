@@ -366,6 +366,13 @@ numeric! { impl Numeric
 	| 347 <-> RPL_ENDOFINVITELIST { channel }
 		=> "{channel} :End of channel invite list"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_348-349.md")]
+	| 348 <-> RPL_EXCEPTLIST { channel, exception_mask }
+		=> "{channel} {exception_mask}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_348-349.md")]
+	| 349 <-> RPL_ENDOFEXCEPTLIST { channel }
+		=> "{channel} :End of channel exception list"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

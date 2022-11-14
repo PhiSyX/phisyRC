@@ -373,6 +373,11 @@ numeric! { impl Numeric
 	| 333 <-> RPL_TOPICWHOTIME { channel, nick, setat }
 		=> "{channel} {nick} {setat}"
 
+	/// Renvoyé par le serveur pour indiquer que la tentative de message
+	/// `INVITE` a réussi et est transmis au client final.
+	| 341 <-> RPL_INVITING { channel, nick }
+		=> "{channel} {nick}"
+
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_346-347.md")]
 	| 346 <-> RPL_INVITELIST { channel, invite_mask }
 		=> "{channel} {invite_mask}"

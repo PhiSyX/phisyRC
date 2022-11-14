@@ -373,6 +373,10 @@ numeric! { impl Numeric
 	| 349 <-> RPL_ENDOFEXCEPTLIST { channel }
 		=> "{channel} :End of channel exception list"
 
+	/// Envoyé par le serveur à un service en cas d'enregistrement réussi.
+	| 383 <-> RPL_YOURESERVICE { servicename }
+		=> "You are service {servicename}"
+
 	// ------- //
 	// Erreurs //
 	// ------- //

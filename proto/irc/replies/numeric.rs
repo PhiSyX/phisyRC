@@ -424,6 +424,18 @@ numeric! { impl Numeric
 	| 315 <-> RPL_ENDOFWHO { name }
 		=> "{name} :End of WHO list"
 
+	/// "`( "=" / "*" / "@" ) <channel> :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )`"
+	///
+	/// "`@`" est utilisé pour les salons secrets, "`*`" pour les salons
+	/// privés et "`=`" pour les autres (salons publics).
+	///
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_353-366.md")]
+	| 353 <-> RPL_NAMREPLY { symbol, channel, nicks_with_symbol }
+		=> "{symbol} {channel} :{nicks_with_symbol}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_353-366.md")]
+	| 366 <-> RPL_ENDOFNAMES { channel }
+		=> "{channel} :End of NAMES list"
+
 	/// Envoyé par le serveur à un service en cas d'enregistrement réussi.
 	| 383 <-> RPL_YOURESERVICE { servicename }
 		=> "You are service {servicename}"

@@ -436,6 +436,13 @@ numeric! { impl Numeric
 	| 366 <-> RPL_ENDOFNAMES { channel }
 		=> "{channel} :End of NAMES list"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_364-365.md")]
+	| 364 <-> RPL_LINKS { mask, server, hopcount, server_info }
+		=> "{mask} {server} :{hopcount} {server_info}"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_364-365.md")]
+	| 365 <-> RPL_ENDOFLINKS { mask }
+		=> "{mask} :End of LINKS list"
+
 	/// Envoyé par le serveur à un service en cas d'enregistrement réussi.
 	| 383 <-> RPL_YOURESERVICE { servicename }
 		=> "You are service {servicename}"

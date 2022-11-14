@@ -361,6 +361,18 @@ numeric! { impl Numeric
 	| 325 <-> RPL_UNIQOPIS { channel, nickname }
 		=> "{channel} {nickname}"
 
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_331-332.md")]
+	| 331 <-> RPL_NOTOPIC { channel }
+		=> "{channel} :No topic is set"
+	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_331-332.md")]
+	| 332 <-> RPL_TOPIC { channel, topic }
+		=> "{channel} :{topic}"
+	/// Envoyé à un client pour lui faire savoir qui a défini le sujet
+	/// (`<nick>`) et quand il l'a défini (`<setat>` est un timestamp unix).
+	/// Envoyé après `RPL_TOPIC`.
+	| 333 <-> RPL_TOPICWHOTIME { channel, nick, setat }
+		=> "{channel} {nick} {setat}"
+
 	#[doc = include_str!("../../../docs/protocols/irc/replies/RPL_346-347.md")]
 	| 346 <-> RPL_INVITELIST { channel, invite_mask }
 		=> "{channel} {invite_mask}"

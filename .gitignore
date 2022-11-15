@@ -13,7 +13,7 @@ target/
 coverage/
 
 *.lock
-!Cargo.lock
+*-lock.yaml
 
 .env
 .env.local

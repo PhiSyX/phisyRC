@@ -1,0 +1,12 @@
+Ce répertoire contient quelques outils Git utiles.
+
+pre-push
+========
+
+Ce hook permet simplement de vérifier la présence de warnings et de formatage
+avec les commandes cargo.
+
+Pour installer ce hook, nous devons créer un lien symbolique ou le déplacer vers
+le répertoire .git/hooks à la racine de ce projet.
+
+  ln -s $(pwd)/hooks/pre-push $(git rev-parse --git-dir)/hooks

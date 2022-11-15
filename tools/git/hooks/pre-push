@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -eu
+
+echo " /!\ Commandes de PRE-PUSH /!\ "
+
+if ! cargo clippy --workspace --all-targets -- -D warnings -A dead_code
+then
+	echo "N'oublions surtout pas de corriger les warnings de \`cargo clippy\`."
+    exit 1
+fi
+
+if ! cargo fmt --check
+then
+	echo "N'oublions surtout pas de formatter le code avec \`cargo fmt\`."
+    exit 1
+fi
+
+exit 0

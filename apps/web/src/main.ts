@@ -12,7 +12,7 @@ import { ExitCode } from "@phisyrc/std/process";
 import { error, info, trace, warn, LogLevel, dbg } from "./logger";
 
 import { UI } from "./app";
-import Vue from "../vue/app";
+import Vue from "~vue/app";
 
 const LOG_LEVEL: LogLevel = import.meta.env.DEV
 	? LogLevel.Trace

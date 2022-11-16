@@ -7,7 +7,7 @@ export default {
 <script lang="ts" setup>
 import type { Room } from "~/server";
 
-import { to_user_friendly } from "std/int/user_friendly";
+import { to_user_friendly } from "@phisyrc/std/int/user_friendly";
 
 import IconRoomClose from "~vue/assets/icons/IconCross.vue";
 import IconRoomMessageEmpty from "~vue/assets/icons/IconMessageEmpty.vue";

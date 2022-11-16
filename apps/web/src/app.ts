@@ -7,7 +7,7 @@
 import type { Route } from "./routes";
 
 import { ROUTES } from "./routes";
-import { Option, Some } from "../std/option";
+import { Option, Some } from "@phisyrc/std/option";
 
 // ---- //
 // Type //
@@ -97,6 +97,18 @@ class App<T extends SetupInterface> {
 
 		return Some(selector);
 	}
+}
+
+// ---- //
+// Test //
+// ---- //
+
+if (import.meta.vitest) {
+	const { it, expect } = import.meta.vitest;
+
+	it("est-ce que ça fonctionne?", () => {
+		expect(1 + 1).toBe(2);
+	});
 }
 
 // ------ //

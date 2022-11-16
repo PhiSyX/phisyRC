@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Option } from "std/option";
+import type { Option } from "@phisyrc/std/option";
 
 /// Focus le bouton d'ajout de salon lors du click sur l'champ de recherche
 /// ou lors de l'appui des touches du clavier.
@@ -16,8 +16,7 @@ function focus_button_channel(
 		return;
 	}
 
-	// @ts-expect-error : n'existe pas en MouseEvent
-	if (evt.code === "Tab") {
+	if ("code" in evt && evt.code === "Tab") {
 		return;
 	}
 

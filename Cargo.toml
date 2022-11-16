@@ -4,14 +4,14 @@ members = [
 
 	"config",
 	"constants",
-	"core/cli",
-	"core/database",
-	"core/env",
-	"core/helpers",
-	"core/logger",
-	"core/network",
-	"core/setup",
-	"core/terminal",
+	"crates/cli",
+	"crates/database",
+	"crates/env",
+	"crates/helpers",
+	"crates/logger",
+	"crates/network",
+	"crates/setup",
+	"crates/terminal",
 	"macro",
 	"proto/irc/message",
 	"tests",
@@ -31,17 +31,17 @@ publish = false
 
 [workspace.dependencies]
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
-cli = { path = "./core/cli", package = "phisyrc-cli" }
+cli = { path = "./crates/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
 constants = { path = "./constants", package = "phisyrc-constants" }
-database = { path = "./core/database", package = "phisyrc-database" }
-env = { path = "./core/env", package = "phisyrc-env" }
-helpers = { path = "./core/helpers", package = "phisyrc-helpers" }
+database = { path = "./crates/database", package = "phisyrc-database" }
+env = { path = "./crates/env", package = "phisyrc-env" }
+helpers = { path = "./crates/helpers", package = "phisyrc-helpers" }
 lang = { git = "https://github.com/PhiSyX/lang" }
-logger = { path = "./core/logger", package = "phisyrc-logger" }
-network = { path = "./core/network", package = "phisyrc-network" }
-setup = { path = "./core/setup", package = "phisyrc-setup" }
-terminal = { path = "./core/terminal", package = "phisyrc-terminal" }
+logger = { path = "./crates/logger", package = "phisyrc-logger" }
+network = { path = "./crates/network", package = "phisyrc-network" }
+setup = { path = "./crates/setup", package = "phisyrc-setup" }
+terminal = { path = "./crates/terminal", package = "phisyrc-terminal" }
 
 chrono = "^0.4"
 clap = { version = "^4.0", features = ["derive", "env", "wrap_help"] }

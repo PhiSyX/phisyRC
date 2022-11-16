@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+// Primitive
+
 declare type bool = boolean;
 declare type str = string;
 

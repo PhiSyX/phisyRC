@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"useDefineForClassFields": true,
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"lib": ["ESNext"],
+		"skipLibCheck": true,
+		"noEmit": true,
+		"baseUrl": "."
+	},
+	"include": ["*.ts", "int/**/*.ts", "str/**/*.ts", "types/**/*.d.ts"]
+}

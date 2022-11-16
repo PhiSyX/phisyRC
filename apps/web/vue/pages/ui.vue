@@ -45,8 +45,9 @@ import IconUser from "~vue/assets/icons/IconUser.vue";
 import IconValidated from "~vue/assets/icons/IconValidated.vue";
 import IconVisualPassword from "~vue/assets/icons/IconVisualPassword.vue";
 
-import { capitalize, computed, onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { capitalize } from "@phisyrc/std/str/capitalize";
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";
@@ -58,7 +59,7 @@ const route = useRoute();
 const props = defineProps(["dyncomponent"]);
 
 const load_component = computed(() => {
-	return "Story" + capitalize(props.dyncomponent);
+	return `Story${capitalize(props.dyncomponent)}`;
 });
 
 type List = {

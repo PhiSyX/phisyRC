@@ -41,9 +41,9 @@ class Option<T> {
 	// ----------- //
 	// Constructor //
 	// ----------- //
-	constructor(public type: Variant, private value?: unsafe<T>) {}
+	constructor(public type: Variant, private value?: unsafe<T>) { }
 
-	expect(msg: str): safety<T> {
+	expect(msg: string): safety<T> {
 		if (this.is_some()) {
 			return this.value!;
 		}
@@ -70,7 +70,7 @@ class Option<T> {
 
 	/// Retourne la valeur contenue dans [Some]
 	unwrap() {
-		const ERROR_MESSAGE: str =
+		const ERROR_MESSAGE: string =
 			"La fonction `.unwrap()` est appelée sur une valeur `None`.";
 		return this.expect(ERROR_MESSAGE);
 	}

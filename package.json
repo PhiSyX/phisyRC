@@ -6,6 +6,7 @@
 	"private": true,
 	"scripts": {
 		"web": "pnpm --filter @phisyrc/web --",
-		"tools/svgo": "pnpm --filter @phisyrc/resources -- svg:optimizer ../../apps/web/assets/svg"
+		"test:unit": "pnpm -r test:unit",
+		"tools/svgo": "pnpm --filter @phisyrc/resources -- svg:optimizer ../../assets/svg"
 	}
 }

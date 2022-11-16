@@ -20,7 +20,7 @@ import type { Room } from "~/server";
 
 import { computed, defineAsyncComponent } from "vue";
 
-import { capitalize } from "std/str/capitalize";
+import { capitalize } from "@phisyrc/std/str/capitalize";
 
 type Props = {
 	type: Room["type"];

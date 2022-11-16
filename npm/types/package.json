@@ -1,0 +1,12 @@
+{
+	"name": "@phisyrc/types",
+	"description": "Les types globaux de phisyRC",
+	"authors": "Mike 'PhiSyX' S.",
+	"version": "1.0.0",
+	"license": "MPL-2.0",
+	"types": "index.d.ts",
+	"devDependencies": {
+		"vitest": "^0.25.2",
+		"vite": "^3.2.4"
+	}
+}

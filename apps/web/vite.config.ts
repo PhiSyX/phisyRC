@@ -22,7 +22,6 @@ export default defineConfig({
 			{ find: /^assets/, replacement: path.resolve("assets") },
 			{ find: /^constants/, replacement: path.resolve("constants") },
 			{ find: /^design/, replacement: path.resolve("design") },
-			{ find: /^std/, replacement: path.resolve("std") },
 		],
 	},
 });

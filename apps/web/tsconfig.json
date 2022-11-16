@@ -9,27 +9,18 @@
 		"resolveJsonModule": true,
 		"isolatedModules": true,
 		"esModuleInterop": true,
-		"lib": [
-			"ESNext",
-			"DOM"
-		],
+		"lib": ["ESNext", "DOM"],
 		"skipLibCheck": true,
 		"noEmit": true,
 		"baseUrl": ".",
 		"paths": {
-			"~vue/*": [
-				"vue/*"
-			],
-			"~/*": [
-				"src/*"
-			],
+			"~vue/*": ["vue/*"],
+			"~/*": ["src/*"]
 		}
 	},
 	"include": [
 		"constants/**/*.ts",
-		"std/**/*.ts",
 		"src/**/*.ts",
-		"src/**/*.d.ts",
 		"types/**/*.d.ts",
 		"vue/**/*.ts",
 		"vue/**/*.vue"

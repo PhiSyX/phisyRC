@@ -99,6 +99,18 @@ class App<T extends SetupInterface> {
 	}
 }
 
+// ---- //
+// Test //
+// ---- //
+
+if (import.meta.vitest) {
+	const { it, expect } = import.meta.vitest;
+
+	it("est-ce que ça fonctionne?", () => {
+		expect(1 + 1).toBe(2);
+	});
+}
+
 // ------ //
 // Export //
 // ------ //

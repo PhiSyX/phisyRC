@@ -7,6 +7,6 @@
 	"scripts": {
 		"web": "pnpm --filter @phisyrc/web --",
 		"test:unit": "pnpm -r test:unit",
-		"tools/svgo": "pnpm --filter @phisyrc/resources -- svg:optimizer ../../apps/web/assets/svg"
+		"tools/svgo": "pnpm --filter @phisyrc/resources -- svg:optimizer ../../assets/svg"
 	}
 }

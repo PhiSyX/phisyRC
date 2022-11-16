@@ -12,11 +12,10 @@ export default defineConfig({
 	resolve: {
 		alias: [
 			{ find: /^~/, replacement: path.resolve("src") },
-			{ find: /^std/, replacement: path.resolve("std") },
 		],
 	},
 
 	test: {
-		includeSource: ["src/**/*.ts", "std/**/*.ts"],
+		includeSource: ["src/**/*.ts"],
 	},
 });

@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Option } from "std/option";
+import type { Option } from "@phisyrc/std/option";
 
 /// Focus le bouton d'ajout de salon lors du click sur l'champ de recherche
 /// ou lors de l'appui des touches du clavier.

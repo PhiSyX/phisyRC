@@ -16,7 +16,7 @@ import { createPinia } from "pinia";
 
 import BaseApp, { System } from "../src/app";
 import DefaultLayoutComponent from "./layouts/default.vue";
-import { Option } from "../std/option";
+import { Option } from "@phisyrc/std/option";
 
 class App extends BaseApp<Framework> {
 	#fw: Framework;

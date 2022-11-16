@@ -7,7 +7,7 @@
 import type { Route } from "./routes";
 
 import { ROUTES } from "./routes";
-import { Option, Some } from "../std/option";
+import { Option, Some } from "@phisyrc/std/option";
 
 // ---- //
 // Type //

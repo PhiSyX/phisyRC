@@ -8,7 +8,7 @@ import "design/style.scss";
 
 import { wasm_initialize_logger } from "assets/wasm/phisyrc_wasm";
 
-import { ExitCode } from "../std/process";
+import { ExitCode } from "@phisyrc/std/process";
 import { error, info, trace, warn, LogLevel, dbg } from "./logger";
 
 import { UI } from "./app";

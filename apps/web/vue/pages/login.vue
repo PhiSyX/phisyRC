@@ -20,7 +20,7 @@ import Waves from "~vue/components/Waves.vue";
 import { computed, ref } from "vue";
 
 import { MAXLENGTH_NICKNAME, VALIDATION_NICKNAME_INFO } from "constants/login";
-import { Option } from "std/option";
+import { Option } from "@phisyrc/std/option";
 import { focus_button_channel, set_selected_channel } from "~/handlers/login";
 
 let form_action_attribute = Option.from(

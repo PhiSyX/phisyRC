@@ -16,8 +16,7 @@ function focus_button_channel(
 		return;
 	}
 
-	// @ts-expect-error : n'existe pas en MouseEvent
-	if (evt.code === "Tab") {
+	if ("code" in evt && evt.code === "Tab") {
 		return;
 	}
 

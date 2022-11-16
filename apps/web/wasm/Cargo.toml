@@ -12,7 +12,7 @@ path = "lib.rs"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-logger = { path = "../../../core/logger", default-features = false, features = [
+logger = { path = "../../../crates/logger", default-features = false, features = [
 	"wasm",
 ], package = "phisyrc-logger" }
 

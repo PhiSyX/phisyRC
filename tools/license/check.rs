@@ -22,7 +22,7 @@ const LICENSE_MPL_PUB: &str = r#"/*
 const APPS_DIR: Dir = include_dir!("apps");
 const CONFIG_DIR: Dir = include_dir!("config");
 const CONSTANTS_DIR: Dir = include_dir!("constants");
-const CORE_DIR: Dir = include_dir!("core");
+const CRATES_DIR: Dir = include_dir!("crates");
 const MACRO_DIR: Dir = include_dir!("macro");
 const PROTO_DIR: Dir = include_dir!("proto");
 const TOOLS_DIR: Dir = include_dir!("tools");
@@ -33,7 +33,7 @@ fn main() -> ExitCode {
 	check_license(&APPS_DIR, &mut files);
 	check_license(&CONFIG_DIR, &mut files);
 	check_license(&CONSTANTS_DIR, &mut files);
-	check_license(&CORE_DIR, &mut files);
+	check_license(&CRATES_DIR, &mut files);
 	check_license(&MACRO_DIR, &mut files);
 	check_license(&PROTO_DIR, &mut files);
 	check_license(&TOOLS_DIR, &mut files);

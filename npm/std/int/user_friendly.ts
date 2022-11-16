@@ -6,16 +6,16 @@
 
 function rounded(n: isize, precision: u32): isize {
 	const { pow: p, round: r } = Math;
-	const precis = p(10, precision);
-	return r(n * precis) / precis;
+	const accurate = p(10, precision);
+	return r(n * accurate) / accurate;
 }
 
 function format(n: isize): str {
 	const { abs: a, floor: f, log: l, min, pow: p } = Math;
-	const abbrev = "kmb";
+	const ABBREVIATIONS = "kmb";
 	let base = f(l(a(n)) / l(1000));
-	let suffix = abbrev[min(2, base - 1)];
-	base = abbrev.indexOf(suffix) + 1;
+	let suffix = ABBREVIATIONS[min(2, base - 1)];
+	base = ABBREVIATIONS.indexOf(suffix) + 1;
 	return suffix ? rounded(n / p(1000, base), 2) + suffix : n.toFixed();
 }
 

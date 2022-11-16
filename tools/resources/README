@@ -1,0 +1,8 @@
+Ce répertoire contient quelques outils utiles pour les ressources statiques.
+
+svgo
+====
+
+Pour optimiser les fichiers SVG:
+
+  pnpm tools/svgo

@@ -1,0 +1,13 @@
+{
+	"name": "@phisyrc/resources",
+	"version": "1.0.0",
+	"description": "Outils utiles pour les ressources statiques.",
+	"scripts": {
+		"svg:optimizer": "svgo --config ./svgo.mjs"
+	},
+	"author": "Mike 'PhiSyX' S.",
+	"license": "MPL-2.0",
+	"dependencies": {
+		"svgo": "^3.0.1"
+	}
+}

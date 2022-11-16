@@ -13,16 +13,16 @@ let rooms: Room[] = [
 	{
 		type: "channel",
 		name: "#channel (message)",
-		active: false,
-		highlight: false,
+		is_active: false,
+		is_highlighted: false,
 		total_unread_message: 1542,
 		total_unread_event: 2,
 	},
 	{
 		type: "private",
 		name: "Private (active room)",
-		active: true,
-		highlight: false,
+		is_active: true,
+		is_highlighted: false,
 		total_unread_message: 2,
 		total_unread_event: 0,
 		last_message: {
@@ -41,16 +41,16 @@ let rooms: Room[] = [
 	{
 		type: "channel",
 		name: "#channel (event)",
-		active: false,
-		highlight: false,
+		is_active: false,
+		is_highlighted: false,
 		total_unread_event: 1,
 		total_unread_message: 0,
 	},
 	{
 		type: "private",
 		name: "Private (highlight)",
-		active: false,
-		highlight: true,
+		is_active: false,
+		is_highlighted: true,
 		total_unread_event: 0,
 		total_unread_message: 1,
 		last_message: {

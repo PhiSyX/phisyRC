@@ -13,7 +13,7 @@ target/
 coverage/
 
 *.lock
-*-lock.yaml
+# *-lock.yaml - la CI de GitHub a besoin du fichier lock généré par pnpm.
 
 .env
 .env.local

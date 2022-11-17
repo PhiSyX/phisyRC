@@ -9,13 +9,13 @@ import type { Server } from "~/server";
 
 import { computed } from "vue";
 
-import IconArrowLeft from "~vue/assets/icons/IconArrowLeft.vue";
-import IconArrowRight from "~vue/assets/icons/IconArrowRight.vue";
-import IconMessages from "~vue/assets/icons/IconMessages.vue";
-import IconSettings from "~vue/assets/icons/IconSettings.vue";
+import IconArrowLeft from "~vue/atoms/Icons/IconArrowLeft.vue";
+import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
+import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
+import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
 
-import Button from "~vue/components/Button.vue";
-import SidebarList from "./SidebarList.vue";
+import Button from "~vue/atoms/Button/Button.vue";
+import SidebarList from "~vue/organisms/Sidebar/SidebarList.vue";
 
 type Props = {
 	toggle: boolean;

@@ -9,8 +9,8 @@ import type { Server } from "~/server";
 
 import { computed } from "vue";
 
-import SidebarItem from "./SidebarItem.vue";
-import SidebarItemServer from "./SidebarItemServer.vue";
+import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";
+import SidebarItemServer from "~vue/molecules/SidebarItem/SidebarItemServer.vue";
 
 type Props = {
 	name: Server["name"];

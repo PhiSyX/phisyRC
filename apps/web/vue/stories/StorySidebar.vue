@@ -3,7 +3,7 @@ import { reactive, ref } from "vue";
 
 import type { Room, Server } from "~/server";
 
-import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
+import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
 import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";
 
 let sidebar1 = ref(false);
@@ -91,7 +91,7 @@ let servers: Server[] = reactive([
 				width: sidebar1 ? 'max-content' : 'var(--nav-min-w)',
 			}"
 		>
-			<SidebarLayout v-model:toggle="sidebar1" :servers="servers" />
+			<Sidebar v-model:toggle="sidebar1" :servers="servers" />
 		</div>
 
 		<div
@@ -100,7 +100,7 @@ let servers: Server[] = reactive([
 				width: sidebar2 ? 'max-content' : 'var(--nav-min-w)',
 			}"
 		>
-			<SidebarLayout v-model:toggle="sidebar2" :servers="servers" />
+			<Sidebar v-model:toggle="sidebar2" :servers="servers" />
 		</div>
 	</section>
 </template>

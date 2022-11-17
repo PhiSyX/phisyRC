@@ -10,7 +10,7 @@ import { useRoute } from "vue-router";
 
 import type { Server } from "~/server";
 
-import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
+import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
 
 let route = useRoute();
 
@@ -48,7 +48,7 @@ let sidebar$ = computed({
 				width: sidebar ? 'max-content' : 'var(--nav-min-w)',
 			}"
 		>
-			<SidebarLayout v-model:toggle="sidebar$" :servers="servers" />
+			<Sidebar v-model:toggle="sidebar$" :servers="servers" />
 		</section>
 
 		<main

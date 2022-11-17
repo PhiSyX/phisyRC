@@ -8,7 +8,7 @@ export default {
 import { onMounted, reactive, ref } from "vue";
 import { Server } from "~/server";
 
-import Window from "~vue/window/Window.vue";
+import Window from "~vue/organisms/Window/Window.vue";
 
 let sidebar_opened = ref(false);
 let servers: Server[] = reactive([]);

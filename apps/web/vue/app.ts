@@ -7,15 +7,15 @@
 import type { App as Vue } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 
-import type { Selector, SetupInterface } from "../src/app";
-import type { Route } from "../src/routes";
+import type { Selector, SetupInterface } from "~/app";
+import type { Route } from "~/routes";
 
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
 
-import BaseApp, { System } from "../src/app";
-import DefaultLayoutComponent from "./layouts/default.vue";
+import BaseApp, { System } from "~/app";
+import LayoutDefaultComponent from "./layouts/LayoutDefault.vue";
 import { Option } from "@phisyrc/std/option";
 
 class App extends BaseApp<Framework> {
@@ -45,7 +45,7 @@ class Framework implements SetupInterface {
 
 	constructor() {
 		// TODO(phisyx): on pourrait imaginer avoir plusieurs layouts;
-		this.lib = createApp(DefaultLayoutComponent);
+		this.lib = createApp(LayoutDefaultComponent);
 	}
 
 	// ------- //

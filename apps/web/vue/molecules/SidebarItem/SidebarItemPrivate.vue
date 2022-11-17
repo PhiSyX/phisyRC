@@ -9,11 +9,11 @@ import type { Room } from "~/server";
 
 import { to_user_friendly } from "@phisyrc/std/int/user_friendly";
 
-import IconRoomClose from "~vue/assets/icons/IconCross.vue";
-import IconRoomMessageEmpty from "~vue/assets/icons/IconMessageEmpty.vue";
-import IconRoomMessage from "~vue/assets/icons/IconMessage.vue";
+import IconRoomClose from "~vue/atoms/Icons/IconCross.vue";
+import IconRoomMessageEmpty from "~vue/atoms/Icons/IconMessageEmpty.vue";
+import IconRoomMessage from "~vue/atoms/Icons/IconMessage.vue";
 
-import Button from "~vue/components/Button.vue";
+import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
 	name: Room["name"];

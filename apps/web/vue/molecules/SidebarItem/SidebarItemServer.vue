@@ -7,11 +7,11 @@ export default {
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import IconArrowDown from "~vue/assets/icons/IconArrowDown.vue";
-import IconArrowRight from "~vue/assets/icons/IconArrowRight.vue";
-import IconServerConnect from "~vue/assets/icons/IconServerConnect.vue";
+import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
+import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
+import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
 
-import Button from "~vue/components/Button.vue";
+import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
 	name: string;

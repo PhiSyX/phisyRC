@@ -4,7 +4,7 @@ import { reactive, ref } from "vue";
 import type { Room, Server } from "~/server";
 
 import SidebarLayout from "~vue/sidebar/SidebarLayout.vue";
-import SidebarItem from "~vue/sidebar/SidebarItem.vue";
+import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";
 
 let sidebar1 = ref(false);
 let sidebar2 = ref(true);

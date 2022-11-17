@@ -6,16 +6,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import IconAddChannel from "~vue/assets/icons/IconAdd.vue";
-import IconChannel from "~vue/assets/icons/IconChannel.vue";
-import IconCross from "~vue/assets/icons/IconCross.vue";
-import IconPassword from "~vue/assets/icons/IconPassword.vue";
-import IconTrashDelete from "~vue/assets/icons/IconTrashDelete.vue";
-import IconUser from "~vue/assets/icons/IconUser.vue";
-import IconValidated from "~vue/assets/icons/IconValidated.vue";
-import IconVisualPassword from "~vue/assets/icons/IconVisualPassword.vue";
+import IconAddChannel from "~vue/atoms/Icons/IconAdd.vue";
+import IconChannel from "~vue/atoms/Icons/IconChannel.vue";
+import IconCross from "~vue/atoms/Icons/IconCross.vue";
+import IconPassword from "~vue/atoms/Icons/IconPassword.vue";
+import IconTrashDelete from "~vue/atoms/Icons/IconTrashDelete.vue";
+import IconUser from "~vue/atoms/Icons/IconUser.vue";
+import IconValidated from "~vue/atoms/Icons/IconValidated.vue";
+import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 
-import Waves from "~vue/components/Waves.vue";
+import Waves from "~vue/atoms/Waves/Waves.vue";
 
 import { computed, ref } from "vue";
 

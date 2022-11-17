@@ -26,24 +26,24 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import IconAdd from "~vue/assets/icons/IconAdd.vue";
-import IconArrowDown from "~vue/assets/icons/IconArrowDown.vue";
-import IconArrowLeft from "~vue/assets/icons/IconArrowLeft.vue";
-import IconArrowRight from "~vue/assets/icons/IconArrowRight.vue";
-import IconArrowUp from "~vue/assets/icons/IconArrowUp.vue";
-import IconChannel from "~vue/assets/icons/IconChannel.vue";
-import IconColor from "~vue/assets/icons/IconColor.vue";
-import IconCross from "~vue/assets/icons/IconCross.vue";
-import IconMessage from "~vue/assets/icons/IconMessage.vue";
-import IconMessageEmpty from "~vue/assets/icons/IconMessageEmpty.vue";
-import IconMessages from "~vue/assets/icons/IconMessages.vue";
-import IconPassword from "~vue/assets/icons/IconPassword.vue";
-import IconServerConnect from "~vue/assets/icons/IconServerConnect.vue";
-import IconSettings from "~vue/assets/icons/IconSettings.vue";
-import IconTrashDelete from "~vue/assets/icons/IconTrashDelete.vue";
-import IconUser from "~vue/assets/icons/IconUser.vue";
-import IconValidated from "~vue/assets/icons/IconValidated.vue";
-import IconVisualPassword from "~vue/assets/icons/IconVisualPassword.vue";
+import IconAdd from "~vue/atoms/Icons/IconAdd.vue";
+import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
+import IconArrowLeft from "~vue/atoms/Icons/IconArrowLeft.vue";
+import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
+import IconArrowUp from "~vue/atoms/Icons/IconArrowUp.vue";
+import IconChannel from "~vue/atoms/Icons/IconChannel.vue";
+import IconColor from "~vue/atoms/Icons/IconColor.vue";
+import IconCross from "~vue/atoms/Icons/IconCross.vue";
+import IconMessage from "~vue/atoms/Icons/IconMessage.vue";
+import IconMessageEmpty from "~vue/atoms/Icons/IconMessageEmpty.vue";
+import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
+import IconPassword from "~vue/atoms/Icons/IconPassword.vue";
+import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
+import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
+import IconTrashDelete from "~vue/atoms/Icons/IconTrashDelete.vue";
+import IconUser from "~vue/atoms/Icons/IconUser.vue";
+import IconValidated from "~vue/atoms/Icons/IconValidated.vue";
+import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";

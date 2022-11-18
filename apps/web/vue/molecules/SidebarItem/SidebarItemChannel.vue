@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Room } from "~/server";
+import type { ChannelProps as SidebarItemChannelProps } from "~/molecules/SidebarItem/props";
 
 import { to_user_friendly } from "@phisyrc/std/int/user_friendly";
 
@@ -16,12 +16,12 @@ import IconRoomMessage from "~vue/atoms/Icons/IconMessage.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
-	name: `#${Room["name"]}`;
-	type: Room["type"];
-	is_active?: Room["is_active"];
-	is_highlighted?: Room["is_highlighted"];
-	total_unread_event?: Room["total_unread_event"];
-	total_unread_message?: Room["total_unread_message"];
+	name: SidebarItemChannelProps["name"];
+	type: SidebarItemChannelProps["type"];
+	is_active?: SidebarItemChannelProps["is_active"];
+	is_highlighted?: SidebarItemChannelProps["is_highlighted"];
+	total_unread_event?: SidebarItemChannelProps["total_unread_event"];
+	total_unread_message?: SidebarItemChannelProps["total_unread_message"];
 };
 
 const props = defineProps<Props>();

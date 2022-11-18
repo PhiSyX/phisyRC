@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Room } from "~/server";
+import type { PrivateProps as SidebarItemPrivateProps } from "~/molecules/SidebarItem/props";
 
 import { to_user_friendly } from "@phisyrc/std/int/user_friendly";
 
@@ -16,12 +16,12 @@ import IconRoomMessage from "~vue/atoms/Icons/IconMessage.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
-	name: Room["name"];
-	last_message: NonNullable<Room["last_message"]>;
-	is_active?: Room["is_active"];
-	is_highlighted?: Room["is_highlighted"];
-	total_unread_event?: Room["total_unread_event"];
-	total_unread_message?: Room["total_unread_message"];
+	name: SidebarItemPrivateProps["name"];
+	last_message: NonNullable<SidebarItemPrivateProps["last_message"]>;
+	is_active?: SidebarItemPrivateProps["is_active"];
+	is_highlighted?: SidebarItemPrivateProps["is_highlighted"];
+	total_unread_event?: SidebarItemPrivateProps["total_unread_event"];
+	total_unread_message?: SidebarItemPrivateProps["total_unread_message"];
 };
 
 const props = defineProps<Props>();

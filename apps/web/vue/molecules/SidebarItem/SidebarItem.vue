@@ -16,14 +16,14 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Room } from "~/server";
+import type { Props as SidebarItemProps } from "~/molecules/SidebarItem/props";
 
 import { computed, defineAsyncComponent } from "vue";
 
 import { capitalize } from "@phisyrc/std/str/capitalize";
 
 type Props = {
-	type: Room["type"];
+	type: SidebarItemProps["type"];
 };
 
 const props = defineProps<Props>();

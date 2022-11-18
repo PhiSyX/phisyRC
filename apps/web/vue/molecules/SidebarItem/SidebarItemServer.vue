@@ -6,6 +6,8 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { ServerProps as SidebarItemServerProps } from "~/molecules/SidebarItem/props";
+
 import { computed } from "vue";
 
 import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
@@ -15,8 +17,10 @@ import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
-	name: string;
-	folded: boolean;
+	name: SidebarItemServerProps["name"];
+
+	// NOTE(phisyx): v-model:folded
+	folded: SidebarItemServerProps["is_folded"];
 };
 
 const props = defineProps<Props>();

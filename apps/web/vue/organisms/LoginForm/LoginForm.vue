@@ -11,6 +11,7 @@ import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 import Input from "~vue/atoms/Input/Input.vue";
 
+import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { computed, ref } from "vue";
 
 import {
@@ -32,18 +33,49 @@ let form_action_attribute = Option.from(
 	import.meta.env.VITE_PHISYRC_LOGIN_CHAT_URL
 ).unwrap_or("#");
 
+// ----- //
+// Props //
+// ----- //
+
+type Props = {
+	nickname: LoginFormProps["nickname"];
+	server_password: LoginFormProps["server_password"];
+	channels: LoginFormProps["channels"];
+};
+
+const props = defineProps<Props>();
+const emit = defineEmits([
+	"update:nickname",
+	"update:server_password",
+	"update:channels",
+]);
+
 // -------- //
 // Nickname //
 // -------- //
 
-let nickname = ref("");
+let nickname$ = computed({
+	get() {
+		return props.nickname;
+	},
+	set($1) {
+		emit("update:nickname", $1);
+	},
+});
 let has_nickname_error = ref();
 
 // -------- //
 // Password //
 // -------- //
 
-let password = ref("");
+let password$ = computed({
+	get() {
+		return props.server_password;
+	},
+	set($1) {
+		emit("update:server_password", $1);
+	},
+});
 
 let can_show_server_password = ref(false);
 let server_password_input_type = computed(() => {
@@ -62,7 +94,14 @@ function handle_toggle_visual_password() {
 // -------- //
 
 let $channel_list_btn = ref<typeof Button | null>(null);
-let channels = ref<Vec<str>>(["#irc", "#ibug"]);
+let channels$ = computed({
+	get() {
+		return props.channels;
+	},
+	set($1) {
+		emit("update:channels", $1);
+	},
+});
 let selected_channel = ref<Vec<usize>>([]);
 
 // ------- //
@@ -78,9 +117,9 @@ function set_selected_channel_handler(evt: MouseEvent, chan_idx: usize) {
 }
 
 function unset_selected_channel_handler(evt: MouseEvent) {
-	channels.value = unset_selected_channel(
+	channels$.value = unset_selected_channel(
 		evt,
-		channels.value,
+		channels$.value,
 		selected_channel.value
 	);
 }
@@ -97,7 +136,7 @@ function add_channel_handler(evt: Event) {}
 function handle_send_connection(evt: Event) {
 	evt.preventDefault();
 
-	console.log(nickname.value, password.value);
+	console.log(nickname$.value, password$.value);
 }
 </script>
 
@@ -118,7 +157,7 @@ function handle_send_connection(evt: Event) {
 			:maxlength="MAXLENGTH_NICKNAME"
 			:placeholder="PLACEHOLDER_NICKNAME"
 			:title="VALIDATION_NICKNAME_INFO"
-			v-model="nickname"
+			v-model="nickname$"
 		>
 			<IconUser />
 
@@ -136,7 +175,7 @@ function handle_send_connection(evt: Event) {
 			autocomplete="off"
 			:placeholder="PLACEHOLDER_SERVER_PASSWORD"
 			:type="server_password_input_type"
-			v-model="password"
+			v-model="password$"
 		>
 			<IconPassword />
 
@@ -164,7 +203,7 @@ function handle_send_connection(evt: Event) {
 			"
 			:diclick="set_selected_channel_handler"
 			name="channels"
-			:datalist="channels"
+			:datalist="channels$"
 			:placeholder="PLACEHOLDER_CHANNELS"
 			@keydown="focus_button_channel_handler"
 			@click="focus_button_channel_handler"

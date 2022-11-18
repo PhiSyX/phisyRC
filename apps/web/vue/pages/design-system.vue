@@ -26,6 +26,9 @@ const StorySidebarList = defineAsyncComponent(
 );
 
 // Organisms
+const StoryChatLoginForm = defineAsyncComponent(
+	() => import("~vue/organisms/LoginForm/Story.vue")
+);
 const StorySidebar = defineAsyncComponent(
 	() => import("~vue/organisms/Sidebar/Story.vue")
 );
@@ -44,6 +47,7 @@ export default {
 		StorySidebarItem,
 		StorySidebarList,
 		// Organisms
+		StoryChatLoginForm,
 		StorySidebar,
 	},
 };
@@ -174,6 +178,10 @@ let organisms: Section = {
 		{
 			text: "Barre latérale",
 			link: "/design-system/sidebar",
+		},
+		{
+			text: "Formulaire de connexion au Chat",
+			link: "/design-system/chat-login-form",
 		},
 	],
 };

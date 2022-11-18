@@ -5,9 +5,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import Waves from "~vue/atoms/Waves/Waves.vue";
+import { reactive, ref } from "vue";
 
+import Waves from "~vue/atoms/Waves/Waves.vue";
 import LoginForm from "~vue/organisms/LoginForm/LoginForm.vue";
+
+// NOTE(phisyx): par exemple: récupérés depuis une api externe
+let nickname = ref("");
+let server_password = ref("");
+let channels = reactive([]);
 </script>
 
 <template>
@@ -17,7 +23,12 @@ import LoginForm from "~vue/organisms/LoginForm/LoginForm.vue";
 		<div class="login@chat<button> [ size:full p=2 flex! gap=6 pos-r ]">
 			<h1 class="[ heading=3 mx=1 mt=4 mb=0 ]">Accès direct au Chat</h1>
 
-			<LoginForm id="login-form" />
+			<LoginForm
+				id="login-form"
+				v-bind:nickname="nickname"
+				v-bind:server_password="server_password"
+				v-bind:channels="channels"
+			/>
 
 			<button
 				type="submit"

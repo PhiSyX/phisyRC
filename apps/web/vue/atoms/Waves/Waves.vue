@@ -1,5 +1,5 @@
 <template>
-	<div class="app@waves [ pos-a:full s:full ]">
+	<div class="app@waves [ pos-a:full size:full ]">
 		<svg
 			version="1.1"
 			xmlns="http://www.w3.org/2000/svg"
@@ -28,51 +28,5 @@
 </template>
 
 <style lang="scss">
-@import "design/functions";
-@import "design/mixins";
-
-@include selector-class("app@waves") {
-	pointer-events: none;
-
-	@include --theme using ($name) {
-		@if $name == dark {
-			--wave-1: var(--color-grey800);
-			--wave-2: var(--color-grey);
-			--wave-3: #212121;
-		} @else if $name == light {
-			--wave-1: var(--color-indigo50);
-			--wave-2: var(--color-indigo200);
-			--wave-3: var(--color-indigo400);
-		}
-	}
-
-	> svg path {
-		animation: wave-anim 30s ease-out infinite alternate-reverse;
-		opacity: 0.9;
-	}
-
-	> svg path:nth-child(1) {
-		animation-delay: -5s;
-		animation-duration: 15s;
-	}
-
-	> svg path:nth-child(2) {
-		animation-delay: -5s;
-		animation-duration: 10s;
-	}
-
-	> svg path:nth-child(3) {
-		animation-delay: -5s;
-		animation-duration: 5s;
-	}
-}
-
-@keyframes wave-anim {
-	0% {
-		transform: translate3d(calc(0 - space(10)), 0, 0);
-	}
-	100% {
-		transform: translate3d(space(10), 0, 0);
-	}
-}
+@import "design/app/atoms/waves";
 </style>

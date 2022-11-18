@@ -11,23 +11,29 @@
 type Options = {
 	/// Remplace tout le reste d'une chaîne de caractères en minuscule.
 	to_lower?: bool;
+	/// Inclus les séparateurs dans le résultat?
+	includes_separators?: bool,
 };
 
 // -------- //
 // Constant //
 // -------- //
 
-const SEPARATOR: RegExp = /([\s-_]+)/;
+const INCLUDE_SEPARATOR: RegExp = /([\s-_]+)/;
+const EXCLUDE_SEPARATOR: RegExp = /[\s-_]+/;
 
 const Default: Options = {
 	to_lower: true,
+	includes_separators: true,
 };
 
 /**
  * Remplace tous les premiers caractères des mots d'une chaîne de caractères |s|
  * par une majuscule.
  */
-function capitalize(s: str, options: Options = Default): str {
+function capitalize(s: str, user_options: Options = Default): str {
+	let options: Options = { ...Default, ...user_options };
+
 	const algo = (s: str) => {
 		if (s.length === 0) {
 			return s;
@@ -49,11 +55,15 @@ function capitalize(s: str, options: Options = Default): str {
 		}
 	};
 
-	if (!SEPARATOR.test(s)) {
+	if (!INCLUDE_SEPARATOR.test(s)) {
 		return algo(s);
 	}
 
-	return s.split(SEPARATOR).map(algo).join("");
+	if (options.includes_separators === true) {
+		return s.split(INCLUDE_SEPARATOR).map(algo).join("");
+	}
+
+	return s.split(EXCLUDE_SEPARATOR).map(algo).join("");
 }
 
 // ------ //
@@ -92,5 +102,19 @@ if (import.meta.vitest) {
 			"HeLLo WorLd",
 			{ to_lower: false }
 		),).toEqual("HeLLo WorLd");
+	});
+
+	it("capitalize: exclusion des séparateurs dans le résultat", () => {
+		expect(capitalize("hello ", {
+			includes_separators: false
+		})).toEqual("Hello");
+
+		expect(capitalize("hello world", {
+			includes_separators: false
+		})).toEqual("HelloWorld");
+
+		expect(capitalize("    hello    ", {
+			includes_separators: false
+		})).toEqual("Hello");
 	});
 }

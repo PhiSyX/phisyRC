@@ -6,25 +6,21 @@ export default {
 </script>
 
 <script lang="ts" setup>
+import type { Props as InputProps } from "~/atoms/Input/props";
 import { computed, HTMLAttributes } from "vue";
 
 type Props = {
-	name: string;
+	name: InputProps<HTMLAttributes["class"]>["name"];
+	datalist?: InputProps<HTMLAttributes["class"]>["datalist"];
 
-	// Label Class
-	lclass?: HTMLAttributes["class"];
-	// Root Class
-	rclass?: HTMLAttributes["class"];
-	/// Icon Class
-	iclass?: HTMLAttributes["class"];
-	/// DataList class
-	dclass?: HTMLAttributes["class"];
-	/// DataList Item class
-	diclass?: (i: usize) => HTMLAttributes["class"];
-	diclick?: (evt: MouseEvent, i: usize) => void;
+	lclass?: InputProps<HTMLAttributes["class"]>["lclass"];
+	rclass?: InputProps<HTMLAttributes["class"]>["rclass"];
+	iclass?: InputProps<HTMLAttributes["class"]>["iclass"];
+	dclass?: InputProps<HTMLAttributes["class"]>["dclass"];
+	diclass?: InputProps<HTMLAttributes["class"]>["diclass"];
+	diclick?: InputProps<HTMLAttributes["class"]>["diclick"];
 
-	datalist?: unknown[];
-
+	// NOTE(phisyx): v-model
 	modelValue?: string | string[];
 };
 

@@ -6,11 +6,13 @@ export default {
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { Server } from "~/server";
+
+import type { Server } from "~/types";
 
 import Window from "~vue/organisms/Window/Window.vue";
 
 let sidebar_opened = ref(false);
+// TODO(phisyx): serveurs récupérés depuis un état par exemple...
 let servers: Server[] = reactive([]);
 
 onMounted(() => {

@@ -8,17 +8,20 @@ export default {
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
-import type { Server } from "~/server";
+import type { Props as WindowProps } from "~/organisms/Window/props";
 
 import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
 
 let route = useRoute();
 
+// NOTE(phisyx): Définie dans les meta-données des routes
 const has_meta_sidebar = route.meta["sidebar"];
 
 type Props = {
-	sidebar: boolean;
-	servers: Server[];
+	servers: WindowProps["servers"];
+
+	// NOTE(phisyx): v-model:sidebar
+	sidebar: WindowProps["is_sidebar_opened"];
 };
 
 const props = defineProps<Props>();

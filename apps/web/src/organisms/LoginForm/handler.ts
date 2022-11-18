@@ -5,6 +5,7 @@
  */
 
 import type { Option } from "@phisyrc/std/option";
+import { CONFIRM_DELETE_CHANNEL } from "./constant";
 
 /// Focus le bouton d'ajout de salon lors du click sur l'champ de recherche
 /// ou lors de l'appui des touches du clavier.
@@ -48,8 +49,24 @@ function set_selected_channel(
 	return local_state;
 }
 
+/// Retire les salons sélectionnés de la liste des salons du composant.
+function unset_selected_channel(
+	evt: MouseEvent,
+	channel_list: Vec<str>,
+	/*mut*/ selected_channel_list: Vec<usize>,
+): Vec<str> {
+	if (!(evt.shiftKey || window.confirm(CONFIRM_DELETE_CHANNEL))) {
+		return channel_list;
+	}
+	for (const s_c_idx of selected_channel_list) {
+		channel_list = channel_list.filter((_, c_idx) => !(c_idx === s_c_idx));
+	}
+	selected_channel_list.length = 0;
+	return channel_list;
+}
+
 // ------ //
 // Export //
 // ------ //
 
-export { focus_button_channel, set_selected_channel };
+export { focus_button_channel, set_selected_channel, unset_selected_channel };

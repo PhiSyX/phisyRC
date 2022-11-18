@@ -1,0 +1,57 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+#login-page {
+	max-width: 500px;
+	align-self: center;
+	/*margin: 0 auto; */
+}
+
+@include selector-class("login@chat<button>") {
+	form ~ button[type="submit"] {
+		transition: 250ms ease;
+		transition-property: color, background-color;
+
+		background-color: var(--bg);
+		color: var(--color);
+
+		font-size: 18px;
+		font-weight: bold;
+
+		&:not(:focus-within) {
+			opacity: 0.9;
+		}
+
+		&:focus-within,
+		&:active {
+			box-shadow: 0 0 0 3px var(--border);
+		}
+
+		&:hover {
+			background-color: var(--border);
+
+			&:focus-within,
+			&:active {
+				box-shadow: 0 0 0 3px var(--bg);
+			}
+		}
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: #ffe033;
+				--border: var(--color-yellow600);
+				--color: #31363a;
+			} @else if $name == light {
+				--bg: var(--color-indigo200);
+				--border: var(--color-indigo300);
+				--color: var(--color-black);
+			}
+		}
+	}
+}

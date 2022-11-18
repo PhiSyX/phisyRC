@@ -19,7 +19,8 @@ function toggle_click_handler(evt: MouseEvent) {
 	emit("update:toggle", !props.toggle);
 
 	if (props.toggle === false) {
-		nextTick(() => (<HTMLButtonElement>evt.currentTarget).blur());
+		let target = evt.currentTarget as HTMLButtonElement;
+		nextTick(() => target.blur());
 	}
 }
 </script>

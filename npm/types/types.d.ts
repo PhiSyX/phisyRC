@@ -9,3 +9,22 @@ declare type unsafe<T> = T | nil;
 declare type safety<T> = T extends Array<infer U>
 	? safety<U>[]
 	: NonNullable<T>;
+
+
+/**
+ * Rend certaines propriétés optionnelles.
+ *
+ * @example ```ts
+ *   interface Params {
+ *     foo: string;
+ *     bar: boolean;
+ *   }
+ *
+ *   const params: Optional<Params, "bar"> = { foo: "bar" };
+ *   console.log(params.foo);
+ * ```
+ *
+ * Contrairement au type `Partial`, ce type ne rend pas TOUTES les propriétés
+ * d'un objet optionnelles.
+ */
+declare type Optional<T, K extends keyof T> = Partial<T> & Omit<T, K>;

@@ -15,7 +15,7 @@ import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
 import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
 
 import Button from "~vue/atoms/Button/Button.vue";
-import SidebarList from "~vue/organisms/Sidebar/SidebarList.vue";
+import SidebarList from "~vue/molecules/SidebarList/SidebarList.vue";
 
 type Props = {
 	toggle: boolean;
@@ -50,6 +50,7 @@ let toggle$ = computed({
 				v-for="server in servers"
 				v-bind="server"
 				:key="server.name"
+				class="network<server>"
 				v-model:folded="server.is_folded"
 			/>
 		</div>
@@ -82,3 +83,7 @@ let toggle$ = computed({
 		</footer>
 	</nav>
 </template>
+
+<style lang="scss">
+@import "design/app/organisms/sidebar";
+</style>

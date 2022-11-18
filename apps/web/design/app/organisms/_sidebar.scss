@@ -1,0 +1,25 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+@include selector-class("sidebar<svg>") {
+	svg {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+@include selector-class("sidebar__actions") {
+	@include --theme using ($name) {
+		@if $name == dark {
+			background-color: #31363a;
+		} @else if $name == light {
+			background-color: #fafafa;
+		}
+	}
+}

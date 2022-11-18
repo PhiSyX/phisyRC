@@ -4,11 +4,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@import "themes";
-@import "background";
-@import "font";
-@import "bases";
-@import "scrollbar";
-@import "elements";
+@import "design/functions";
+@import "design/mixins";
 
-@import "window";
+@include selector-class("sidebar@list") {
+	&.is-folded {
+		> *:not(:first-child) {
+			display: none;
+		}
+	}
+}

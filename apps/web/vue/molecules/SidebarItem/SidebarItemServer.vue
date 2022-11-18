@@ -1,6 +1,7 @@
 <script lang="ts">
 export default {
 	name: "SidebarItemServer",
+	inheritAttrs: false,
 };
 </script>
 
@@ -33,7 +34,7 @@ let folded$ = computed({
 </script>
 
 <template>
-	<li class="app:bg=primary" data-type="server">
+	<li class="app:bg=primary sidebar@item" data-type="server">
 		<div>
 			<IconServerConnect />
 		</div>

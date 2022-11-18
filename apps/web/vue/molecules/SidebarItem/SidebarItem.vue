@@ -34,5 +34,14 @@ const component_item = computed(() => {
 </script>
 
 <template>
-	<component :is="component_item" :type="type" v-bind="$attrs" />
+	<component
+		:is="component_item"
+		:type="type"
+		v-bind="$attrs"
+		class="sidebar@item"
+	/>
 </template>
+
+<style lang="scss">
+@import "design/app/molecules/sidebar-item";
+</style>

@@ -36,7 +36,7 @@ let folded$ = computed({
 
 <template>
 	<ul
-		class="app:bg=secondary network<server> [ list:reset ]"
+		class="app:bg=secondary sidebar@list [ list:reset ]"
 		:class="{
 			'is-folded': is_folded,
 			'is-not-folded': !is_folded,
@@ -57,3 +57,7 @@ let folded$ = computed({
 		/>
 	</ul>
 </template>
+
+<style lang="scss">
+@import "design/app/molecules/sidebar-list";
+</style>

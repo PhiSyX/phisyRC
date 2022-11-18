@@ -29,7 +29,6 @@ const props = defineProps<Props>();
 
 <template>
 	<li
-		class="network@server@room"
 		data-type="private"
 		:class="{
 			'app:bg=primary is-active': is_active,

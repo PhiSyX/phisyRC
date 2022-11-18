@@ -17,6 +17,7 @@ import Button from "~vue/atoms/Button/Button.vue";
 
 type Props = {
 	name: `#${Room["name"]}`;
+	type: Room["type"];
 	is_active?: Room["is_active"];
 	is_highlighted?: Room["is_highlighted"];
 	total_unread_event?: Room["total_unread_event"];
@@ -28,7 +29,6 @@ const props = defineProps<Props>();
 
 <template>
 	<li
-		class="network@server@room"
 		data-type="channel"
 		:class="{
 			'app:bg=primary is-active': is_active,

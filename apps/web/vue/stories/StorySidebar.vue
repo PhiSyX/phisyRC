@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 
-import type { Room, Server } from "~/server";
+import type { Room, Server } from "~/types";
 
 import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
 import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";

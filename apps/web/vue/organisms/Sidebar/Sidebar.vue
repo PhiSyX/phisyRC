@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Server } from "~/server";
+import type { Props as SidebarProps } from "~/organisms/Sidebar/props";
 
 import { computed } from "vue";
 
@@ -18,8 +18,10 @@ import Button from "~vue/atoms/Button/Button.vue";
 import SidebarList from "~vue/molecules/SidebarList/SidebarList.vue";
 
 type Props = {
-	toggle: boolean;
-	servers: Server[];
+	servers: SidebarProps["servers"];
+
+	// NOTE(phisyx): v-model:toggle
+	toggle: SidebarProps["is_sidebar_opened"];
 };
 
 const props = defineProps<Props>();

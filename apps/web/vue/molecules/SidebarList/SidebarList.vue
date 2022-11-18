@@ -5,7 +5,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Server } from "~/server";
+import type { Props as SidebarListProps } from "~/molecules/SidebarList/props";
 
 import { computed } from "vue";
 
@@ -13,11 +13,13 @@ import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";
 import SidebarItemServer from "~vue/molecules/SidebarItem/SidebarItemServer.vue";
 
 type Props = {
-	name: Server["name"];
-	rooms: Server["rooms"];
-	is_focused: Server["is_focused"];
-	is_folded: Server["is_folded"];
-	folded: Server["is_folded"];
+	name: SidebarListProps["name"];
+	rooms: SidebarListProps["rooms"];
+	is_focused: SidebarListProps["is_focused"];
+	is_folded: SidebarListProps["is_folded"];
+
+	// NOTE(phisyx): v-model:folded
+	folded: SidebarListProps["is_folded"];
 };
 
 const props = defineProps<Props>();

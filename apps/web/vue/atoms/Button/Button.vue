@@ -34,3 +34,7 @@ function toggle_click_handler(evt: MouseEvent) {
 		<slot />
 	</button>
 </template>
+
+<style lang="scss">
+@import "design/app/atoms/button";
+</style>

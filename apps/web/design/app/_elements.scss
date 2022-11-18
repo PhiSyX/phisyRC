@@ -4,38 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-@include selector-class("app@btn") {
-	position: relative;
-	padding: 0;
-	cursor: pointer;
-
-	&::before {
-		content: "";
-
-		--pz: calc(0rem - var(--space) / 1.25);
-
-		position: absolute;
-		top: var(--pz);
-		left: var(--pz);
-		right: var(--pz);
-		bottom: var(--pz);
-	}
-
-	&:focus svg,
-	&:hover svg {
-		filter: opacity(0.75);
-	}
-	svg {
-		transition: filter 200ms;
-		filter: opacity(0.5);
-	}
-
-	svg:focus,
-	svg:hover {
-		filter: opacity(1);
-	}
-}
-
 a {
 	@include --theme using($name) {
 		@if $name == dark {

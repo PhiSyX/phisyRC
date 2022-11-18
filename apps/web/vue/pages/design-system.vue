@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineAsyncComponent } from "vue";
 
+// Générales
 const StoryColors = defineAsyncComponent(
 	() => import("~vue/stories/StoryColors.vue")
 );
@@ -10,16 +11,35 @@ const StoryTypography = defineAsyncComponent(
 const StoryUtilities = defineAsyncComponent(
 	() => import("~vue/stories/StoryUtilities.vue")
 );
+
+// Atoms
+
+// Molecules
+const StorySidebarItem = defineAsyncComponent(
+	() => import("~vue/molecules/SidebarItem/Story.vue")
+);
+const StorySidebarList = defineAsyncComponent(
+	() => import("~vue/molecules/SidebarList/Story.vue")
+);
+
+// Organisms
 const StorySidebar = defineAsyncComponent(
-	() => import("~vue/stories/StorySidebar.vue")
+	() => import("~vue/organisms/Sidebar/Story.vue")
 );
 
 export default {
 	name: "UI",
 	components: {
+		// Générales
 		StoryColors,
 		StoryTypography,
 		StoryUtilities,
+
+		// Atoms
+		// Molecules
+		StorySidebarItem,
+		StorySidebarList,
+		// Organisms
 		StorySidebar,
 	},
 };
@@ -59,8 +79,16 @@ const route = useRoute();
 const props = defineProps(["dyncomponent"]);
 
 const load_component = computed(() => {
-	return `Story${capitalize(props.dyncomponent)}`;
+	return `Story${capitalize(props.dyncomponent, {
+		includes_separators: false,
+	})}`;
 });
+
+type Section = {
+	opened?: boolean;
+	title: string;
+	components: List[];
+};
 
 type List = {
 	icon?: unknown;
@@ -68,50 +96,80 @@ type List = {
 	link?: string;
 };
 
-let general = [
-	{
-		icon: IconColor,
-		text: "Les couleurs",
-		link: "/ui/colors",
-	},
-	{
-		text: "Typographie",
-		link: "/ui/typography",
-	},
-	{
-		text: "Utilitaires",
-		link: "/ui/utilities",
-	},
-];
+let general: Section = {
+	title: "Générale",
+	components: [
+		{
+			icon: IconColor,
+			text: "Les couleurs",
+			link: "/design-system/colors",
+		},
+		{
+			text: "Typographie",
+			link: "/design-system/typography",
+		},
+		{
+			text: "Utilitaires",
+			link: "/design-system/utilities",
+		},
+	],
+};
 
-let components: List[] = [];
+let icons: Section = {
+	title: "Les icônes",
+	opened: false,
+	components: [
+		{ icon: IconAdd, text: "Add" },
+		{ icon: IconArrowDown, text: "ArrowDown" },
+		{ icon: IconArrowLeft, text: "ArrowLeft" },
+		{ icon: IconArrowRight, text: "ArrowRight" },
+		{ icon: IconArrowUp, text: "ArrowUp" },
+		{ icon: IconChannel, text: "Channel" },
+		{ icon: IconCross, text: "Cross" },
+		{ icon: IconMessage, text: "Message" },
+		{ icon: IconMessageEmpty, text: "MessageEmpty" },
+		{ icon: IconMessages, text: "Messages" },
+		{ icon: IconPassword, text: "Password" },
+		{ icon: IconServerConnect, text: "ServerConnect" },
+		{ icon: IconSettings, text: "Settings" },
+		{ icon: IconTrashDelete, text: "TrashDelete" },
+		{ icon: IconUser, text: "User" },
+		{ icon: IconValidated, text: "Validated" },
+		{ icon: IconVisualPassword, text: "VisualPassword" },
+	],
+};
 
-let icons: List[] = [
-	{ icon: IconAdd, text: "Add" },
-	{ icon: IconArrowDown, text: "ArrowDown" },
-	{ icon: IconArrowLeft, text: "ArrowLeft" },
-	{ icon: IconArrowRight, text: "ArrowRight" },
-	{ icon: IconArrowUp, text: "ArrowUp" },
-	{ icon: IconChannel, text: "Channel" },
-	{ icon: IconCross, text: "Cross" },
-	{ icon: IconMessage, text: "Message" },
-	{ icon: IconMessageEmpty, text: "MessageEmpty" },
-	{ icon: IconMessages, text: "Messages" },
-	{ icon: IconPassword, text: "Password" },
-	{ icon: IconServerConnect, text: "ServerConnect" },
-	{ icon: IconSettings, text: "Settings" },
-	{ icon: IconTrashDelete, text: "TrashDelete" },
-	{ icon: IconUser, text: "User" },
-	{ icon: IconValidated, text: "Validated" },
-	{ icon: IconVisualPassword, text: "VisualPassword" },
-];
+let atoms: Section = {
+	title: "Les atomes",
+	components: [],
+};
 
-let application: List[] = [
-	{
-		text: "Barre latérale",
-		link: "/ui/sidebar",
-	},
-];
+let molecules: Section = {
+	title: "Les molécules",
+	components: [
+		{
+			text: "Barre latérale (élément)",
+			link: "/design-system/sidebar-item",
+		},
+
+		{
+			text: "Barre latérale (liste)",
+			link: "/design-system/sidebar-list",
+		},
+	],
+};
+
+let organisms: Section = {
+	title: "Les organismes",
+	components: [
+		{
+			text: "Barre latérale",
+			link: "/design-system/sidebar",
+		},
+	],
+};
+
+let sections: Section[] = [general, atoms, molecules, organisms, icons];
 </script>
 
 <template>
@@ -122,80 +180,19 @@ let application: List[] = [
 			</h1>
 
 			<aside class="[ flex:full scroll:y scroll:hidden ]">
-				<details open>
-					<summary class="[ pl=1 pb=1 ]">Général</summary>
+				<details
+					v-for="section in sections"
+					:open="section.opened ?? true"
+				>
+					<summary class="[ pl=1 pb=1 ]">{{ section.title }}</summary>
 
 					<ul class="[ flex! gap=1 list:reset ]">
 						<li
 							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-							v-for="item in general"
+							v-for="item in section.components"
 							:class="{
 								active: item.link == route.fullPath,
 							}"
-						>
-							<component :is="item.icon" width="20" height="20" />
-
-							<span class="[ flex:full ]">{{ item.text }}</span>
-
-							<RouterLink
-								v-if="item.link"
-								:to="item.link"
-								class="pos-a:full"
-							></RouterLink>
-						</li>
-					</ul>
-				</details>
-
-				<details open>
-					<summary class="[ pl=1 pb=1 ]">Composants globaux</summary>
-
-					<ul class="[ flex! gap=1 list:reset ]">
-						<li
-							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-							v-for="item in components"
-							:class="{
-								active: item.link == route.fullPath,
-							}"
-						>
-							<component :is="item.icon" width="20" height="20" />
-
-							<span class="[ flex:full ]">{{ item.text }}</span>
-
-							<RouterLink
-								v-if="item.link"
-								:to="item.link"
-								class="pos-a:full"
-							></RouterLink>
-						</li>
-					</ul>
-				</details>
-
-				<details open>
-					<summary class="[ pl=1 pb=1 ]">Application</summary>
-
-					<ul class="[ flex! gap=1 list:reset scroll:y ]">
-						<li
-							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-							v-for="item in application"
-						>
-							<span class="[ flex:full ]">{{ item.text }}</span>
-
-							<RouterLink
-								v-if="item.link"
-								:to="item.link"
-								class="pos-a:full"
-							></RouterLink>
-						</li>
-					</ul>
-				</details>
-
-				<details>
-					<summary class="[ pl=1 pb=1 ]">Les icônes</summary>
-
-					<ul class="[ flex! gap=1 list:reset scroll:y ]">
-						<li
-							class="[ pos-r flex align-i:center gap=1 px=1 border:radius=2 ]"
-							v-for="item in icons"
 						>
 							<component :is="item.icon" width="20" height="20" />
 

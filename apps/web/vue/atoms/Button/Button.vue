@@ -5,10 +5,13 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { nextTick } from "vue";
+import type { Props as ButtonProps } from "~/atoms/Button/props";
+
+import { toggle_click } from "~/atoms/Button/handler";
 
 type Props = {
-	toggle?: boolean;
+	// v-model:toggle
+	toggle?: ButtonProps["toggle"];
 };
 
 const props = defineProps<Props>();
@@ -16,12 +19,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["update:toggle"]);
 
 function toggle_click_handler(evt: MouseEvent) {
-	emit("update:toggle", !props.toggle);
-
-	if (props.toggle === false) {
-		let target = evt.currentTarget as HTMLButtonElement;
-		nextTick(() => target.blur());
-	}
+	toggle_click(evt, !props.toggle, ($1) => emit("update:toggle", $1));
 }
 </script>
 

@@ -13,6 +13,9 @@ const StoryUtilities = defineAsyncComponent(
 );
 
 // Atoms
+const StoryButton = defineAsyncComponent(
+	() => import("~vue/atoms/Button/Story.vue")
+);
 
 // Molecules
 const StorySidebarItem = defineAsyncComponent(
@@ -36,6 +39,7 @@ export default {
 		StoryUtilities,
 
 		// Atoms
+		StoryButton,
 		// Molecules
 		StorySidebarItem,
 		StorySidebarList,
@@ -141,7 +145,12 @@ let icons: Section = {
 
 let atoms: Section = {
 	title: "Les atomes",
-	components: [],
+	components: [
+		{
+			text: "Button",
+			link: "/design-system/button",
+		},
+	],
 };
 
 let molecules: Section = {

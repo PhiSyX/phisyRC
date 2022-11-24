@@ -29,16 +29,12 @@ network.workspace = true
 setup = { workspace = true, features = ["config", "logger", "database"] }
 terminal.workspace = true
 
+irc_msg = { workspace = true, features = ["json"] }
+irc_replies = { workspace = true, features = ["json"] }
+
 chrono.workspace = true
 clap.workspace = true
 tokio.workspace = true
-
-irc_msg = { path = "../../proto/irc/message", package = "proto-irc-msg", features = [
-	"json",
-] }
-irc_replies = { path = "../../proto/irc/replies", package = "proto-irc-replies", features = [
-	"json",
-] }
 
 argon2 = { version = "^1.0", package = "rust-argon2" }
 dns-lookup = "^1.0"

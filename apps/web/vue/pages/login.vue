@@ -25,9 +25,9 @@ let channels = reactive([]);
 
 			<LoginForm
 				id="login-form"
-				v-bind:nickname="nickname"
-				v-bind:server_password="server_password"
-				v-bind:channels="channels"
+				v-model:nickname="nickname"
+				v-model:server_password="server_password"
+				v-model:channels="channels"
 			/>
 
 			<button

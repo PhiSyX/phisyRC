@@ -65,9 +65,11 @@ import IconCross from "~vue/atoms/Icons/IconCross.vue";
 import IconMessage from "~vue/atoms/Icons/IconMessage.vue";
 import IconMessageEmpty from "~vue/atoms/Icons/IconMessageEmpty.vue";
 import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
+import IconNicklist from "~vue/atoms/Icons/IconNicklist.vue";
 import IconPassword from "~vue/atoms/Icons/IconPassword.vue";
 import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
 import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
+import IconSettingsVertical from "~vue/atoms/Icons/IconSettingsVertical.vue";
 import IconTrashDelete from "~vue/atoms/Icons/IconTrashDelete.vue";
 import IconUser from "~vue/atoms/Icons/IconUser.vue";
 import IconValidated from "~vue/atoms/Icons/IconValidated.vue";
@@ -137,9 +139,11 @@ let icons: Section = {
 		{ icon: IconMessage, text: "Message" },
 		{ icon: IconMessageEmpty, text: "MessageEmpty" },
 		{ icon: IconMessages, text: "Messages" },
+		{ icon: IconNicklist, text: "Nicklist" },
 		{ icon: IconPassword, text: "Password" },
 		{ icon: IconServerConnect, text: "ServerConnect" },
 		{ icon: IconSettings, text: "Settings" },
+		{ icon: IconSettingsVertical, text: "Settings (barre verticale)" },
 		{ icon: IconTrashDelete, text: "TrashDelete" },
 		{ icon: IconUser, text: "User" },
 		{ icon: IconValidated, text: "Validated" },

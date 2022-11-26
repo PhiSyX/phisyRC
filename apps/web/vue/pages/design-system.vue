@@ -24,6 +24,9 @@ const StorySidebarItem = defineAsyncComponent(
 const StorySidebarList = defineAsyncComponent(
 	() => import("~vue/molecules/SidebarList/Story.vue")
 );
+const StoryTopic = defineAsyncComponent(
+	() => import("~vue/molecules/Topic/Story.vue")
+);
 
 // Organisms
 const StoryChatLoginForm = defineAsyncComponent(
@@ -46,6 +49,7 @@ export default {
 		// Molecules
 		StorySidebarItem,
 		StorySidebarList,
+		StoryTopic,
 		// Organisms
 		StoryChatLoginForm,
 		StorySidebar,
@@ -172,6 +176,11 @@ let molecules: Section = {
 		{
 			text: "Barre latérale (liste)",
 			link: "/design-system/sidebar-list",
+		},
+
+		{
+			text: "Topic",
+			link: "/design-system/topic",
 		},
 	],
 };

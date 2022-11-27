@@ -28,6 +28,7 @@ import {
 	set_selected_channel,
 	unset_selected_channel,
 } from "~/organisms/LoginForm/handler";
+import { use_model } from "~vue/hooks/use_models";
 
 let form_action_attribute = Option.from(
 	import.meta.env.VITE_PHISYRC_LOGIN_CHAT_URL
@@ -54,28 +55,14 @@ const emit = defineEmits([
 // Nickname //
 // -------- //
 
-let nickname$ = computed({
-	get() {
-		return props.nickname;
-	},
-	set($1) {
-		emit("update:nickname", $1);
-	},
-});
+let nickname$ = use_model(props, "nickname")(emit);
 let has_nickname_error = ref();
 
 // -------- //
 // Password //
 // -------- //
 
-let password$ = computed({
-	get() {
-		return props.server_password;
-	},
-	set($1) {
-		emit("update:server_password", $1);
-	},
-});
+let password$ = use_model(props, "server_password")(emit);
 
 let can_show_server_password = ref(false);
 let server_password_input_type = computed(() => {
@@ -94,14 +81,7 @@ function handle_toggle_visual_password() {
 // -------- //
 
 let $channel_list_btn = ref<typeof Button | null>(null);
-let channels$ = computed({
-	get() {
-		return props.channels;
-	},
-	set($1) {
-		emit("update:channels", $1);
-	},
-});
+let channels$ = use_model(props, "channels")(emit);
 let selected_channel = ref<Vec<usize>>([]);
 
 // ------- //

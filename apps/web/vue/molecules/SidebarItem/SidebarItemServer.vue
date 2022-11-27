@@ -6,15 +6,14 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { ServerProps as SidebarItemServerProps } from "~/molecules/SidebarItem/props";
-
-import { computed } from "vue";
-
 import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
 import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
 import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
 
 import Button from "~vue/atoms/Button/Button.vue";
+
+import type { ServerProps as SidebarItemServerProps } from "~/molecules/SidebarItem/props";
+import { use_model } from "~vue/hooks/use_models";
 
 type Props = {
 	name: SidebarItemServerProps["name"];
@@ -27,14 +26,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:folded"]);
 
-let folded$ = computed({
-	get() {
-		return props.folded;
-	},
-	set($1: boolean) {
-		emit("update:folded", $1);
-	},
-});
+let folded$ = use_model(props, "folded")(emit);
 </script>
 
 <template>

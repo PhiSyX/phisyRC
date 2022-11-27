@@ -5,17 +5,17 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Props as SidebarProps } from "~/organisms/Sidebar/props";
-
-import { computed } from "vue";
-
 import IconArrowLeft from "~vue/atoms/Icons/IconArrowLeft.vue";
 import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
 import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
 import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
 
 import Button from "~vue/atoms/Button/Button.vue";
+
 import SidebarList from "~vue/molecules/SidebarList/SidebarList.vue";
+
+import type { Props as SidebarProps } from "~/organisms/Sidebar/props";
+import { use_model } from "~vue/hooks/use_models";
 
 type Props = {
 	servers: SidebarProps["servers"];
@@ -28,14 +28,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:toggle"]);
 
-let toggle$ = computed({
-	get() {
-		return props.toggle;
-	},
-	set($1: boolean) {
-		emit("update:toggle", $1);
-	},
-});
+let toggle$ = use_model(props, "toggle")(emit);
 </script>
 
 <template>

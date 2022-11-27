@@ -11,7 +11,8 @@ import IconCross from "~vue/atoms/Icons/IconCross.vue";
 
 import Button from "~vue/atoms/Button/Button.vue";
 
-import { computed, nextTick, ref } from "vue";
+import { nextTick, ref } from "vue";
+import { use_model } from "~vue/hooks/use_models";
 
 type Props = {
 	topic: string;
@@ -22,14 +23,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:topic"]);
 
-const topic$ = computed({
-	get() {
-		return props.topic;
-	},
-	set($1) {
-		emit("update:topic", $1);
-	},
-});
+let topic$ = use_model(props, "topic")(emit);
 
 let $input = ref<HTMLInputElement>();
 let edit_mode = ref(false);

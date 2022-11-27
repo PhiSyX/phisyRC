@@ -5,12 +5,11 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import type { Props as SidebarListProps } from "~/molecules/SidebarList/props";
-
-import { computed } from "vue";
-
 import SidebarItem from "~vue/molecules/SidebarItem/SidebarItem.vue";
 import SidebarItemServer from "~vue/molecules/SidebarItem/SidebarItemServer.vue";
+
+import type { Props as SidebarListProps } from "~/molecules/SidebarList/props";
+import { use_model } from "~vue/hooks/use_models";
 
 type Props = {
 	name: SidebarListProps["name"];
@@ -26,14 +25,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:folded"]);
 
-let folded$ = computed({
-	get() {
-		return props.is_folded;
-	},
-	set($1: boolean) {
-		emit("update:folded", $1);
-	},
-});
+let folded$ = use_model(props, "folded")(emit);
 </script>
 
 <template>

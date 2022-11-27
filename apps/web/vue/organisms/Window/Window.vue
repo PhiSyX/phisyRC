@@ -5,12 +5,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRoute } from "vue-router";
+import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
 
 import type { Props as WindowProps } from "~/organisms/Window/props";
-
-import Sidebar from "~vue/organisms/Sidebar/Sidebar.vue";
+import { useRoute } from "vue-router";
+import { use_model } from "~vue/hooks/use_models";
 
 let route = useRoute();
 
@@ -28,20 +27,13 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:sidebar"]);
 
-let sidebar$ = computed({
-	get() {
-		return props.sidebar;
-	},
-	set($1: boolean) {
-		emit("update:sidebar", $1);
-	},
-});
+let sidebar$ = use_model(props, "sidebar")(emit);
 </script>
 
 <template>
 	<div class="window [ flex size:full border:radius=1 ]">
 		<section
-			v-if="has_meta_sidebar"
+			v-if="has_meta_sidebar && servers.length"
 			class="window@navigation [ resizable:x ]"
 			:class="{
 				'is-opened': sidebar,

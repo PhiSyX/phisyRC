@@ -7,7 +7,8 @@ export default {
 
 <script lang="ts" setup>
 import type { Props as InputProps } from "~/atoms/Input/props";
-import { computed, HTMLAttributes } from "vue";
+import { HTMLAttributes } from "vue";
+import { use_model } from "~vue/hooks/use_models";
 
 type Props = {
 	name: InputProps<HTMLAttributes["class"]>["name"];
@@ -28,14 +29,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["update:modelValue"]);
 
-let model = computed({
-	get() {
-		return props.modelValue;
-	},
-	set($1) {
-		emit("update:modelValue", $1);
-	},
-});
+let model$ = use_model(props)(emit);
 </script>
 
 <template>
@@ -64,7 +58,7 @@ let model = computed({
 					:name="name"
 					class="[ input:reset ]"
 					v-bind="$attrs"
-					v-model="model"
+					v-model="model$"
 				/>
 			</li>
 		</ol>
@@ -74,7 +68,7 @@ let model = computed({
 			:name="name"
 			class="[ input:reset ]"
 			v-bind="$attrs"
-			v-model="model"
+			v-model="model$"
 		/>
 
 		<span :class="iclass" v-if="$slots.icon">

@@ -11,6 +11,7 @@ importers:
       '@phisyrc/std': workspaces
       '@phisyrc/types': workspaces
       '@vitejs/plugin-vue': ^3.2.0
+      focus-trap: ^7.1.0
       pinia: ^2.0.23
       rome: 0.10.1-next
       sass: ^1.55.0
@@ -26,6 +27,7 @@ importers:
       '@phisyrc/css': link:../../npm/css
       '@phisyrc/std': link:../../npm/std
       '@phisyrc/types': link:../../npm/types
+      focus-trap: 7.1.0
       pinia: 2.0.23_lkvyoo2kqf5fp4b2zmqolhfxpe
       vue: 3.2.41
       vue-router: 4.1.6_vue@3.2.41
@@ -888,6 +890,12 @@ packages:
       to-regex-range: 5.0.1
     dev: true
 
+  /focus-trap/7.1.0:
+    resolution: {integrity: sha512-CuJvwUBfJCWcU6fc4xr3UwMF5vWnox4isXAixCwrPzCsPKOQjP9T+nTlYT2t+vOmQL8MOQ16eim99XhjQHAuiQ==}
+    dependencies:
+      tabbable: 6.0.1
+    dev: false
+
   /fsevents/2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -1134,6 +1142,10 @@ packages:
       css-tree: 2.2.1
       csso: 5.0.5
       picocolors: 1.0.0
+    dev: false
+
+  /tabbable/6.0.1:
+    resolution: {integrity: sha512-SYJSIgeyXW7EuX1ytdneO5e8jip42oHWg9xl/o3oTYhmXusZVgiA+VlPvjIN+kHii9v90AmzTZEBcsEvuAY+TA==}
     dev: false
 
   /tinybench/2.3.1:

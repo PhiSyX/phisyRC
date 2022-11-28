@@ -1,0 +1,121 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+@include selector-class("dialog@channels") {
+	width: space(320);
+	height: space(260);
+
+	background-color: var(--bg);
+
+	font-size: 14px;
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: #31363a;
+		} @else if $name == light {
+			--bg: #f5f5f5;
+		}
+	}
+}
+
+@include selector-class("dialog@channels:form<input>") {
+	> form > input {
+		background-color: var(--bg);
+		border: 1px solid var(--border);
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: #3c4043;
+				--border: #313941;
+			} @else if $name == light {
+				--bg: var(--color-white);
+				--border: var(--color-grey400);
+			}
+		}
+	}
+}
+
+@include selector-class("dialog@channels:form<submit>") {
+	> form > button[type="button"] {
+		color: var(--color);
+		background-color: var(--bg);
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--color: #313941;
+				--bg: #d8af20;
+			} @else if $name == light {
+				--color: var(--color-snow);
+				--bg: var(--color-indigo300);
+			}
+		}
+	}
+}
+
+@include selector-class("dialog@channels:list<item>") {
+	li {
+		min-height: space(100);
+		max-height: space(100);
+
+		background-color: var(--bg);
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: var(--color-grey900);
+			} @else if $name == light {
+				--bg: var(--color-white);
+			}
+		}
+	}
+
+	p {
+		margin: 0;
+		word-break: break-all;
+		color: var(--color);
+		font-size: 13px;
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--color: #abb7b7;
+			} @else if $name == light {
+				--color: var(--color-grey700);
+			}
+		}
+	}
+}
+
+@include selector-class("dialog@channels:list<bookmark>") {
+	button[type="button"] {
+		position: absolute;
+		top: 2px;
+		right: 2px;
+
+		svg {
+			color: var(--color);
+
+			@include --theme using ($name) {
+				@if $name == dark {
+					--color: var(--color-grey700);
+				} @else if $name == light {
+					--color: var(--color-grey500);
+				}
+			}
+		}
+
+		&.is-bookmarked svg {
+			@include --theme using ($name) {
+				@if $name == dark {
+					--color: #d8af20;
+				} @else if $name == light {
+					--color: var(--color-red);
+				}
+			}
+		}
+	}
+}

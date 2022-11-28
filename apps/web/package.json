@@ -16,8 +16,10 @@
 		"test:unit-coverage": "vitest run --coverage"
 	},
 	"dependencies": {
+		"@phisyrc/css": "workspaces",
 		"@phisyrc/std": "workspaces",
 		"@phisyrc/types": "workspaces",
+		"focus-trap": "^7.1.0",
 		"pinia": "^2.0.23",
 		"vue": "^3.2.41",
 		"vue-router": "^4.1.6"

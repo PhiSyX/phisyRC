@@ -11,6 +11,8 @@ import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 import Input from "~vue/atoms/Input/Input.vue";
 
+import LoginDialog from "~vue/organisms/LoginForm/LoginDialog.vue";
+
 import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { computed, ref } from "vue";
 
@@ -28,7 +30,12 @@ import {
 	set_selected_channel,
 	unset_selected_channel,
 } from "~/organisms/LoginForm/handler";
+
 import { use_model } from "~vue/hooks/use_models";
+import { use_overlayer_store } from "~vue/stores/overlayer";
+
+let store_init = use_overlayer_store();
+let store = store_init();
 
 let form_action_attribute = Option.from(
 	import.meta.env.VITE_PHISYRC_LOGIN_CHAT_URL
@@ -82,6 +89,9 @@ function handle_toggle_visual_password() {
 
 let $channel_list_btn = ref<typeof Button | null>(null);
 let channels$ = use_model(props, "channels")(emit);
+let channel_list = computed(() => {
+	return props.channels.map((channel) => channel.name);
+});
 let selected_channel = ref<Vec<usize>>([]);
 
 // ------- //
@@ -111,7 +121,13 @@ function focus_button_channel_handler(evt: MouseEvent | KeyboardEvent) {
 	);
 }
 
-function add_channel_handler(evt: Event) {}
+function add_channel_handler(evt: Event) {
+	store.create_layer({
+		id: "login-chat-channels-list",
+		event: evt,
+		dom_element: evt.currentTarget as Element,
+	});
+}
 
 function handle_send_connection(evt: Event) {
 	evt.preventDefault();
@@ -183,7 +199,7 @@ function handle_send_connection(evt: Event) {
 			"
 			:diclick="set_selected_channel_handler"
 			name="channels"
-			:datalist="channels$"
+			:datalist="channel_list"
 			:placeholder="PLACEHOLDER_CHANNELS"
 			@keydown="focus_button_channel_handler"
 			@click="focus_button_channel_handler"
@@ -210,6 +226,12 @@ function handle_send_connection(evt: Event) {
 			</template>
 		</Input>
 	</form>
+	<Teleport
+		v-if="store.layers.has('login-chat-channels-list')"
+		to="#login-chat-channels-list_dialog"
+	>
+		<LoginDialog v-model="channels$" />
+	</Teleport>
 </template>
 
 <style lang="scss">

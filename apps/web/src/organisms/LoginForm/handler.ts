@@ -6,6 +6,7 @@
 
 import type { Option } from "@phisyrc/std/option";
 import { CONFIRM_DELETE_CHANNEL } from "./constant";
+import { Props } from "./props";
 
 /// Focus le bouton d'ajout de salon lors du click sur l'champ de recherche
 /// ou lors de l'appui des touches du clavier.
@@ -52,9 +53,9 @@ function set_selected_channel(
 /// Retire les salons sélectionnés de la liste des salons du composant.
 function unset_selected_channel(
 	evt: MouseEvent,
-	channel_list: Vec<str>,
+	channel_list: Props["channels"],
 	/*mut*/ selected_channel_list: Vec<usize>,
-): Vec<str> {
+): Props["channels"] {
 	if (!(evt.shiftKey || window.confirm(CONFIRM_DELETE_CHANNEL))) {
 		return channel_list;
 	}

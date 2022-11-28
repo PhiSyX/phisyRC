@@ -4,10 +4,20 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+type Channel = {
+	id: string | number
+	name: string;
+	topic: string;
+
+	is_bookmarked: boolean;
+	is_checked: boolean;
+	image_url: `http${"s" | ""}://${string}`;
+};
+
 type Props = {
 	nickname: string;
 	server_password: string;
-	channels: string[];
+	channels: Channel[];
 };
 
 export type { Props };

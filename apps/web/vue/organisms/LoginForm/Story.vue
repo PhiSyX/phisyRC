@@ -1,15 +1,33 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 
 import ChatLoginForm from "~vue/organisms/LoginForm/LoginForm.vue";
 
 let nickname = ref("PhiSyX");
 let server_password = ref("");
-let channels = ref(["#irc", "##ibug"]);
+let channels = ref<LoginFormProps["channels"]>([
+	{
+		id: 1,
+		name: "#irc",
+		topic: "Topic #irc",
+		is_bookmarked: true,
+		is_checked: false,
+		image_url: "https://picsum.photos/200",
+	},
+	{
+		id: 2,
+		name: "#ibug",
+		topic: "Topic #ibug",
+		is_bookmarked: false,
+		is_checked: false,
+		image_url: "https://picsum.photos/300",
+	},
+]);
 </script>
 
 <template>
-	<section class="[ flex gap=4 p=1 ]">
+	<section class="[ flex! gap=4 p=1 ]">
 		<ChatLoginForm
 			v-model:nickname="nickname"
 			v-model:server_password="server_password"

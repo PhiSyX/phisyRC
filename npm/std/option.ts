@@ -109,12 +109,24 @@ if (import.meta.vitest) {
 		expect(None).toEqual(None);
 	});
 
+	it("Option#from", () => {
+		expect(Option.from(null)).toEqual(None);
+
+		expect(Option.from("hello")).toEqual(Some("hello"));
+	})
+
 	it("Option#{is_some, is_none}", () => {
 		expect(Some("").is_some()).toBeTruthy();
 		expect(Some("").is_none()).toBeFalsy();
 
 		expect(None.is_some()).toBeFalsy();
 		expect(None.is_none()).toBeTruthy();
+	});
+
+	it("Option#map", () => {
+		expect(Some("Hello").map((hello) => `${hello} World`)).toEqual(Some("Hello World"));
+
+		expect(None.map((hello) => `${hello} World`)).toEqual(None);
 	});
 
 	it("Option#unwrap", () => {

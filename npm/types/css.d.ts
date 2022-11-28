@@ -5,9 +5,9 @@
  */
 
 declare type CSSUnitValue =
-	| { value: usize; unit: str; }
+	| { value: isize; unit: str; }
 	| str;
 
 declare namespace CSS {
-	function px(n: usize): CSSUnitValue;
-}
+	function px(n: isize): CSSUnitValue;
+};

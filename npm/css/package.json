@@ -5,11 +5,13 @@
 	"version": "1.0.0",
 	"license": "MPL-2.0",
 	"scripts": {
-		"test:unit": "vitest run"
+		"test:unit": "vitest run",
+		"test:unit-coverage": "vitest run --coverage"
 	},
 	"devDependencies": {
 		"@phisyrc/types": "workspaces",
 		"typescript": "^4.9",
-		"vitest": "^0.25.2"
+		"vitest": "^0.25.2",
+		"@vitest/coverage-c8": "^0.25.3"
 	}
 }

@@ -14,5 +14,5 @@
 		"noEmit": true,
 		"baseUrl": "."
 	},
-	"include": ["**/*.ts", "types/**/*.d.ts"]
+	"include": ["*.ts", "houdini/**/*.ts", "types/**/*.d.ts"]
 }

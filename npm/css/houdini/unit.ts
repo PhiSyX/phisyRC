@@ -4,8 +4,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export * from "./css";
-export * from "./core";
-export * from "./types";
-export * from "./vite";
-export * from "./vitest";
+/// CSS.px houdini
+function to_px(n: usize): CSSUnitValue {
+	if (typeof CSS?.px !== "undefined") {
+		return CSS.px(n);
+	}
+	return `${n}px`;
+}
+
+export { to_px };

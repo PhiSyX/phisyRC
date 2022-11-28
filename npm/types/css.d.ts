@@ -4,8 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-export * from "./css";
-export * from "./core";
-export * from "./types";
-export * from "./vite";
-export * from "./vitest";
+declare type CSSUnitValue =
+	| { value: usize; unit: str; }
+	| str;
+
+declare namespace CSS {
+	function px(n: usize): CSSUnitValue;
+}

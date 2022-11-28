@@ -1,0 +1,15 @@
+{
+	"name": "@phisyrc/css",
+	"description": "Code liée au CSS (in JS) pour phisyRC",
+	"authors": "Mike 'PhiSyX' S.",
+	"version": "1.0.0",
+	"license": "MPL-2.0",
+	"scripts": {
+		"test:unit": "vitest run"
+	},
+	"devDependencies": {
+		"@phisyrc/types": "workspaces",
+		"typescript": "^4.9",
+		"vitest": "^0.25.2"
+	}
+}

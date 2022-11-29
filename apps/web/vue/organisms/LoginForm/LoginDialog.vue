@@ -16,6 +16,15 @@ const emit = defineEmits(["update:modelValue"]);
 let channels$ = use_model(props)(emit);
 let new_channel_name = ref("");
 
+function isin_channels_list(channel_name: str): bool {
+	return (
+		channels$.value.findIndex(
+			(channel) =>
+				channel.name.toLowerCase() === channel_name.toLowerCase()
+		) >= 0
+	);
+}
+
 function add_channel_handler(evt: Event) {
 	evt.preventDefault();
 
@@ -23,7 +32,8 @@ function add_channel_handler(evt: Event) {
 
 	if (
 		is_empty(new_channel_name_stripped) ||
-		new_channel_name_stripped.startsWith("#") === false
+		new_channel_name_stripped.startsWith("#") === false ||
+		isin_channels_list(new_channel_name_stripped)
 	) {
 		return;
 	}
@@ -38,6 +48,7 @@ function add_channel_handler(evt: Event) {
 	};
 
 	channels$.value.push(new_channel);
+	new_channel_name.value = "";
 }
 </script>
 

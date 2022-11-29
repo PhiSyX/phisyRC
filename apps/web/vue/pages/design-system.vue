@@ -286,7 +286,7 @@ main > h1 {
 }
 
 nav {
-	width: space(320);
+	min-width: space(320);
 	font-size: 14px;
 
 	@include --theme using($name) {

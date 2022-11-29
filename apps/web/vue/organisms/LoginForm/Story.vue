@@ -2,7 +2,8 @@
 import { ref } from "vue";
 import { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 
-import ChatLoginForm from "~vue/organisms/LoginForm/LoginForm.vue";
+import ChatLoginForm from "./LoginForm.vue";
+import ChatLoginDialog from "./LoginDialog.vue";
 
 let nickname = ref("PhiSyX");
 let server_password = ref("");
@@ -34,6 +35,8 @@ let channels = ref<LoginFormProps["channels"]>([
 			v-model:channels="channels"
 		/>
 
+		<ChatLoginDialog id="chat-login-dlg" v-model="channels" />
+
 		<div style="color: white">
 			<div>Nickname: {{ nickname }}</div>
 			<div>Server Password: {{ server_password }}</div>
@@ -41,3 +44,9 @@ let channels = ref<LoginFormProps["channels"]>([
 		</div>
 	</section>
 </template>
+
+<style scoped>
+#chat-login-dlg {
+	margin-top: 0 !important;
+}
+</style>

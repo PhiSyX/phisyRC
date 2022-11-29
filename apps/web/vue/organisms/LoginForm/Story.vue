@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { ref } from "vue";
-import { Props as LoginFormProps } from "~/organisms/LoginForm/props";
+import { Some } from "@phisyrc/std";
+import { uuid } from "@phisyrc/std/str/uuid";
 
 import ChatLoginForm from "./LoginForm.vue";
 import ChatLoginDialog from "./LoginDialog.vue";
@@ -9,20 +11,20 @@ let nickname = ref("PhiSyX");
 let server_password = ref("");
 let channels = ref<LoginFormProps["channels"]>([
 	{
-		id: 1,
+		id: uuid(),
 		name: "#irc",
 		topic: "Topic #irc",
 		is_bookmarked: true,
 		is_checked: false,
-		image_url: "https://picsum.photos/200",
+		image_url: Some("https://picsum.photos/200"),
 	},
 	{
-		id: 2,
+		id: uuid(),
 		name: "#ibug",
 		topic: "Topic #ibug",
 		is_bookmarked: false,
 		is_checked: false,
-		image_url: "https://picsum.photos/300",
+		image_url: Some("https://picsum.photos/300"),
 	},
 ]);
 </script>

@@ -42,7 +42,7 @@
 }
 
 @include selector-class("dialog@channels:form<submit>") {
-	> form > button[type="button"] {
+	> form > button[type="submit"] {
 		color: var(--color);
 		background-color: var(--bg);
 

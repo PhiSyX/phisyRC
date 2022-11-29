@@ -15,7 +15,7 @@ type OneOfProperty = {
 };
 
 /// Vérifie si la valeur passée par argument |value| est vide.
-function is_empty<T extends OneOfProperty>(value: T): value is T {
+function is_empty<T extends OneOfProperty>(value: T): value is never {
 	return value.length === 0 || value.count === 0 || value.size === 0;
 }
 

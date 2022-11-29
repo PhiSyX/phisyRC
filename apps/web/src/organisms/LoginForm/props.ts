@@ -4,6 +4,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import { Option } from "@phisyrc/std";
+
 type Channel = {
 	id: string | number
 	name: string;
@@ -11,7 +13,7 @@ type Channel = {
 
 	is_bookmarked: boolean;
 	is_checked: boolean;
-	image_url: `http${"s" | ""}://${string}`;
+	image_url: Option<`http${"s" | ""}://${string}`>;
 };
 
 type Props = {

@@ -142,6 +142,7 @@ function handle_send_connection(evt: Event) {
 		method="post"
 		class="login@form [ flex! mx=1 px=1 border:radius=4 box:shadow ]"
 		@submit="handle_send_connection"
+		v-bind="$attrs"
 	>
 		<Input
 			rclass="[ align-i:center ]"

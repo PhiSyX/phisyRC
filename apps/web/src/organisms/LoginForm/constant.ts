@@ -21,8 +21,11 @@ doivent respecter, un format précis, les conditions suivantes :
 export const MAXLENGTH_NICKNAME: u8 = 24;
 
 export const PLACEHOLDER_NICKNAME: str = `Pseudonyme (max. ${MAXLENGTH_NICKNAME} caractères)`;
-export const PLACEHOLDER_SERVER_PASSWORD: str = "Mot de passe serveur (optionnel)";
+export const PLACEHOLDER_SERVER_PASSWORD: str =
+	"Mot de passe serveur (optionnel)";
 export const PLACEHOLDER_CHANNELS = "Ajouter un ou plusieurs salons";
 
-export const CONFIRM_DELETE_CHANNEL: str = "Voulez-vous vraiment supprimer le salon?";
-export const BYPASS_CONFIRM_DELETE_CHANNEL: str = "Maintenir la touche `Shift` pour outrepasser la boite de confirmation.";
+export const CONFIRM_DELETE_CHANNEL: str =
+	"Voulez-vous vraiment supprimer le salon?";
+export const BYPASS_CONFIRM_DELETE_CHANNEL: str =
+	"Maintenir la touche `Shift` pour outrepasser la boite de confirmation.";

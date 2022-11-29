@@ -11,18 +11,19 @@ type Props = {
 };
 
 interface ChannelProps extends Room {
-	type: "channel",
+	type: "channel";
 	name: `#${Room["name"]}`;
-};
+}
 
-interface PrivateProps extends Optional<
-	Room,
-	| "is_active"
-	| "is_highlighted"
-	| "total_unread_event"
-	| "total_unread_message"
-> {
-	type: "private",
+interface PrivateProps
+	extends Optional<
+		Room,
+		| "is_active"
+		| "is_highlighted"
+		| "total_unread_event"
+		| "total_unread_message"
+	> {
+	type: "private";
 	last_message: NonNullable<Room["last_message"]>;
 }
 

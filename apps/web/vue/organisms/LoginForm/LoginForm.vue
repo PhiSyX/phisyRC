@@ -24,7 +24,7 @@ import {
 	VALIDATION_NICKNAME_INFO,
 	BYPASS_CONFIRM_DELETE_CHANNEL,
 } from "~/organisms/LoginForm/constant";
-import { Option } from "@phisyrc/std/option";
+import { Option } from "@phisyrc/std";
 import {
 	focus_button_channel,
 	set_selected_channel,

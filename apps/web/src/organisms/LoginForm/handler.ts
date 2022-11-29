@@ -4,7 +4,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Option } from "@phisyrc/std/option";
+import type { Option } from "@phisyrc/std";
 import { CONFIRM_DELETE_CHANNEL } from "./constant";
 import { Props } from "./props";
 

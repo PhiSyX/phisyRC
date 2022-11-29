@@ -7,7 +7,7 @@ export default {
 <script lang="ts" setup>
 import type { PrivateProps as SidebarItemPrivateProps } from "~/molecules/SidebarItem/props";
 
-import { to_user_friendly } from "@phisyrc/std/int/user_friendly";
+import { to_user_friendly } from "@phisyrc/std";
 
 import IconRoomClose from "~vue/atoms/Icons/IconCross.vue";
 import IconRoomMessageEmpty from "~vue/atoms/Icons/IconMessageEmpty.vue";

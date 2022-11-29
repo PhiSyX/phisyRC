@@ -6,6 +6,6 @@
 
 import type { Server } from "~/types";
 
-interface Props extends Server { };
+interface Props extends Server {}
 
 export type { Props };

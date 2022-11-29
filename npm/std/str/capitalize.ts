@@ -12,7 +12,7 @@ type Options = {
 	/// Remplace tout le reste d'une chaîne de caractères en minuscule.
 	to_lower?: bool;
 	/// Inclus les séparateurs dans le résultat?
-	includes_separators?: bool,
+	includes_separators?: bool;
 };
 
 // -------- //
@@ -98,23 +98,26 @@ if (import.meta.vitest) {
 	});
 
 	it("capitalize: garde le reste de la chaîne de caractères intacte", () => {
-		expect(capitalize(
+		expect(capitalize("HeLLo WorLd", { to_lower: false })).toEqual(
 			"HeLLo WorLd",
-			{ to_lower: false }
-		),).toEqual("HeLLo WorLd");
+		);
 	});
 
 	it("capitalize: exclusion des séparateurs dans le résultat", () => {
-		expect(capitalize("hello ", {
-			includes_separators: false
-		})).toEqual("Hello");
+		expect(capitalize("hello ", { includes_separators: false })).toEqual(
+			"Hello",
+		);
 
-		expect(capitalize("hello world", {
-			includes_separators: false
-		})).toEqual("HelloWorld");
+		expect(
+			capitalize("hello world", {
+				includes_separators: false,
+			}),
+		).toEqual("HelloWorld");
 
-		expect(capitalize("    hello    ", {
-			includes_separators: false
-		})).toEqual("Hello");
+		expect(
+			capitalize("    hello    ", {
+				includes_separators: false,
+			}),
+		).toEqual("Hello");
 	});
 }

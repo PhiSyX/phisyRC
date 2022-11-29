@@ -7,7 +7,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 
-import { is_empty } from "@phisyrc/std/lang/is_empty";
+import { is_empty } from "@phisyrc/std";
 import { to_px } from "@phisyrc/css/houdini/unit";
 
 // ---- //
@@ -26,7 +26,7 @@ type Layer = {
 		left: CSSUnitValue;
 		width: CSSUnitValue;
 		height: CSSUnitValue;
-	}
+	};
 };
 
 // -------- //
@@ -77,7 +77,7 @@ function setup() {
 			event,
 			dom_element,
 			destroyable,
-			style
+			style,
 		});
 	}
 
@@ -130,7 +130,7 @@ function setup() {
 			return;
 		}
 		let layer = list.value.get(layer_id)!;
-		list.value.set(layer_id, { ...layer, style })
+		list.value.set(layer_id, { ...layer, style });
 	}
 
 	function update_layers() {
@@ -147,7 +147,7 @@ function setup() {
 		destroy_layer,
 		destroy_layers,
 		update_layer,
-		update_layers
+		update_layers,
 	};
 }
 

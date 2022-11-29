@@ -10,8 +10,8 @@
 
 type OneOfProperty = {
 	count?: usize;
-	length?: usize
-	size?: usize
+	length?: usize;
+	size?: usize;
 };
 
 /// Vérifie si la valeur passée par argument |value| est vide.

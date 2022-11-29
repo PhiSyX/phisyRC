@@ -28,10 +28,11 @@ if (import.meta.vitest) {
 	const { expect, it, beforeEach } = import.meta.vitest;
 
 	beforeEach(() => {
+		// @ts-ignore
 		globalThis.CSS = {
 			px(n: isize): CSSUnitValue {
-				return { unit: "px", value: n }
-			}
+				return { unit: "px", value: n };
+			},
 		};
 	});
 

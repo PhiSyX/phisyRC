@@ -20,7 +20,7 @@ import type { Props as SidebarItemProps } from "~/molecules/SidebarItem/props";
 
 import { computed, defineAsyncComponent } from "vue";
 
-import { capitalize } from "@phisyrc/std/str/capitalize";
+import { capitalize } from "@phisyrc/std";
 
 type Props = {
 	type: SidebarItemProps["type"];

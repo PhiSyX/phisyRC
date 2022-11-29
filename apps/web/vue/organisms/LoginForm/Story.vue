@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { ref } from "vue";
-import { Some } from "@phisyrc/std";
-import { uuid } from "@phisyrc/std/str/uuid";
+import { Some, uuid } from "@phisyrc/std";
 
 import ChatLoginForm from "./LoginForm.vue";
 import ChatLoginDialog from "./LoginDialog.vue";

@@ -7,7 +7,7 @@
 import { Option } from "@phisyrc/std";
 
 type Channel = {
-	id: string | number
+	id: string | number;
 	name: string;
 	topic: string;
 

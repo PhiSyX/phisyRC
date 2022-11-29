@@ -7,7 +7,7 @@
 function toggle_click(
 	evt: MouseEvent,
 	/*$1*/ toggle_value: boolean,
-	notifier: ($1: boolean) => void
+	notifier: ($1: boolean) => void,
 ) {
 	notifier(toggle_value);
 
@@ -16,6 +16,5 @@ function toggle_click(
 		setTimeout(() => target.blur(), 0);
 	}
 }
-
 
 export { toggle_click };

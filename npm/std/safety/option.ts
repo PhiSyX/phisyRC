@@ -41,7 +41,7 @@ class Option<T> {
 	// ----------- //
 	// Constructor //
 	// ----------- //
-	constructor(public type: Variant, private value?: unsafe<T>) { }
+	constructor(public type: Variant, private value?: unsafe<T>) {}
 
 	expect(msg: string): safety<T> {
 		if (this.is_some()) {
@@ -113,7 +113,7 @@ if (import.meta.vitest) {
 		expect(Option.from(null)).toEqual(None);
 
 		expect(Option.from("hello")).toEqual(Some("hello"));
-	})
+	});
 
 	it("Option#{is_some, is_none}", () => {
 		expect(Some("").is_some()).toBeTruthy();
@@ -124,7 +124,9 @@ if (import.meta.vitest) {
 	});
 
 	it("Option#map", () => {
-		expect(Some("Hello").map((hello) => `${hello} World`)).toEqual(Some("Hello World"));
+		expect(Some("Hello").map((hello) => `${hello} World`)).toEqual(
+			Some("Hello World"),
+		);
 
 		expect(None.map((hello) => `${hello} World`)).toEqual(None);
 	});

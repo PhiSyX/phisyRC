@@ -17,7 +17,7 @@ const trap_focus: Directive = {
 			clickOutsideDeactivates: true,
 		});
 		trap.activate();
-	}
+	},
 };
 
 export default trap_focus;

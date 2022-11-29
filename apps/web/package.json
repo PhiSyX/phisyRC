@@ -10,7 +10,7 @@
 		"build": "pnpm run wasm:build && pnpm run vue:build",
 		"vue:build": "vue-tsc && vite build",
 		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../assets/wasm",
-		"check:fmt": "rome format src std types vue",
+		"check:fmt": "rome format src types vue",
 		"test:unit:watch": "vitest",
 		"test:unit": "vitest run",
 		"test:unit-coverage": "vitest run --coverage"
@@ -27,7 +27,7 @@
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^3.2.0",
 		"@vitest/coverage-c8": "^0.25.3",
-		"rome": "0.10.1-next",
+		"rome": "^10.0.1",
 		"sass": "^1.55.0",
 		"typescript": "^4.9.3",
 		"vite": "^3.2.0",

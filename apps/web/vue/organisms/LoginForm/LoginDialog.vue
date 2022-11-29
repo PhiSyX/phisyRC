@@ -5,9 +5,7 @@ import IconChecked from "~vue/atoms/Icons/IconChecked.vue";
 import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { ref } from "vue";
 import { use_model } from "~vue/hooks/use_models";
-import { is_empty } from "@phisyrc/std/lang/is_empty";
-import { uuid } from "@phisyrc/std/str/uuid";
-import { None } from "@phisyrc/std";
+import { is_empty, uuid, None } from "@phisyrc/std";
 
 type Props = {
 	modelValue: LoginFormProps["channels"];

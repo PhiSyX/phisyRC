@@ -83,7 +83,7 @@ import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { capitalize } from "@phisyrc/std/str/capitalize";
+import { capitalize } from "@phisyrc/std";
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";

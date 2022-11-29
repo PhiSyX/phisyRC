@@ -15,14 +15,12 @@ function get_random_str(s: str): str {
 	let dt = new Date().getTime();
 
 	const replaceXY = (c: str) => {
-		const random = (dt + r() * 16) % 16 | 0;
+		const random = ((dt + r() * 16) % 16) | 0;
 		dt = f(dt / 16);
-		return (c === 'x' ? random : (random & 0x3 | 0x8)).toString(16);
+		return (c === "x" ? random : (random & 0x3) | 0x8).toString(16);
 	};
 
-	return s
-		.replace(/[xy]/g, replaceXY)
-		.replace(/^\d/g, () => 'x');
+	return s.replace(/[xy]/g, replaceXY).replace(/^\d/g, () => "x");
 }
 
 export { uuid };

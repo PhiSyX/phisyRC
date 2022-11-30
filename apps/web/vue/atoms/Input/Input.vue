@@ -34,9 +34,11 @@ let model$ = use_model(props)(emit);
 
 <template>
 	<div class="app@input" :class="rclass">
-		<label :class="lclass" :for="name" v-if="$slots.default">
-			<slot />
-		</label>
+		<slot name="label">
+			<label :class="lclass" :for="name" v-if="$slots.default">
+				<slot />
+			</label>
+		</slot>
 
 		<ol
 			class="[ list:reset flex flex:wrap gap=1 ]"

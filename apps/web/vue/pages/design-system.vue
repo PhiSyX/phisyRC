@@ -24,6 +24,9 @@ const StorySidebarItem = defineAsyncComponent(
 const StorySidebarList = defineAsyncComponent(
 	() => import("~vue/molecules/SidebarList/Story.vue")
 );
+const StoryEditbox = defineAsyncComponent(
+	() => import("~vue/molecules/Editbox/Story.vue")
+);
 const StoryTopic = defineAsyncComponent(
 	() => import("~vue/molecules/Topic/Story.vue")
 );
@@ -49,6 +52,7 @@ export default {
 		// Molecules
 		StorySidebarItem,
 		StorySidebarList,
+		StoryEditbox,
 		StoryTopic,
 		// Organisms
 		StoryChatLoginForm,
@@ -186,6 +190,11 @@ let molecules: Section = {
 		{
 			text: "Barre latérale (liste)",
 			link: "/design-system/sidebar-list",
+		},
+
+		{
+			text: "Editbox",
+			link: "/design-system/editbox",
 		},
 
 		{

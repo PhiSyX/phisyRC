@@ -16,11 +16,12 @@
 	}
 
 	@include selector-class("box-fd:shadow") {
+		filter: drop-shadow(2px 2px 4px var(--shadow-color));
 		@include --theme using($name) {
 			@if $name == dark {
-				filter: drop-shadow(2px 2px 4px rgba(#fff, 0.5));
+				--shadow-color: #{rgba(#fff, 0.5)};
 			} @else if $name == light {
-				filter: drop-shadow(2px 2px 4px rgba(#000, 0.25));
+				--shadow-color: #{rgba(#000, 0.25)};
 			}
 		}
 	}

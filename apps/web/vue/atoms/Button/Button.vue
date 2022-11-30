@@ -27,6 +27,9 @@ function toggle_click_handler(evt: MouseEvent) {
 	<button
 		type="button"
 		class="app@btn [ btn:reset ]"
+		:class="{
+			'app@btn(:focused)': toggle,
+		}"
 		@click="toggle_click_handler"
 	>
 		<slot />

@@ -18,3 +18,51 @@ $app-palette-light-colors: (
 	red: #ef4836,
 	snow: #eaf2f4,
 );
+
+$app-palette-irc-dark: (
+	0: #212121,
+	1: #eaf2f4,
+	2: #4489e1,
+	3: #28a228,
+	4: #f54a37,
+	5: #d66935,
+	6: #c357f1,
+	7: #f39c12,
+	8: #f2ca27,
+	9: #abe338,
+	10: #00a4a6,
+	11: #81cfe0,
+	12: #00a1ff,
+	13: #e889e8,
+	14: #bdc3c7,
+	15: #95a5a6,
+);
+
+$app-palette-irc-light: (
+	0: #eaf2f4,
+	1: #212121,
+	2: #0f4880,
+	3: #087f32,
+	4: #d52111,
+	5: #9c4f41,
+	6: #8a2be2,
+	7: #b54e11,
+	8: #8e661d,
+	9: #4a7e2d,
+	10: #277972,
+	11: #638bb3,
+	12: #0066e8,
+	13: #c9169c,
+	14: #6d6d6d,
+	15: #515151,
+);
+
+:root {
+	@include --theme using($name) {
+		@if $name == dark {
+			@include --add-variant(irc, $app-palette-irc-dark);
+		} @else if $name == light {
+			@include --add-variant(irc, $app-palette-irc-light);
+		}
+	}
+}

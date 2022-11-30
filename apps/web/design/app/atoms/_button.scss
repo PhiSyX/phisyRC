@@ -24,17 +24,29 @@
 		bottom: var(--pz);
 	}
 
+	&:focus .svg,
 	&:focus svg,
+	&:hover .svg,
 	&:hover svg {
 		filter: opacity(0.75);
 	}
+	.svg,
 	svg {
 		transition: filter 200ms;
 		filter: opacity(0.5);
 	}
 
+	.svg:focus,
 	svg:focus,
+	.svg:hover,
 	svg:hover {
 		filter: opacity(1);
+	}
+}
+
+@include selector-class("app@btn(:focused)") {
+	.svg,
+	svg {
+		filter: opacity(1) !important;
 	}
 }

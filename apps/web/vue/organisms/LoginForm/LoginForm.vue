@@ -92,17 +92,21 @@ let channels$ = use_model(props, "channels")(emit);
 let channel_list = computed(() => {
 	return props.channels.map((channel) => channel.name);
 });
-let selected_channel = ref<Vec<usize>>([]);
+let selected_channel = ref<Vec<str>>([]);
 
 // ------- //
 // Handler //
 // ------- //
 
-function set_selected_channel_handler(evt: MouseEvent, chan_idx: usize) {
+function set_selected_channel_handler(
+	evt: MouseEvent,
+	chan_name: str,
+	_: usize
+) {
 	selected_channel.value = set_selected_channel(
 		evt,
 		selected_channel.value,
-		chan_idx
+		chan_name
 	);
 }
 
@@ -192,10 +196,10 @@ function handle_send_connection(evt: Event) {
 			iclass="[ align-t:center flex! gap=1 ]"
 			dclass="[ flex:full ]"
 			:diclass="
-				(i) => [
+				(chan_name) => [
 					'login@channel:label',
 					'[ p=1 cursor:pointer border:radius=2 f-family=roboto ]',
-					{ 'is-selected': selected_channel.includes(i) },
+					{ 'is-selected': selected_channel.includes(chan_name) },
 				]
 			"
 			:diclick="set_selected_channel_handler"

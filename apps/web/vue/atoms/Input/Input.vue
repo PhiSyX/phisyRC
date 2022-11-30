@@ -45,8 +45,8 @@ let model$ = use_model(props)(emit);
 		>
 			<li
 				class="[ align-s:start ]"
-				:class="diclass?.(i)"
-				@click="diclick?.($event, i)"
+				:class="diclass?.(item, i)"
+				@click="diclick?.($event, item, i)"
 				v-for="(item, i) in datalist"
 			>
 				{{ item }}

@@ -24,6 +24,7 @@ const CONFIG_DIR: Dir = include_dir!("config");
 const CONSTANTS_DIR: Dir = include_dir!("constants");
 const CRATES_DIR: Dir = include_dir!("crates");
 const MACRO_DIR: Dir = include_dir!("macro");
+const NPM_DIR: Dir = include_dir!("npm");
 const PROTO_DIR: Dir = include_dir!("proto");
 const TOOLS_DIR: Dir = include_dir!("tools");
 
@@ -34,6 +35,7 @@ fn main() -> ExitCode {
 	check_license(&CONFIG_DIR, &mut files);
 	check_license(&CONSTANTS_DIR, &mut files);
 	check_license(&CRATES_DIR, &mut files);
+	check_license(&NPM_DIR, &mut files);
 	check_license(&MACRO_DIR, &mut files);
 	check_license(&PROTO_DIR, &mut files);
 	check_license(&TOOLS_DIR, &mut files);

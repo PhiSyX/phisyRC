@@ -4,8 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Option } from "@phisyrc/std/option";
+import type { Option } from "@phisyrc/std";
+import { dbg } from "~/logger";
 import { CONFIRM_DELETE_CHANNEL } from "./constant";
+import { Props } from "./props";
 
 /// Focus le bouton d'ajout de salon lors du click sur l'champ de recherche
 /// ou lors de l'appui des touches du clavier.
@@ -33,17 +35,17 @@ function focus_button_channel(
 /// Définis les salons sélectionnés dans l'état local du composant.
 function set_selected_channel(
 	evt: MouseEvent,
-	local_state: Vec<usize>,
-	chan_idx: usize,
-): Vec<number> {
-	if (local_state.includes(chan_idx)) {
-		return local_state.filter((x) => x !== chan_idx);
+	local_state: Vec<str>,
+	chan_name: str,
+): Vec<str> {
+	if (local_state.includes(chan_name)) {
+		return local_state.filter((x) => x !== chan_name);
 	}
 
 	if (evt.ctrlKey) {
-		local_state = [...local_state, chan_idx];
+		local_state = [...local_state, chan_name];
 	} else {
-		local_state = [chan_idx];
+		local_state = [chan_name];
 	}
 
 	return local_state;
@@ -52,14 +54,16 @@ function set_selected_channel(
 /// Retire les salons sélectionnés de la liste des salons du composant.
 function unset_selected_channel(
 	evt: MouseEvent,
-	channel_list: Vec<str>,
-	/*mut*/ selected_channel_list: Vec<usize>,
-): Vec<str> {
+	channel_list: Props["channels"],
+	/*mut*/ selected_channel_list: Vec<str>,
+): Props["channels"] {
 	if (!(evt.shiftKey || window.confirm(CONFIRM_DELETE_CHANNEL))) {
 		return channel_list;
 	}
-	for (const s_c_idx of selected_channel_list) {
-		channel_list = channel_list.filter((_, c_idx) => !(c_idx === s_c_idx));
+	for (const s_c_name of selected_channel_list) {
+		channel_list = channel_list.filter((c, _) => {
+			return !(c.name === s_c_name);
+		});
 	}
 	selected_channel_list.length = 0;
 	return channel_list;

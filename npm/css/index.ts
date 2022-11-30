@@ -4,8 +4,4 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Server } from "~/types";
-
-interface Props extends Server {}
-
-export type { Props };
+export { };

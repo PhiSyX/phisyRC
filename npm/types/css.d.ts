@@ -4,8 +4,10 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import type { Server } from "~/types";
+declare type CSSUnitValue =
+	| { value: isize; unit: str; }
+	| str;
 
-interface Props extends Server {}
-
-export type { Props };
+declare namespace CSS {
+	function px(n: isize): CSSUnitValue;
+};

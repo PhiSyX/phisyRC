@@ -63,7 +63,9 @@ import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
 import IconArrowLeft from "~vue/atoms/Icons/IconArrowLeft.vue";
 import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
 import IconArrowUp from "~vue/atoms/Icons/IconArrowUp.vue";
+import IconBookmark from "~vue/atoms/Icons/IconBookmark.vue";
 import IconChannel from "~vue/atoms/Icons/IconChannel.vue";
+import IconChecked from "~vue/atoms/Icons/IconChecked.vue";
 import IconColor from "~vue/atoms/Icons/IconColor.vue";
 import IconCross from "~vue/atoms/Icons/IconCross.vue";
 import IconMessage from "~vue/atoms/Icons/IconMessage.vue";
@@ -81,7 +83,7 @@ import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { capitalize } from "@phisyrc/std/str/capitalize";
+import { capitalize } from "@phisyrc/std";
 
 onMounted(() => {
 	document.documentElement.dataset["js"] = "on";
@@ -138,7 +140,9 @@ let icons: Section = {
 		{ icon: IconArrowLeft, text: "ArrowLeft" },
 		{ icon: IconArrowRight, text: "ArrowRight" },
 		{ icon: IconArrowUp, text: "ArrowUp" },
+		{ icon: IconBookmark, text: "Bookmark" },
 		{ icon: IconChannel, text: "Channel" },
+		{ icon: IconChecked, text: "Checked" },
 		{ icon: IconCross, text: "Cross" },
 		{ icon: IconMessage, text: "Message" },
 		{ icon: IconMessageEmpty, text: "MessageEmpty" },
@@ -282,7 +286,7 @@ main > h1 {
 }
 
 nav {
-	width: space(320);
+	min-width: space(320);
 	font-size: 14px;
 
 	@include --theme using($name) {

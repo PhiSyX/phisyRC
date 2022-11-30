@@ -5,8 +5,10 @@
 	"license": "MPL 2.0",
 	"private": true,
 	"scripts": {
+		"check:fmt": "pnpm -r check:fmt",
 		"web": "pnpm --filter @phisyrc/web --",
 		"test:unit": "pnpm -r test:unit",
+		"test:unit-coverage": "pnpm -r test:unit-coverage",
 		"tools/svgo": "pnpm --filter @phisyrc/resources -- svg:optimizer ../../assets/svg"
 	}
 }

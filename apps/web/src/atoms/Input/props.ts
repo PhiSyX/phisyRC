@@ -17,8 +17,8 @@ type Props<HTMLAttributeClass> = {
 	/// DataList Class
 	dclass?: HTMLAttributeClass;
 	/// DataList Item Class
-	diclass?: (i: usize) => HTMLAttributeClass;
-	diclick?: (evt: MouseEvent, i: usize) => void;
+	diclass?: (item: any, i: usize) => HTMLAttributeClass;
+	diclick?: (evt: MouseEvent, item: any, i: usize) => void;
 };
 
 export type { Props };

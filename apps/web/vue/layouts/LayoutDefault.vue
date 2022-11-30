@@ -4,6 +4,11 @@ export default {
 };
 </script>
 
+<script setup lang="ts">
+import Overlayer from "~vue/organisms/Overlayer/Overlayer.vue";
+</script>
+
 <template>
 	<RouterView />
+	<Overlayer />
 </template>

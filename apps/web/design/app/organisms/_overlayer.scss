@@ -1,0 +1,81 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+.overlay {
+	position: fixed;
+	z-index: 1000;
+
+	background-color: hsla(var(--bg), 0.75);
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: var(--color-black_hsl);
+		} @else if $name == light {
+			--bg: var(--color-grey700_hsl);
+		}
+	}
+}
+
+.layer {
+	position: fixed;
+
+	/*
+	top: var(--top);
+	right: var(--right);
+	bottom: var(--bottom);
+	left: var(--left);
+
+	width: var(--width);
+	height: var(--height);
+	*/
+
+	background: hsla(var(--bg), 50%);
+	border: 1px solid var(--border);
+	box-shadow: 0 2px 16px var(--box-shadow);
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: var(--color-grey_hsl);
+			--border: var(--color-yell0w700);
+			--box-shadow: hsla(var(--color-white_hsl), 50%);
+		} @else if $name == light {
+			--bg: var(--color-white_hsl);
+			--border: var(--color-indigo300);
+			--box-shadow: hsla(var(--color-black_hsl), 30%);
+		}
+	}
+
+	z-index: 1005;
+	&\@highlight {
+		z-index: 1010 !important;
+
+		position: relative;
+
+		pointer-events: none;
+	}
+	&\@highlight_alt {
+		z-index: 1010 !important;
+
+		pointer-events: none;
+	}
+}
+
+.dialog > * {
+	z-index: 1010;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 200ms ease-in-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}

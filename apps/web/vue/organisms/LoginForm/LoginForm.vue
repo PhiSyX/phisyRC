@@ -11,6 +11,8 @@ import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 import Input from "~vue/atoms/Input/Input.vue";
 
+import LoginDialog from "~vue/organisms/LoginForm/LoginDialog.vue";
+
 import type { Props as LoginFormProps } from "~/organisms/LoginForm/props";
 import { computed, ref } from "vue";
 
@@ -22,13 +24,18 @@ import {
 	VALIDATION_NICKNAME_INFO,
 	BYPASS_CONFIRM_DELETE_CHANNEL,
 } from "~/organisms/LoginForm/constant";
-import { Option } from "@phisyrc/std/option";
+import { Option } from "@phisyrc/std";
 import {
 	focus_button_channel,
 	set_selected_channel,
 	unset_selected_channel,
 } from "~/organisms/LoginForm/handler";
+
 import { use_model } from "~vue/hooks/use_models";
+import { use_overlayer_store } from "~vue/stores/overlayer";
+
+let store_init = use_overlayer_store();
+let store = store_init();
 
 let form_action_attribute = Option.from(
 	import.meta.env.VITE_PHISYRC_LOGIN_CHAT_URL
@@ -82,17 +89,24 @@ function handle_toggle_visual_password() {
 
 let $channel_list_btn = ref<typeof Button | null>(null);
 let channels$ = use_model(props, "channels")(emit);
-let selected_channel = ref<Vec<usize>>([]);
+let channel_list = computed(() => {
+	return props.channels.map((channel) => channel.name);
+});
+let selected_channel = ref<Vec<str>>([]);
 
 // ------- //
 // Handler //
 // ------- //
 
-function set_selected_channel_handler(evt: MouseEvent, chan_idx: usize) {
+function set_selected_channel_handler(
+	evt: MouseEvent,
+	chan_name: str,
+	_: usize
+) {
 	selected_channel.value = set_selected_channel(
 		evt,
 		selected_channel.value,
-		chan_idx
+		chan_name
 	);
 }
 
@@ -111,7 +125,13 @@ function focus_button_channel_handler(evt: MouseEvent | KeyboardEvent) {
 	);
 }
 
-function add_channel_handler(evt: Event) {}
+function add_channel_handler(evt: Event) {
+	store.create_layer({
+		id: "login-chat-channels-list",
+		event: evt,
+		dom_element: evt.currentTarget as Element,
+	});
+}
 
 function handle_send_connection(evt: Event) {
 	evt.preventDefault();
@@ -126,6 +146,7 @@ function handle_send_connection(evt: Event) {
 		method="post"
 		class="login@form [ flex! mx=1 px=1 border:radius=4 box:shadow ]"
 		@submit="handle_send_connection"
+		v-bind="$attrs"
 	>
 		<Input
 			rclass="[ align-i:center ]"
@@ -175,15 +196,15 @@ function handle_send_connection(evt: Event) {
 			iclass="[ align-t:center flex! gap=1 ]"
 			dclass="[ flex:full ]"
 			:diclass="
-				(i) => [
+				(chan_name) => [
 					'login@channel:label',
 					'[ p=1 cursor:pointer border:radius=2 f-family=roboto ]',
-					{ 'is-selected': selected_channel.includes(i) },
+					{ 'is-selected': selected_channel.includes(chan_name) },
 				]
 			"
 			:diclick="set_selected_channel_handler"
 			name="channels"
-			:datalist="channels$"
+			:datalist="channel_list"
 			:placeholder="PLACEHOLDER_CHANNELS"
 			@keydown="focus_button_channel_handler"
 			@click="focus_button_channel_handler"
@@ -210,6 +231,12 @@ function handle_send_connection(evt: Event) {
 			</template>
 		</Input>
 	</form>
+	<Teleport
+		v-if="store.layers.has('login-chat-channels-list')"
+		to="#login-chat-channels-list_dialog"
+	>
+		<LoginDialog v-model="channels$" />
+	</Teleport>
 </template>
 
 <style lang="scss">

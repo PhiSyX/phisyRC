@@ -4,29 +4,41 @@ import Editbox from "./Editbox.vue";
 
 let room1 = reactive({
 	input: "",
+	input_history: [],
 });
 
 let room2 = reactive({
 	input: "",
+	input_history: [],
 });
 
 let room3 = reactive({
 	input: "",
+	input_history: ["hello", "world"],
 });
 </script>
 
 <template>
 	<section class="[ flex! gap=2 p=1 ]">
 		<div id="editbox1" class="[ w:full ]">
-			<Editbox v-model="room1.input" />
+			<Editbox
+				v-model="room1.input"
+				v-model:history="room1.input_history"
+			/>
 		</div>
 
 		<div id="editbox2" class="[ w:full ]">
-			<Editbox v-model="room2.input" />
+			<Editbox
+				v-model="room2.input"
+				v-model:history="room2.input_history"
+			/>
 		</div>
 
 		<div id="editbox3" class="[ w:full ]">
-			<Editbox v-model="room3.input" />
+			<Editbox
+				v-model="room3.input"
+				v-model:history="room3.input_history"
+			/>
 		</div>
 	</section>
 </template>

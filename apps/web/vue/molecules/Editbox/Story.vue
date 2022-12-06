@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { reactive } from "vue";
-import Editbox from "./Editbox.vue";
+import Editbox from "./EditboxForm.vue";
 
 let room1 = reactive({
 	input: "",
@@ -54,7 +54,7 @@ let room3 = reactive({
 		@if $name == light {
 			background: var(--color-white);
 		} @else if $name == dark {
-			background: var(--color-grey900);
+			background: #31363a;
 		}
 	}
 }

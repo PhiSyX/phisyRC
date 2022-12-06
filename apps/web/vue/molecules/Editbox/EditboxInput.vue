@@ -1,16 +1,9 @@
-<script lang="ts">
-export default {
-	name: "Editbox",
-};
-</script>
-
 <script lang="ts" setup>
 import IconAttachFile from "~vue/atoms/Icons/IconAttachFile.vue";
-import IconSendMessage from "~vue/atoms/Icons/IconSendMessage.vue";
 import IconVoiceRecording from "~vue/atoms/Icons/IconVoiceRecording.vue";
 
-import Input from "~vue/atoms/Input/Input.vue";
 import Button from "~vue/atoms/Button/Button.vue";
+import Input from "~vue/atoms/Input/Input.vue";
 
 import { ref } from "vue";
 import { is_empty, uuid } from "@phisyrc/std";
@@ -26,14 +19,7 @@ type Props = {
 const props = defineProps<Props>();
 const emit = defineEmits(["update:modelValue", "update:history"]);
 
-const input$ = use_model(props)(emit);
 const history$ = use_model(props, "history")(emit);
-
-const id = uuid();
-
-let voice_recording = ref(false);
-let attach_file = ref(false);
-let text_format = ref(false);
 
 let current_input_history_index = ref(props.history.length);
 
@@ -70,51 +56,44 @@ function keydown_handler(e: KeyboardEvent) {
 	let current_input = history$.value[current_input_history_index.value] || "";
 	input$.value = current_input;
 }
+
+const input$ = use_model(props)(emit);
+
+const id = uuid();
+
+let voice_recording = ref(false);
+let attach_file = ref(false);
+let text_format = ref(false);
 </script>
 
 <template>
-	<form
-		autocapitalize="off"
-		method="post"
-		class="editbox [ p=1 border:radius=1 ]"
-		@submit.prevent
+	<Input
+		rclass="[ flex:full ][ flex align-i:center gap=1 p=1 border:radius=1 ]"
+		iclass="[ flex gap=1 ]"
+		class="editbox@input:user-color [ flex:full ][ box-fd:shadow f-family=roboto ]"
+		autocomplete="off"
+		placeholder="Envoyer un message"
+		:name="`message-${id}`"
+		v-model="input$"
+		@keydown="keydown_handler"
 	>
-		<Input
-			rclass="[ flex align-i:center gap=1 ]"
-			iclass="[ flex gap=1 ]"
-			class="editbox@input:user-color [ flex:full ][ box-fd:shadow f-family=roboto ]"
-			autocomplete="off"
-			placeholder="Envoyer un message"
-			:name="`message-${id}`"
-			v-model="input$"
-			@keydown="keydown_handler"
-		>
-			<template #label>
-				<Button v-model:toggle="voice_recording">
-					<IconVoiceRecording />
-				</Button>
+		<template #label>
+			<Button v-model:toggle="voice_recording">
+				<IconVoiceRecording />
+			</Button>
 
-				<Button v-model:toggle="attach_file">
-					<IconAttachFile />
-				</Button>
-			</template>
+			<Button v-model:toggle="attach_file">
+				<IconAttachFile />
+			</Button>
+		</template>
 
-			<template #icon>
-				<Button
-					v-model:toggle="text_format"
-					style="font-size: 24px; color: var(--user-fg-color)"
-				>
-					<span class="[ svg ] [ text:underline ]">A</span>
-				</Button>
-
-				<Button class="[ border:radius=full [ p=1 ] ]" type="submit">
-					<IconSendMessage />
-				</Button>
-			</template>
-		</Input>
-	</form>
+		<template #icon>
+			<Button
+				v-model:toggle="text_format"
+				style="font-size: 24px; color: var(--user-fg-color)"
+			>
+				<span class="[ svg ] [ text:underline ]">A</span>
+			</Button>
+		</template>
+	</Input>
 </template>
-
-<style lang="scss">
-@import "design/app/molecules/editbox";
-</style>

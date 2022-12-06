@@ -8,15 +8,27 @@
 @import "design/mixins";
 
 .editbox {
-	transition: border-color 200ms, box-shadow 1s;
-	border: 2px solid transparent;
+	@include selector-class("app@input") {
+		> & {
+			transition: border-color 200ms, box-shadow 1s;
+			border: 2px solid transparent;
 
-	&:focus-within {
-		border-color: hsl(
-			var(--user-fg-color_hsl),
-			var(--default-background-opacity)
-		);
-		box-shadow: 0 0 0 3px hsla(var(--user-fg-color_hsl), 0.1);
+			&:focus-within {
+				border-color: hsl(
+					var(--user-fg-color_hsl),
+					var(--default-background-opacity)
+				);
+				box-shadow: 0 0 0 3px hsla(var(--user-fg-color_hsl), 0.1);
+			}
+
+			@include --theme using ($name) {
+				@if $name == light {
+					background: var(--color-snow);
+				} @else if $name == dark {
+					background: var(--color-grey900);
+				}
+			}
+		}
 	}
 }
 

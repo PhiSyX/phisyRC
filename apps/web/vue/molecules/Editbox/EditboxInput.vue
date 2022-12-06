@@ -6,8 +6,9 @@ import Button from "~vue/atoms/Button/Button.vue";
 import Input from "~vue/atoms/Input/Input.vue";
 
 import { ref } from "vue";
-import { is_empty, uuid } from "@phisyrc/std";
+import { uuid } from "@phisyrc/std";
 import { use_model } from "~vue/hooks/use_models";
+import { handle_keydown } from "~/molecules/Editbox/handler";
 
 type Props = {
 	// v-model:history
@@ -19,45 +20,29 @@ type Props = {
 const props = defineProps<Props>();
 const emit = defineEmits(["update:modelValue", "update:history"]);
 
+const input$ = use_model(props)(emit);
 const history$ = use_model(props, "history")(emit);
 
 let current_input_history_index = ref(props.history.length);
 
-function keydown_handler(e: KeyboardEvent) {
-	if (!is_empty(input$.value) && !history$.value.includes(input$.value)) {
-		return;
-	}
-
-	switch (e.code.toLowerCase()) {
-		case "arrowup":
-			{
-				current_input_history_index.value -= 1;
-
-				if (current_input_history_index.value <= 0) {
-					current_input_history_index.value = 0;
-				}
-			}
-			break;
-
-		case "arrowdown":
-			{
-				current_input_history_index.value += 1;
-				if (
-					current_input_history_index.value >= history$.value.length
-				) {
-					current_input_history_index.value = history$.value.length;
-				}
-			}
-			break;
-		default:
-			return;
-	}
-
-	let current_input = history$.value[current_input_history_index.value] || "";
-	input$.value = current_input;
+function on_history_handler(evt: KeyboardEvent) {
+	handle_keydown(
+		evt,
+		{
+			data: input$.value,
+			update(input) {
+				input$.value = input;
+			},
+		},
+		{
+			data: history$.value,
+			current: current_input_history_index.value,
+			update(index) {
+				current_input_history_index.value = index;
+			},
+		}
+	);
 }
-
-const input$ = use_model(props)(emit);
 
 const id = uuid();
 
@@ -75,7 +60,7 @@ let text_format = ref(false);
 		placeholder="Envoyer un message"
 		:name="`message-${id}`"
 		v-model="input$"
-		@keydown="keydown_handler"
+		@keydown="on_history_handler"
 	>
 		<template #label>
 			<Button v-model:toggle="voice_recording">

@@ -28,7 +28,7 @@ function toggle_click_handler(evt: MouseEvent) {
 		type="button"
 		class="app@btn [ btn:reset ]"
 		:class="{
-			'app@btn(:focused)': toggle,
+			'box-fd:shadow app@btn(:focused)': toggle,
 		}"
 		@click="toggle_click_handler"
 	>

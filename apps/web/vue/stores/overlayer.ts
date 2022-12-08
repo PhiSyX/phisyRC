@@ -5,7 +5,7 @@
  */
 
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 
 import { is_empty } from "@phisyrc/std";
 import { to_px } from "@phisyrc/css/houdini/unit";
@@ -19,6 +19,8 @@ type Layer = {
 	event: Event;
 	dom_element: Element;
 	destroyable: "background" | "manual";
+	before_destroy?: (this: Layer) => void;
+	after_destroy?: (this: Layer) => void;
 	style: {
 		top: CSSUnitValue;
 		right: CSSUnitValue;
@@ -46,7 +48,10 @@ function setup() {
 	function create_layer(
 		payload: Omit<Optional<Layer, "destroyable">, "style">,
 	) {
-		let { dom_element, event, id, destroyable = "background" } = payload;
+		let {
+			dom_element, event, id, destroyable = "background",
+			after_destroy, before_destroy
+		} = payload;
 		if (
 			dom_element.classList.contains(LAYER_HL_CSS_CLASS) ||
 			dom_element.classList.contains(LAYER_HL_CSS_CLASS_ALT)
@@ -61,7 +66,7 @@ function setup() {
 		if (["absolute", "fixed"].includes(css_position_element)) {
 			layer_css_class = LAYER_HL_CSS_CLASS_ALT;
 		}
-		dom_element.classList.add(layer_css_class);
+		nextTick(() => dom_element.classList.add(layer_css_class));
 		let doc_position_element = dom_element.getBoundingClientRect();
 		let style: Layer["style"] = {
 			top: to_px(doc_position_element.top),
@@ -77,6 +82,8 @@ function setup() {
 			event,
 			dom_element,
 			destroyable,
+			after_destroy,
+			before_destroy,
 			style,
 		});
 	}
@@ -92,7 +99,9 @@ function setup() {
 		const layer = list.value.get(layer_id)!;
 		layer.dom_element.classList.remove(LAYER_HL_CSS_CLASS);
 		layer.dom_element.classList.remove(LAYER_HL_CSS_CLASS_ALT);
+		layer.before_destroy?.();
 		destroy_layer_mut(layer.id);
+		nextTick(() => layer.after_destroy?.());
 	}
 
 	function destroy_layer_mut(layer_id: Layer["id"]) {

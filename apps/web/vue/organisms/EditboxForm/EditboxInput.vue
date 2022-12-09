@@ -11,6 +11,7 @@ import EditboxTextFormatDialog from "./EditboxTextFormatDialog.vue";
 import { ref } from "vue";
 import { uuid } from "@phisyrc/std";
 import { use_model } from "~vue/hooks/use_models";
+import { use_overlayer_store } from "~vue/stores/overlayer";
 import { handle_keydown } from "~/organisms/EditboxForm/handler";
 
 type Props = {
@@ -27,6 +28,9 @@ const input$ = use_model(props)(emit);
 const history$ = use_model(props, "history")(emit);
 
 const id = uuid();
+
+let store_init = use_overlayer_store();
+let store = store_init();
 
 let current_input_history_index = ref(props.history.length);
 
@@ -51,6 +55,17 @@ function on_history_handler(evt: KeyboardEvent) {
 			},
 		}
 	);
+}
+
+function open_file_attachment_dialog(evt: MouseEvent) {
+	store.create_layer({
+		id: `editbox-file-attachment${id}`,
+		event: evt,
+		dom_element: evt.currentTarget as Element,
+		before_destroy() {
+			attach_file.value = false;
+		},
+	});
 }
 </script>
 
@@ -88,6 +103,14 @@ function on_history_handler(evt: KeyboardEvent) {
 			</Button>
 		</template>
 	</Input>
+
+	<Teleport
+		v-if="store.layers.has(`editbox-file-attachment${id}`)"
+		:to="`#editbox-file-attachment${id}_dialog`"
+	>
+		<EditboxAttachmentDialog :name="`editbox-file-attachment${id}`" />
+	</Teleport>
+
 </template>
 
 <style lang="scss">

@@ -1,0 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+.editbox {
+	button[type="submit"] svg {
+		transform: scale(0.75) translateX(2px);
+	}
+}

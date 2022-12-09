@@ -24,15 +24,15 @@ const StorySidebarItem = defineAsyncComponent(
 const StorySidebarList = defineAsyncComponent(
 	() => import("~vue/molecules/SidebarList/Story.vue")
 );
-const StoryEditbox = defineAsyncComponent(
-	() => import("~vue/molecules/Editbox/Story.vue")
-);
 const StoryTopic = defineAsyncComponent(
 	() => import("~vue/molecules/Topic/Story.vue")
 );
 
 // Organisms
-const StoryChatLoginForm = defineAsyncComponent(
+const StoryEditboxForm = defineAsyncComponent(
+	() => import("~vue/organisms/EditboxForm/Story.vue")
+);
+const StoryLoginForm = defineAsyncComponent(
 	() => import("~vue/organisms/LoginForm/Story.vue")
 );
 const StorySidebar = defineAsyncComponent(
@@ -52,10 +52,10 @@ export default {
 		// Molecules
 		StorySidebarItem,
 		StorySidebarList,
-		StoryEditbox,
 		StoryTopic,
 		// Organisms
-		StoryChatLoginForm,
+		StoryEditboxForm,
+		StoryLoginForm,
 		StorySidebar,
 	},
 };
@@ -193,11 +193,6 @@ let molecules: Section = {
 		},
 
 		{
-			text: "Editbox",
-			link: "/design-system/editbox",
-		},
-
-		{
 			text: "Topic",
 			link: "/design-system/topic",
 		},
@@ -212,8 +207,13 @@ let organisms: Section = {
 			link: "/design-system/sidebar",
 		},
 		{
-			text: "Formulaire de connexion au Chat",
-			link: "/design-system/chat-login-form",
+			text: "Formulaire de connexion au Chat (Login)",
+			link: "/design-system/login-form",
+		},
+
+		{
+			text: "Formulaire de saisie (Editbox)",
+			link: "/design-system/editbox-form",
 		},
 	],
 };

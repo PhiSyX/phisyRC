@@ -10,6 +10,7 @@ import IconSendMessage from "~vue/atoms/Icons/IconSendMessage.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 
 import { use_model } from "~vue/hooks/use_models";
+
 import EditboxInput from "./EditboxInput.vue";
 
 type Props = {
@@ -42,5 +43,5 @@ const history$ = use_model(props, "history")(emit);
 </template>
 
 <style lang="scss">
-@import "design/app/molecules/editbox";
+@import "design/app/organisms/editbox-form";
 </style>

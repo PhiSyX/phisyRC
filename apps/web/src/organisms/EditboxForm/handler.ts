@@ -13,8 +13,8 @@ type InputOptions = {
 
 type HistoryOptions = {
 	data: str[];
-	current: isize,
-	update: (_: isize) => void,
+	current: isize;
+	update: (_: isize) => void;
 };
 
 function handle_keydown(
@@ -56,11 +56,12 @@ function handle_keydown_history(
 			break;
 		}
 
-		default: return;
+		default:
+			return;
 	}
 
 	let new_input = history.data[history_current] || "";
 	input.update(new_input);
 }
 
-export { handle_keydown }
+export { handle_keydown };

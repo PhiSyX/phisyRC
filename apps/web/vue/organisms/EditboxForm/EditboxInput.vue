@@ -5,10 +5,13 @@ import IconVoiceRecording from "~vue/atoms/Icons/IconVoiceRecording.vue";
 import Button from "~vue/atoms/Button/Button.vue";
 import Input from "~vue/atoms/Input/Input.vue";
 
+import EditboxAttachmentDialog from "./EditboxAttachmentDialog.vue";
+import EditboxTextFormatDialog from "./EditboxTextFormatDialog.vue";
+
 import { ref } from "vue";
 import { uuid } from "@phisyrc/std";
 import { use_model } from "~vue/hooks/use_models";
-import { handle_keydown } from "~/molecules/Editbox/handler";
+import { handle_keydown } from "~/organisms/EditboxForm/handler";
 
 type Props = {
 	// v-model:history
@@ -23,7 +26,13 @@ const emit = defineEmits(["update:modelValue", "update:history"]);
 const input$ = use_model(props)(emit);
 const history$ = use_model(props, "history")(emit);
 
+const id = uuid();
+
 let current_input_history_index = ref(props.history.length);
+
+let voice_recording = ref(false);
+let attach_file = ref(false);
+let text_format = ref(false);
 
 function on_history_handler(evt: KeyboardEvent) {
 	handle_keydown(
@@ -43,12 +52,6 @@ function on_history_handler(evt: KeyboardEvent) {
 		}
 	);
 }
-
-const id = uuid();
-
-let voice_recording = ref(false);
-let attach_file = ref(false);
-let text_format = ref(false);
 </script>
 
 <template>
@@ -67,7 +70,10 @@ let text_format = ref(false);
 				<IconVoiceRecording />
 			</Button>
 
-			<Button v-model:toggle="attach_file">
+			<Button
+				v-model:toggle="attach_file"
+				@click="open_file_attachment_dialog"
+			>
 				<IconAttachFile />
 			</Button>
 		</template>
@@ -76,9 +82,14 @@ let text_format = ref(false);
 			<Button
 				v-model:toggle="text_format"
 				style="font-size: 24px; color: var(--user-fg-color)"
+				@click="open_text_format_dialog"
 			>
 				<span class="[ svg ] [ text:underline ]">A</span>
 			</Button>
 		</template>
 	</Input>
 </template>
+
+<style lang="scss">
+@import "design/app/organisms/editbox-input";
+</style>

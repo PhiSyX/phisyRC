@@ -61,10 +61,14 @@ onBeforeUnmount(() => {
 			></div>
 
 			<div
-				v-for="[id] of store.layers"
+				v-for="[id, layer] of store.layers"
 				:key="`${id}_dialog`"
 				:id="`${id}_dialog`"
-				class="dialog [ pos-a:full flex! align-i:center ]"
+				class="dialog [ pos-a:full flex! ]"
+				:class="{
+					'[ align-i:center ]': layer.centered,
+				}"
+				:style="layer.mouse_position as StyleValue"
 			></div>
 		</div>
 	</transition>

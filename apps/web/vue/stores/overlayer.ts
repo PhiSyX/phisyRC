@@ -16,11 +16,18 @@ import { to_px } from "@phisyrc/css/houdini/unit";
 
 type Layer = {
 	id: string | number;
-	event: Event;
+	event: Event & {
+		clientX: number;
+		clientY: number;
+	};
 	dom_element: Element;
+	/**
+	 * Default = false
+	 */
+	centered: boolean;
 	destroyable: "background" | "manual";
-	before_destroy?: (this: Layer) => void;
-	after_destroy?: (this: Layer) => void;
+	before_destroy: (this: Layer) => void;
+	after_destroy: () => void;
 	style: {
 		top: CSSUnitValue;
 		right: CSSUnitValue;
@@ -29,6 +36,10 @@ type Layer = {
 		width: CSSUnitValue;
 		height: CSSUnitValue;
 	};
+	mouse_position: Partial<{
+		top: CSSUnitValue;
+		left: CSSUnitValue;
+	}>;
 };
 
 // -------- //
@@ -42,16 +53,36 @@ const LAYER_HL_CSS_CLASS = "layer@highlight";
 /// différente de `relative`.
 const LAYER_HL_CSS_CLASS_ALT = "layer@highlight--alt";
 
+const DEFAULT_DESTROYABLE_BEHAVIOR = "background";
+const DEFAULT_CENTERED = false;
+const NOOP = () => {
+	// no operation
+};
+
+const MOUSE_POSITION_PADDING: u8 = 4;
+
 function setup() {
 	let list = ref<Map<Layer["id"], Layer>>(new Map());
 
 	function create_layer(
-		payload: Omit<Optional<Layer, "destroyable">, "style">,
+		payload: Omit<
+			Optional<
+				Layer,
+				"centered" | "destroyable" | "after_destroy" | "before_destroy"
+			>,
+			"style" | "mouse_position"
+		>,
 	) {
 		let {
-			dom_element, event, id, destroyable = "background",
-			after_destroy, before_destroy
+			dom_element,
+			event,
+			id,
+			destroyable = DEFAULT_DESTROYABLE_BEHAVIOR,
+			centered = DEFAULT_CENTERED,
+			after_destroy = NOOP,
+			before_destroy = NOOP,
 		} = payload;
+
 		if (
 			dom_element.classList.contains(LAYER_HL_CSS_CLASS) ||
 			dom_element.classList.contains(LAYER_HL_CSS_CLASS_ALT)
@@ -67,31 +98,37 @@ function setup() {
 			layer_css_class = LAYER_HL_CSS_CLASS_ALT;
 		}
 		nextTick(() => dom_element.classList.add(layer_css_class));
+
 		let doc_position_element = dom_element.getBoundingClientRect();
 		let style: Layer["style"] = {
-			top: to_px(doc_position_element.top),
-			right: to_px(doc_position_element.right),
-			bottom: to_px(doc_position_element.bottom),
-			left: to_px(doc_position_element.left),
-			width: to_px(doc_position_element.width),
-			height: to_px(doc_position_element.height),
+			top: to_px(doc_position_element.top - MOUSE_POSITION_PADDING),
+			right: to_px(doc_position_element.right + MOUSE_POSITION_PADDING),
+			bottom: to_px(doc_position_element.bottom - MOUSE_POSITION_PADDING),
+			left: to_px(doc_position_element.left - MOUSE_POSITION_PADDING),
+			width: to_px(doc_position_element.width + MOUSE_POSITION_PADDING * 2),
+			height: to_px(doc_position_element.height + MOUSE_POSITION_PADDING * 2),
 		};
+
+		let mouse_position: Layer["mouse_position"] = {};
+		if (!centered) {
+			mouse_position["left"] = to_px(event.clientX + MOUSE_POSITION_PADDING);
+			mouse_position["top"] = to_px(event.clientY + MOUSE_POSITION_PADDING);
+		}
 
 		create_layer_mut({
 			id,
 			event,
 			dom_element,
+			centered,
 			destroyable,
 			after_destroy,
 			before_destroy,
 			style,
+			mouse_position,
 		});
 	}
 
 	function create_layer_mut(payload: Layer) {
-		if (!payload.destroyable) {
-			payload.destroyable = "background";
-		}
 		list.value.set(payload.id, payload);
 	}
 
@@ -99,17 +136,22 @@ function setup() {
 		const layer = list.value.get(layer_id)!;
 		layer.dom_element.classList.remove(LAYER_HL_CSS_CLASS);
 		layer.dom_element.classList.remove(LAYER_HL_CSS_CLASS_ALT);
-		layer.before_destroy?.();
+		layer.before_destroy();
 		destroy_layer_mut(layer.id);
-		nextTick(() => layer.after_destroy?.());
+		nextTick(() => layer.after_destroy());
 	}
 
 	function destroy_layer_mut(layer_id: Layer["id"]) {
 		list.value.delete(layer_id);
 	}
 
-	function destroy_layers() {
+	function destroy_layers(options: { force: bool } = { force: false }) {
 		list.value.forEach((layer) => {
+			if (options.force) {
+				destroy_layer(layer.id);
+				return;
+			}
+
 			if (layer.destroyable !== "background") {
 				return;
 			}
@@ -123,12 +165,12 @@ function setup() {
 		let element_dom_position = layer.dom_element.getBoundingClientRect();
 
 		let style: Layer["style"] = {
-			top: to_px(element_dom_position.top - 5),
-			right: to_px(element_dom_position.right),
-			bottom: to_px(element_dom_position.bottom),
-			left: to_px(element_dom_position.left),
-			width: to_px(element_dom_position.width),
-			height: to_px(element_dom_position.height + 8),
+			top: to_px(element_dom_position.top - MOUSE_POSITION_PADDING),
+			right: to_px(element_dom_position.right + MOUSE_POSITION_PADDING),
+			bottom: to_px(element_dom_position.bottom - MOUSE_POSITION_PADDING),
+			left: to_px(element_dom_position.left - MOUSE_POSITION_PADDING),
+			width: to_px(element_dom_position.width + MOUSE_POSITION_PADDING * 2),
+			height: to_px(element_dom_position.height + MOUSE_POSITION_PADDING * 2),
 		};
 
 		update_layer_mut(layer_id, style);

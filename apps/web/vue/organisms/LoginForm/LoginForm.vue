@@ -125,11 +125,12 @@ function focus_button_channel_handler(evt: MouseEvent | KeyboardEvent) {
 	);
 }
 
-function add_channel_handler(evt: Event) {
+function add_channel_handler(evt: MouseEvent) {
 	store.create_layer({
 		id: "login-chat-channels-list",
 		event: evt,
 		dom_element: evt.currentTarget as Element,
+		centered: true,
 	});
 }
 

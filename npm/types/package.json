@@ -7,6 +7,6 @@
 	"types": "index.d.ts",
 	"devDependencies": {
 		"vitest": "^0.25.2",
-		"vite": "^3.2.4"
+		"vite": "^4.0.0"
 	}
 }

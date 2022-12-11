@@ -1,0 +1,37 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@mixin --use-transparency {
+	@include selector-class("opacity=0") {
+		opacity: 0;
+	}
+	@include selector-class("opacity=0(:hover)") {
+		&:hover {
+			opacity: 0;
+		}
+	}
+
+	@for $idx from 1 through 9 {
+		@include selector-class("opacity=.#{$idx}") {
+			opacity: #{"." + $idx};
+		}
+
+		@include selector-class("opacity=.#{$idx}(:hover)") {
+			&:hover {
+				opacity: #{"." + $idx};
+			}
+		}
+	}
+
+	@include selector-class("opacity=1") {
+		opacity: 1;
+	}
+	@include selector-class("opacity=1(:hover)") {
+		&:hover {
+			opacity: 1;
+		}
+	}
+}

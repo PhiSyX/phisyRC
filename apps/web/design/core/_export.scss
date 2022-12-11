@@ -7,6 +7,7 @@
 @import "alignment/export";
 @import "backgrounds/export";
 @import "box/export";
+@import "color/export";
 @import "css2/export";
 @import "elements/export";
 @import "flexbox/export";
@@ -21,6 +22,7 @@
 @include --use-alignment;
 @include --use-backgrounds;
 @include --use-box;
+@include --use-color;
 @include --use-css2;
 @include --use-flexbox;
 @include --use-fonts;

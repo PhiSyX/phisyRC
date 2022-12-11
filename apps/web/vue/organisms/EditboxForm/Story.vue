@@ -5,39 +5,51 @@ import Editbox from "./EditboxForm.vue";
 let room1 = reactive({
 	input: "",
 	input_history: [],
+	input_foreground: 1,
+	input_background: null,
 });
 
 let room2 = reactive({
 	input: "",
 	input_history: [],
+	input_foreground: 4,
+	input_background: 3,
 });
 
 let room3 = reactive({
 	input: "",
 	input_history: ["hello", "world"],
+	input_foreground: 7,
+	input_background: 4,
 });
 </script>
 
 <template>
 	<section class="[ flex! gap=2 p=1 ]">
-		<div id="editbox1" class="[ w:full ]">
+		<div class="editbox-story [ w:full ]">
 			<Editbox
 				v-model="room1.input"
 				v-model:history="room1.input_history"
+				v-model:foreground="room1.input_foreground"
+				v-model:background="room1.input_background"
 			/>
 		</div>
 
-		<div id="editbox2" class="[ w:full ]">
+		<div class="editbox-story [ w:full ]">
 			<Editbox
 				v-model="room2.input"
 				v-model:history="room2.input_history"
+				v-model:foreground="room2.input_foreground"
+				v-model:background="room2.input_background"
 			/>
 		</div>
 
-		<div id="editbox3" class="[ w:full ]">
+		<div class="editbox-story [ w:full ]">
 			<Editbox
 				v-model="room3.input"
 				v-model:history="room3.input_history"
+				v-model:foreground="room3.input_foreground"
+				v-model:background="room3.input_background"
 			/>
 		</div>
 	</section>
@@ -47,9 +59,7 @@ let room3 = reactive({
 @import "design/functions";
 @import "design/mixins";
 
-#editbox1,
-#editbox2,
-#editbox3 {
+.editbox-story {
 	@include --theme using ($name) {
 		@if $name == light {
 			background: var(--color-white);
@@ -57,16 +67,5 @@ let room3 = reactive({
 			background: #31363a;
 		}
 	}
-}
-
-#editbox2 {
-	--user-fg-color: var(--color-irc4);
-	--user-fg-color_hsl: var(--color-irc4_hsl);
-	--user-bg-color: var(--color-irc3);
-}
-#editbox3 {
-	--user-fg-color: var(--color-irc7);
-	--user-fg-color_hsl: var(--color-irc7_hsl);
-	--user-bg-color: var(--color-irc4);
 }
 </style>

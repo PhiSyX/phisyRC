@@ -35,7 +35,10 @@
 @include selector-class("editbox@input:user-color") {
 	color: var(--user-fg-color);
 	--shadow-color: transparent;
-	&:focus:not(:placeholder-shown) {
+	&:placeholder-shown {
+		color: var(--default-text-color);
+	}
+	&:not(:placeholder-shown) {
 		--shadow-color: var(--user-bg-color);
 	}
 }

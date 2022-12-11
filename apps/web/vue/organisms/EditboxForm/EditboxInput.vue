@@ -15,6 +15,10 @@ import { use_overlayer_store } from "~vue/stores/overlayer";
 import { handle_keydown } from "~/organisms/EditboxForm/handler";
 
 type Props = {
+	// v-model:foreground
+	foreground: number;
+	// v-model:background
+	background: number | null;
 	// v-model:history
 	history: string[];
 	// v-model
@@ -22,10 +26,17 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const emit = defineEmits(["update:modelValue", "update:history"]);
+const emit = defineEmits([
+	"update:modelValue",
+	"update:history",
+	"update:foreground",
+	"update:background",
+]);
 
 const input$ = use_model(props)(emit);
 const history$ = use_model(props, "history")(emit);
+const foreground$ = use_model(props, "foreground")(emit);
+const background$ = use_model(props, "background")(emit);
 
 const id = uuid();
 
@@ -64,6 +75,17 @@ function open_file_attachment_dialog(evt: MouseEvent) {
 		dom_element: evt.currentTarget as Element,
 		before_destroy() {
 			attach_file.value = false;
+		},
+	});
+}
+
+function open_text_format_dialog(evt: MouseEvent) {
+	store.create_layer({
+		id: `editbox-text-format${id}`,
+		event: evt,
+		dom_element: evt.currentTarget as Element,
+		before_destroy() {
+			text_format.value = false;
 		},
 	});
 }
@@ -111,6 +133,16 @@ function open_file_attachment_dialog(evt: MouseEvent) {
 		<EditboxAttachmentDialog :name="`editbox-file-attachment${id}`" />
 	</Teleport>
 
+	<Teleport
+		v-if="store.layers.has(`editbox-text-format${id}`)"
+		:to="`#editbox-text-format${id}_teleport`"
+	>
+		<EditboxTextFormatDialog
+			:name="`editbox-text-format${id}`"
+			v-model:foreground="foreground$"
+			v-model:background="background$"
+		/>
+	</Teleport>
 </template>
 
 <style lang="scss">

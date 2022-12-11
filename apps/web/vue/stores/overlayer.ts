@@ -178,10 +178,13 @@ function setup() {
 		update_layer_mut(layer_id, { style });
 	}
 
-	function update_layer_mut(layer_id: Layer["id"], payload: {
-		style?: Layer["style"];
-		mouse_position?: Layer["mouse_position"];
-	}) {
+	function update_layer_mut(
+		layer_id: Layer["id"],
+		payload: {
+			style?: Layer["style"];
+			mouse_position?: Layer["mouse_position"];
+		},
+	) {
 		if (!list.value.has(layer_id)) {
 			return;
 		}

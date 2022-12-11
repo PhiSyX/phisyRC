@@ -106,7 +106,7 @@ function open_file_attachment_dialog(evt: MouseEvent) {
 
 	<Teleport
 		v-if="store.layers.has(`editbox-file-attachment${id}`)"
-		:to="`#editbox-file-attachment${id}_dialog`"
+		:to="`#editbox-file-attachment${id}_teleport`"
 	>
 		<EditboxAttachmentDialog :name="`editbox-file-attachment${id}`" />
 	</Teleport>

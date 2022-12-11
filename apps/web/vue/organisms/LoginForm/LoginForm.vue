@@ -234,7 +234,7 @@ function handle_send_connection(evt: Event) {
 	</form>
 	<Teleport
 		v-if="store.layers.has('login-chat-channels-list')"
-		to="#login-chat-channels-list_dialog"
+		to="#login-chat-channels-list_teleport"
 	>
 		<LoginDialog v-model="channels$" />
 	</Teleport>

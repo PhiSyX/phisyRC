@@ -6,8 +6,9 @@ export default {
 
 <script setup lang="ts">
 import type { Layer } from "~vue/stores/overlayer";
-
 import type { StyleValue } from "vue";
+
+import OverlayerTeleport from "./Teleport.vue";
 
 import { onBeforeMount, onBeforeUnmount } from "vue";
 
@@ -20,7 +21,7 @@ let store = use_store();
 /// Événement de destruction d'un layer
 ///
 /// Quand un ID est spécifié, seul le layer qui a cet ID est détruit.
-function destroy(evt: Event, id?: Layer["id"]) {
+function destroy(_: Event, id?: Layer["id"]) {
 	if (id) {
 		store.destroy_layer(id);
 	} else {
@@ -38,7 +39,7 @@ function resize() {
 // ----- //
 
 onBeforeMount(() => {
-	window.addEventListener("resize", resize);
+	window.addEventListener("resize", resize, { passive: true });
 });
 
 onBeforeUnmount(() => {
@@ -60,16 +61,12 @@ onBeforeUnmount(() => {
 				:style="layer.style as StyleValue"
 			></div>
 
-			<div
+			<OverlayerTeleport
 				v-for="[id, layer] of store.layers"
-				:key="`${id}_dialog`"
-				:id="`${id}_dialog`"
-				class="dialog [ pos-a:full flex! ]"
-				:class="{
-					'[ align-i:center ]': layer.centered,
-				}"
-				:style="layer.mouse_position as StyleValue"
-			></div>
+				:key="`${id}_teleport`"
+				:id="id"
+				:layer="layer"
+			/>
 		</div>
 	</transition>
 </template>

@@ -63,6 +63,7 @@ const MOUSE_POSITION_PADDING: u8 = 4;
 
 function setup() {
 	let list = ref<Map<Layer["id"], Layer>>(new Map());
+	let doc_position_element = document.body.getBoundingClientRect();
 
 	function create_layer(
 		payload: Omit<
@@ -99,20 +100,21 @@ function setup() {
 		}
 		nextTick(() => dom_element.classList.add(layer_css_class));
 
-		let doc_position_element = dom_element.getBoundingClientRect();
+		let dom_position_element = dom_element.getBoundingClientRect();
 		let style: Layer["style"] = {
-			top: to_px(doc_position_element.top - MOUSE_POSITION_PADDING),
-			right: to_px(doc_position_element.right + MOUSE_POSITION_PADDING),
-			bottom: to_px(doc_position_element.bottom - MOUSE_POSITION_PADDING),
-			left: to_px(doc_position_element.left - MOUSE_POSITION_PADDING),
-			width: to_px(doc_position_element.width + MOUSE_POSITION_PADDING * 2),
-			height: to_px(doc_position_element.height + MOUSE_POSITION_PADDING * 2),
+			top: to_px(dom_position_element.top - MOUSE_POSITION_PADDING),
+			right: to_px(dom_position_element.right + MOUSE_POSITION_PADDING),
+			bottom: to_px(dom_position_element.bottom - MOUSE_POSITION_PADDING),
+			left: to_px(dom_position_element.left - MOUSE_POSITION_PADDING),
+			width: to_px(dom_position_element.width + MOUSE_POSITION_PADDING * 2),
+			height: to_px(dom_position_element.height + MOUSE_POSITION_PADDING * 2),
 		};
 
 		let mouse_position: Layer["mouse_position"] = {};
 		if (!centered) {
-			mouse_position["left"] = to_px(event.clientX + MOUSE_POSITION_PADDING);
-			mouse_position["top"] = to_px(event.clientY + MOUSE_POSITION_PADDING);
+			let { clientX: deltaX, clientY: deltaY } = event;
+			mouse_position["top"] = to_px(deltaY + MOUSE_POSITION_PADDING);
+			mouse_position["left"] = to_px(deltaX + MOUSE_POSITION_PADDING);
 		}
 
 		create_layer_mut({
@@ -162,26 +164,29 @@ function setup() {
 	function update_layer(layer_id: Layer["id"]) {
 		const layer = list.value.get(layer_id)!;
 
-		let element_dom_position = layer.dom_element.getBoundingClientRect();
+		let dom_position_element = layer.dom_element.getBoundingClientRect();
 
 		let style: Layer["style"] = {
-			top: to_px(element_dom_position.top - MOUSE_POSITION_PADDING),
-			right: to_px(element_dom_position.right + MOUSE_POSITION_PADDING),
-			bottom: to_px(element_dom_position.bottom - MOUSE_POSITION_PADDING),
-			left: to_px(element_dom_position.left - MOUSE_POSITION_PADDING),
-			width: to_px(element_dom_position.width + MOUSE_POSITION_PADDING * 2),
-			height: to_px(element_dom_position.height + MOUSE_POSITION_PADDING * 2),
+			top: to_px(dom_position_element.top - MOUSE_POSITION_PADDING),
+			right: to_px(dom_position_element.right + MOUSE_POSITION_PADDING),
+			bottom: to_px(dom_position_element.bottom - MOUSE_POSITION_PADDING),
+			left: to_px(dom_position_element.left - MOUSE_POSITION_PADDING),
+			width: to_px(dom_position_element.width + MOUSE_POSITION_PADDING * 2),
+			height: to_px(dom_position_element.height + MOUSE_POSITION_PADDING * 2),
 		};
 
-		update_layer_mut(layer_id, style);
+		update_layer_mut(layer_id, { style });
 	}
 
-	function update_layer_mut(layer_id: Layer["id"], style: Layer["style"]) {
+	function update_layer_mut(layer_id: Layer["id"], payload: {
+		style?: Layer["style"];
+		mouse_position?: Layer["mouse_position"];
+	}) {
 		if (!list.value.has(layer_id)) {
 			return;
 		}
 		let layer = list.value.get(layer_id)!;
-		list.value.set(layer_id, { ...layer, style });
+		list.value.set(layer_id, { ...layer, ...payload });
 	}
 
 	function update_layers() {
@@ -198,6 +203,7 @@ function setup() {
 		destroy_layer,
 		destroy_layers,
 		update_layer,
+		update_layer_mut,
 		update_layers,
 	};
 }

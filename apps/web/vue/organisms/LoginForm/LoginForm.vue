@@ -125,11 +125,12 @@ function focus_button_channel_handler(evt: MouseEvent | KeyboardEvent) {
 	);
 }
 
-function add_channel_handler(evt: Event) {
+function add_channel_handler(evt: MouseEvent) {
 	store.create_layer({
 		id: "login-chat-channels-list",
 		event: evt,
 		dom_element: evt.currentTarget as Element,
+		centered: true,
 	});
 }
 
@@ -233,7 +234,7 @@ function handle_send_connection(evt: Event) {
 	</form>
 	<Teleport
 		v-if="store.layers.has('login-chat-channels-list')"
-		to="#login-chat-channels-list_dialog"
+		to="#login-chat-channels-list_teleport"
 	>
 		<LoginDialog v-model="channels$" />
 	</Teleport>

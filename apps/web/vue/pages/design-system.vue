@@ -29,7 +29,10 @@ const StoryTopic = defineAsyncComponent(
 );
 
 // Organisms
-const StoryChatLoginForm = defineAsyncComponent(
+const StoryEditboxForm = defineAsyncComponent(
+	() => import("~vue/organisms/EditboxForm/Story.vue")
+);
+const StoryLoginForm = defineAsyncComponent(
 	() => import("~vue/organisms/LoginForm/Story.vue")
 );
 const StorySidebar = defineAsyncComponent(
@@ -51,7 +54,8 @@ export default {
 		StorySidebarList,
 		StoryTopic,
 		// Organisms
-		StoryChatLoginForm,
+		StoryEditboxForm,
+		StoryLoginForm,
 		StorySidebar,
 	},
 };
@@ -63,6 +67,7 @@ import IconArrowDown from "~vue/atoms/Icons/IconArrowDown.vue";
 import IconArrowLeft from "~vue/atoms/Icons/IconArrowLeft.vue";
 import IconArrowRight from "~vue/atoms/Icons/IconArrowRight.vue";
 import IconArrowUp from "~vue/atoms/Icons/IconArrowUp.vue";
+import IconAttachFile from "~vue/atoms/Icons/IconAttachFile.vue";
 import IconBookmark from "~vue/atoms/Icons/IconBookmark.vue";
 import IconChannel from "~vue/atoms/Icons/IconChannel.vue";
 import IconChecked from "~vue/atoms/Icons/IconChecked.vue";
@@ -73,6 +78,7 @@ import IconMessageEmpty from "~vue/atoms/Icons/IconMessageEmpty.vue";
 import IconMessages from "~vue/atoms/Icons/IconMessages.vue";
 import IconNicklist from "~vue/atoms/Icons/IconNicklist.vue";
 import IconPassword from "~vue/atoms/Icons/IconPassword.vue";
+import IconSendMessage from "~vue/atoms/Icons/IconSendMessage.vue";
 import IconServerConnect from "~vue/atoms/Icons/IconServerConnect.vue";
 import IconSettings from "~vue/atoms/Icons/IconSettings.vue";
 import IconSettingsVertical from "~vue/atoms/Icons/IconSettingsVertical.vue";
@@ -80,6 +86,7 @@ import IconTrashDelete from "~vue/atoms/Icons/IconTrashDelete.vue";
 import IconUser from "~vue/atoms/Icons/IconUser.vue";
 import IconValidated from "~vue/atoms/Icons/IconValidated.vue";
 import IconVisualPassword from "~vue/atoms/Icons/IconVisualPassword.vue";
+import IconVoiceRecording from "~vue/atoms/Icons/IconVoiceRecording.vue";
 
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
@@ -140,6 +147,7 @@ let icons: Section = {
 		{ icon: IconArrowLeft, text: "ArrowLeft" },
 		{ icon: IconArrowRight, text: "ArrowRight" },
 		{ icon: IconArrowUp, text: "ArrowUp" },
+		{ icon: IconAttachFile, text: "AttachFile" },
 		{ icon: IconBookmark, text: "Bookmark" },
 		{ icon: IconChannel, text: "Channel" },
 		{ icon: IconChecked, text: "Checked" },
@@ -149,6 +157,7 @@ let icons: Section = {
 		{ icon: IconMessages, text: "Messages" },
 		{ icon: IconNicklist, text: "Nicklist" },
 		{ icon: IconPassword, text: "Password" },
+		{ icon: IconSendMessage, text: "SendMessage" },
 		{ icon: IconServerConnect, text: "ServerConnect" },
 		{ icon: IconSettings, text: "Settings" },
 		{ icon: IconSettingsVertical, text: "Settings (barre verticale)" },
@@ -156,6 +165,7 @@ let icons: Section = {
 		{ icon: IconUser, text: "User" },
 		{ icon: IconValidated, text: "Validated" },
 		{ icon: IconVisualPassword, text: "VisualPassword" },
+		{ icon: IconVoiceRecording, text: "VoiceRecording" },
 	],
 };
 
@@ -197,8 +207,13 @@ let organisms: Section = {
 			link: "/design-system/sidebar",
 		},
 		{
-			text: "Formulaire de connexion au Chat",
-			link: "/design-system/chat-login-form",
+			text: "Formulaire de connexion au Chat (Login)",
+			link: "/design-system/login-form",
+		},
+
+		{
+			text: "Formulaire de saisie (Editbox)",
+			link: "/design-system/editbox-form",
 		},
 	],
 };

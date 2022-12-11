@@ -59,14 +59,17 @@
 
 		pointer-events: none;
 	}
-	&\@highlight_alt {
+	&\@highlight--alt {
 		z-index: 1010 !important;
 
 		pointer-events: none;
 	}
 }
 
-.dialog > * {
+.teleport {
+	outline: 0;
+}
+.teleport > * {
 	z-index: 1010;
 }
 

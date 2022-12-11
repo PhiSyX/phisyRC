@@ -41,3 +41,17 @@ $for-loop-max-iterations: 20;
 		}
 	}
 }
+
+@mixin --add-variant($color_name: "", $variants: ()) {
+	@each $variant, $color in $variants {
+		--color-#{""+$color_name}#{""+$variant}: #{$color};
+		--color-#{""+$color_name}#{""+$variant}_rgb: #{hex2rgb($color)};
+		--color-#{""+$color_name}#{""+$variant}_hsl: #{hex2hsl($color)};
+
+		@if $variant == 500 {
+			--color-#{""+$color_name}: #{$color};
+			--color-#{""+$color_name}_rgb: #{hex2rgb($color)};
+			--color-#{""+$color_name}_hsl: #{hex2hsl($color)};
+		}
+	}
+}

@@ -1,0 +1,101 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+@include selector-class("dialog@file-attachment") {
+	width: space(350);
+	height: space(200);
+
+	background-color: var(--bg);
+	font-size: 14px;
+	user-select: none;
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: #31363a;
+		} @else if $name == light {
+			--bg: #f5f5f5;
+		}
+	}
+
+	label {
+		outline: 2px dashed currentColor;
+	}
+
+	input[type="file"] {
+		width: 0.1px;
+		height: 0.1px;
+		opacity: 0;
+		overflow: hidden;
+		position: absolute;
+		z-index: -1;
+	}
+}
+
+@include selector-class("dialog@text-format") {
+	min-width: space(250);
+
+	background-color: var(--bg);
+	font-size: 14px;
+	user-select: none;
+
+	@include --theme using ($name) {
+		@if $name == dark {
+			--bg: #31363a;
+		} @else if $name == light {
+			--bg: #f5f5f5;
+		}
+	}
+
+	a {
+		opacity: 0.5;
+		transition: opacity 250ms;
+		color: inherit;
+		text-decoration: none;
+
+		&.is-active {
+			opacity: 1;
+			font-weight: bold;
+		}
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	fieldset {
+		background-color: var(--bg);
+		border: 1px inset var(--bg);
+
+		@include --theme using ($name) {
+			@if $name == dark {
+				--bg: var(--color-grey900);
+			} @else if $name == light {
+				--bg: var(--color-snow);
+			}
+		}
+	}
+}
+
+@include selector-class("dialog@text-format:color") {
+	display: grid;
+	grid-template-columns: repeat(8, auto);
+
+	label {
+		transition: opacity 200ms ease-in-out;
+
+		border: 1px ridge;
+
+		background-color: var(--color);
+
+		&:hover,
+		&:focus-within {
+			border-style: groove;
+		}
+	}
+}

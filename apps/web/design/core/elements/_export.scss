@@ -5,6 +5,7 @@
  */
 
 @import "button";
+@import "dialog";
 @import "heading";
 @import "input";
 @import "list";
@@ -18,6 +19,7 @@
 
 @mixin --use-elements {
 	@include --use-button;
+	@include --use-dialog;
 	@include --use-heading;
 	@include --use-input;
 	@include --use-list;

@@ -1,0 +1,44 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+@import "design/functions";
+@import "design/mixins";
+
+.editbox {
+	@include selector-class("app@input") {
+		> & {
+			transition: border-color 200ms, box-shadow 1s;
+			border: 2px solid transparent;
+
+			&:focus-within {
+				border-color: hsl(
+					var(--user-fg-color_hsl),
+					var(--default-background-opacity)
+				);
+				box-shadow: 0 0 0 3px hsla(var(--user-fg-color_hsl), 0.1);
+			}
+
+			@include --theme using ($name) {
+				@if $name == light {
+					background: var(--color-snow);
+				} @else if $name == dark {
+					background: var(--color-grey900);
+				}
+			}
+		}
+	}
+}
+
+@include selector-class("editbox@input:user-color") {
+	color: var(--user-fg-color);
+	--shadow-color: transparent;
+	&:placeholder-shown {
+		color: var(--default-text-color);
+	}
+	&:not(:placeholder-shown) {
+		--shadow-color: var(--user-bg-color);
+	}
+}

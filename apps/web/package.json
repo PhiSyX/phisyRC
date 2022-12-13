@@ -8,7 +8,7 @@
 	"scripts": {
 		"dev": "pnpm run scss:build && vite",
 		"build": "pnpm run wasm:build && pnpm run scss:build && pnpm run vue:build",
-		"scss:build": "cargo run --release --bin generate-style -- ./design/generated.scss",
+		"scss:build": "node scripts/generate-style.js -t ./design/generated.scss",
 		"vue:build": "vue-tsc && vite build",
 		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../assets/wasm",
 		"check:fmt": "rome format src types vue",

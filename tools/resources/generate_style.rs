@@ -9,14 +9,18 @@ mod style;
 use core::fmt;
 use std::{
 	collections::{HashMap, HashSet},
-	env,
 	fs::File as StdFile,
-	io::Write,
+	io::{Read, Write},
+	ops,
+	path::PathBuf,
 	process::ExitCode,
 	str,
 };
 
+use clap::Parser;
+use cli::{EmptyCommand, CLI};
 use include_dir::{include_dir, Dir, File};
+use lang::stream::ByteStream;
 use once_cell::sync::Lazy;
 
 // ---- //
@@ -75,6 +79,42 @@ static CONDITION_VALUE_FOR_PROP: Lazy<
 // --------- //
 // Structure //
 // --------- //
+
+type CliApp = CLI<Flags, Options, EmptyCommand>;
+
+#[derive(Debug)]
+#[derive(clap::Parser)]
+struct Flags {
+	/// Un fichier de sortie.
+	#[clap(short = 't', long, value_parser)]
+	target_file: PathBuf,
+}
+
+#[derive(Debug)]
+#[derive(clap::Parser)]
+struct Options {
+	/// Un fichier, contenant de l'HTML, à analyser
+	#[clap(short = 'f', long, value_parser)]
+	file: Option<PathBuf>,
+}
+
+#[derive(Debug)]
+#[allow(non_camel_case_types)]
+struct cli_app(CliApp);
+
+impl cli_app {
+	fn arguments() -> Self {
+		Self(CliApp::parse())
+	}
+}
+
+impl ops::Deref for cli_app {
+	type Target = CliApp;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
+}
 
 #[derive(Debug)]
 #[derive(PartialEq, Eq, Hash)]
@@ -259,7 +299,7 @@ impl fmt::Display for CSSClassCustom {
 			properties,
 		);
 
-		writeln!(f, "{}", rule)
+		write!(f, "{}", rule)
 	}
 }
 
@@ -337,47 +377,60 @@ impl str::FromStr for CSSPropertyCustom {
 // Fonction //
 // -------- //
 
-fn main() -> ExitCode {
-	let mut args = env::args();
-
-	if args.len() != 2 {
-		return ExitCode::FAILURE;
-	}
-
-	args.next();
-
-	let relative_filename = args.next().expect("filename");
-
+#[phisyrc::setup]
+fn main(cli: cli_app) -> ExitCode {
 	let mut classes = HashSet::new();
 
-	check_file(&VUE_DIR, &mut classes);
-
-	let mut temporary_buffer = String::new();
-	for class in classes {
-		temporary_buffer.push_str(&class.to_string());
+	if let Some(path) = cli.options.file.as_ref() {
+		let file = StdFile::open(path);
+		let bytestream = ByteStream::try_from(file)
+			.expect("Impossible de lire le fichier passé par l'option --file");
+		let bytes = bytestream.bytes();
+		let file = File::new(path.to_str().unwrap_or_default(), bytes);
+		generate_style(&file, &mut classes);
+	} else {
+		check_file(&VUE_DIR, &mut classes);
 	}
 
-	let mut file = StdFile::create(relative_filename)
-		.expect("impossible de créer le fichier scss");
+	let mut styles: Vec<String> = if cli.options.file.is_none() {
+		vec![
+			"/*".into(),
+			" * This Source Code Form is subject to the terms of the Mozilla Public".into(),
+			" * License, v. 2.0. If a copy of the MPL was not distributed with this".into(),
+			" * file, You can obtain one at https://mozilla.org/MPL/2.0/.".into(),
+			" */".into(),
+			r#"@import "design/functions";"#.into(),
+			r#"@import "design/mixins";"#.into(),
+		]
+	} else {
+		vec![]
+	};
 
-	file.write_all(
-		b"/*
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */
-",
-	)
-	.expect("licence en-tête");
+	if cli.options.file.is_some() {
+		let mut buffer = String::new();
+		let mut file = StdFile::open(&cli.flags.target_file)
+			.expect("Impossible d'ouvrir le fichier de destination");
+		file.read_to_string(&mut buffer)
+			.expect("Impossible de lire le fichier");
+		buffer.lines().for_each(|line| {
+			if !styles.contains(&line.into()) {
+				styles.push(line.to_owned());
+			}
+		});
+	}
 
-	file.write_all(
-		br#"
-@import "design/functions";
-@import "design/mixins";
-	"#,
-	)
-	.expect("scss import");
+	let mut file = StdFile::create(&cli.flags.target_file)
+		.expect("Impossible d'ouvrir le fichier de destination");
+	let mut temporary_buffer = HashSet::new();
+	for class in classes {
+		let cs = class.to_string();
+		if !styles.contains(&cs) {
+			temporary_buffer.insert(cs);
+		}
+	}
+	styles.extend(temporary_buffer);
 
+	let temporary_buffer = styles.into_iter().collect::<Vec<_>>().join("\n");
 	file.write_all(temporary_buffer.as_bytes())
 		.expect("Impossible d'écrire dans le fichier");
 
@@ -414,7 +467,7 @@ fn check_file(directory: &'static Dir, list: &mut CSSClassCustomList) {
 	}
 }
 
-fn generate_style(file: &'static File, list: &mut CSSClassCustomList) {
+fn generate_style<'a>(file: &'a File, list: &mut CSSClassCustomList) {
 	if cfg!(debug_assertions) {
 		println!("Fichier {}", file.path().to_string_lossy());
 	}

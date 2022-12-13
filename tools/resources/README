@@ -13,7 +13,8 @@ generate-style
 Pour générer des classes CSS à la volé. définies dans les fichiers .vue:
 
   Commande:
-  	cargo run --bin generate-style -- <relative-filepath>
+  	cargo run --bin generate-style -- -t <target-filepath> [ -f <html-filepath> ]
 
   Exemple:
-  	cargo run --bin generate-style -- apps/web/design/_generated.scss
+  	cargo run --bin generate-style -- -t apps/web/design/generated.scss
+  	cargo run --bin generate-style -- -t apps/web/design/generated.scss -f apps/web/vue/molecules/Topic/Topic.vue

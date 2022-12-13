@@ -146,7 +146,7 @@ impl CSSClassCustom {
 			| CSSPropertyCustom::BorderRadiusBottomRight
 			| CSSPropertyCustom::BorderRadiusBottomLeft
 			| CSSPropertyCustom::BorderRadiusLeft => format!("calc(2px * {})", self.1),
-			| _ => format!("space({})", self.1),
+			| _ => format!("space({}, true)", self.1),
 		}
 	}
 }
@@ -249,7 +249,7 @@ impl fmt::Display for CSSClassCustom {
 			.0
 			.property()
 			.iter()
-			.map(|prop| format!("{prop}: {};", self.value()))
+			.map(|prop| format!("{prop}: {} !important;", self.value()))
 			.collect::<String>();
 
 		let rule = format!(
@@ -365,10 +365,18 @@ fn main() -> ExitCode {
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
- */\n
+ */
 ",
 	)
-	.expect("header");
+	.expect("licence en-tête");
+
+	file.write_all(
+		br#"
+@import "design/functions";
+@import "design/mixins";
+	"#,
+	)
+	.expect("scss import");
 
 	file.write_all(temporary_buffer.as_bytes())
 		.expect("Impossible d'écrire dans le fichier");

@@ -12,6 +12,7 @@ import { defineConfig } from "vite";
 import pkg from "./package.json" assert { type: "json" };
 
 import vue from "@vitejs/plugin-vue";
+import basicSsl from "@vitejs/plugin-basic-ssl";
 import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
@@ -41,7 +42,17 @@ function phisyRC_execCargoCommandOnChange(): Plugin {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [phisyRC_execCargoCommandOnChange(), topLevelAwait(), wasm(), vue()],
+	plugins: [
+		basicSsl(),
+		phisyRC_execCargoCommandOnChange(),
+		topLevelAwait(),
+		wasm(),
+		vue()
+	],
+
+	server: {
+		https: true,
+	},
 
 	resolve: {
 		alias: [

@@ -27,6 +27,7 @@ use once_cell::sync::Lazy;
 // Type //
 // ---- //
 
+type CliApp = CLI<Flags, Options, EmptyCommand>;
 type CSSClassCustomList = HashSet<CSSClassCustom>;
 
 // --------- //
@@ -34,6 +35,10 @@ type CSSClassCustomList = HashSet<CSSClassCustom>;
 // --------- //
 
 const VUE_DIR: Dir = include_dir!("apps/web/vue");
+
+// ------ //
+// Static //
+// ------ //
 
 static CONDITION_VALUE_FOR_PROP: Lazy<
 	HashMap<CSSPropertyCustom, ConditionType>,
@@ -80,9 +85,9 @@ static CONDITION_VALUE_FOR_PROP: Lazy<
 // Structure //
 // --------- //
 
-type CliApp = CLI<Flags, Options, EmptyCommand>;
+#[allow(non_camel_case_types)]
+struct cli_app(CliApp);
 
-#[derive(Debug)]
 #[derive(clap::Parser)]
 struct Flags {
 	/// Un fichier de sortie.
@@ -90,7 +95,6 @@ struct Flags {
 	target_file: PathBuf,
 }
 
-#[derive(Debug)]
 #[derive(clap::Parser)]
 struct Options {
 	/// Un fichier, contenant de l'HTML, à analyser
@@ -98,27 +102,12 @@ struct Options {
 	file: Option<PathBuf>,
 }
 
-#[derive(Debug)]
-#[allow(non_camel_case_types)]
-struct cli_app(CliApp);
-
-impl cli_app {
-	fn arguments() -> Self {
-		Self(CliApp::parse())
-	}
-}
-
-impl ops::Deref for cli_app {
-	type Target = CliApp;
-
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
-}
-
-#[derive(Debug)]
 #[derive(PartialEq, Eq, Hash)]
 struct CSSClassCustom(CSSPropertyCustom, String);
+
+// ----------- //
+// Énumération //
+// ----------- //
 
 #[derive(Debug)]
 #[derive(PartialEq, Eq, Hash)]
@@ -164,6 +153,12 @@ enum ConditionType {
 // -------------- //
 // Implémentation //
 // -------------- //
+
+impl cli_app {
+	fn arguments() -> Self {
+		Self(CliApp::parse())
+	}
+}
 
 impl CSSClassCustom {
 	fn is_valid_value(prop: &CSSPropertyCustom, value: &str) -> bool {
@@ -282,6 +277,14 @@ impl CSSPropertyCustom {
 // -------------- //
 // Implémentation // -> Interface
 // -------------- //
+
+impl ops::Deref for cli_app {
+	type Target = CliApp;
+
+	fn deref(&self) -> &Self::Target {
+		&self.0
+	}
+}
 
 impl fmt::Display for CSSClassCustom {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

@@ -6,3 +6,14 @@ svgo
 Pour optimiser les fichiers SVG:
 
   pnpm tools/svgo
+
+generate-style
+==============
+
+Pour générer des classes CSS à la volé. définies dans les fichiers .vue:
+
+  Commande:
+  	cargo run --bin generate-style -- <relative-filepath>
+
+  Exemple:
+  	cargo run --bin generate-style -- apps/web/design/_generated.scss

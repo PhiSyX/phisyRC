@@ -1,0 +1,15 @@
+[package]
+name = "resources"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+publish = false
+
+[[bin]]
+name = "generate-style"
+path = "./generate_style.rs"
+
+[dependencies]
+lang.workspace = true
+include_dir = { version = "^0.7", features = ["glob"] }
+once_cell = "^1.16"

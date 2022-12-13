@@ -15,34 +15,34 @@
 		width: 100%;
 	}
 
-	@for $size from 0 through $for-loop-max-iterations {
-		%w\=#{$size} {
-			width: space($size);
-		}
-		%max-w\=#{$size} {
-			max-width: space($size);
-		}
-		%min-w\=#{$size} {
-			min-width: space($size);
-		}
+	// @for $size from 0 through $for-loop-max-iterations {
+	// 	%w\=#{$size} {
+	// 		width: space($size);
+	// 	}
+	// 	%max-w\=#{$size} {
+	// 		max-width: space($size);
+	// 	}
+	// 	%min-w\=#{$size} {
+	// 		min-width: space($size);
+	// 	}
 
-		@include selector-class("w=#{$size}") {
-			@extend %w\=#{$size};
-		}
-		@include selector-class("size=#{$size}") {
-			@extend %w\=#{$size};
-		}
-		@include selector-class("s=#{$size}") {
-			@extend %w\=#{$size};
-		}
+	// 	@include selector-class("w=#{$size}") {
+	// 		@extend %w\=#{$size};
+	// 	}
+	// 	@include selector-class("size=#{$size}") {
+	// 		@extend %w\=#{$size};
+	// 	}
+	// 	@include selector-class("s=#{$size}") {
+	// 		@extend %w\=#{$size};
+	// 	}
 
-		@include selector-class("max-w=#{$size}") {
-			@extend %max-w\=#{$size};
-		}
-		@include selector-class("min-w=#{$size}") {
-			@extend %min-w\=#{$size};
-		}
-	}
+	// 	@include selector-class("max-w=#{$size}") {
+	// 		@extend %max-w\=#{$size};
+	// 	}
+	// 	@include selector-class("min-w=#{$size}") {
+	// 		@extend %min-w\=#{$size};
+	// 	}
+	// }
 }
 
 @mixin --use-height {
@@ -56,32 +56,32 @@
 		height: 100%;
 	}
 
-	@for $size from 0 through $for-loop-max-iterations {
-		%h\=#{$size} {
-			height: space($size);
-		}
-		%max-h\=#{$size} {
-			max-height: space($size);
-		}
-		%min-h\=#{$size} {
-			min-height: space($size);
-		}
+	// @for $size from 0 through $for-loop-max-iterations {
+	// 	%h\=#{$size} {
+	// 		height: space($size);
+	// 	}
+	// 	%max-h\=#{$size} {
+	// 		max-height: space($size);
+	// 	}
+	// 	%min-h\=#{$size} {
+	// 		min-height: space($size);
+	// 	}
 
-		@include selector-class("h=#{$size}") {
-			@extend %h\=#{$size};
-		}
-		@include selector-class("size=#{$size}") {
-			@extend %h\=#{$size};
-		}
-		@include selector-class("s=#{$size}") {
-			@extend %h\=#{$size};
-		}
+	// 	@include selector-class("h=#{$size}") {
+	// 		@extend %h\=#{$size};
+	// 	}
+	// 	@include selector-class("size=#{$size}") {
+	// 		@extend %h\=#{$size};
+	// 	}
+	// 	@include selector-class("s=#{$size}") {
+	// 		@extend %h\=#{$size};
+	// 	}
 
-		@include selector-class("max-h=#{$size}") {
-			@extend %max-h\=#{$size};
-		}
-		@include selector-class("min-h=#{$size}") {
-			@extend %min-h\=#{$size};
-		}
-	}
+	// 	@include selector-class("max-h=#{$size}") {
+	// 		@extend %max-h\=#{$size};
+	// 	}
+	// 	@include selector-class("min-h=#{$size}") {
+	// 		@extend %min-h\=#{$size};
+	// 	}
+	// }
 }

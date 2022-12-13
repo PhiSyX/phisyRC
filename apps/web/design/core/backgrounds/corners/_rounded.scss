@@ -31,38 +31,38 @@
 		@extend %br;
 	}
 
-	@for $idx from 0 through $for-loop-max-iterations {
-		@include selector-class("border:radius=#{$idx}") {
-			--b-radius: calc(2px * #{$idx});
-			@extend %br;
-		}
+	// @for $idx from 0 through $for-loop-max-iterations {
+	// 	@include selector-class("border:radius=#{$idx}") {
+	// 		--b-radius: calc(2px * #{$idx});
+	// 		@extend %br;
+	// 	}
 
-		@include selector-class("border-t:radius=#{$idx}") {
-			--btrr: calc(2px * #{$idx});
-			--btlr: calc(2px * #{$idx});
-			@extend %btrr;
-			@extend %btlr;
-		}
+	// 	@include selector-class("border-t:radius=#{$idx}") {
+	// 		--btrr: calc(2px * #{$idx});
+	// 		--btlr: calc(2px * #{$idx});
+	// 		@extend %btrr;
+	// 		@extend %btlr;
+	// 	}
 
-		@include selector-class("border-r:radius=#{$idx}") {
-			--btrr: calc(2px * #{$idx});
-			--bbrr: calc(2px * #{$idx});
-			@extend %btrr;
-			@extend %bbrr;
-		}
+	// 	@include selector-class("border-r:radius=#{$idx}") {
+	// 		--btrr: calc(2px * #{$idx});
+	// 		--bbrr: calc(2px * #{$idx});
+	// 		@extend %btrr;
+	// 		@extend %bbrr;
+	// 	}
 
-		@include selector-class("border-b:radius=#{$idx}") {
-			--bbrr: calc(2px * #{$idx});
-			--bblr: calc(2px * #{$idx});
-			@extend %bbrr;
-			@extend %bblr;
-		}
+	// 	@include selector-class("border-b:radius=#{$idx}") {
+	// 		--bbrr: calc(2px * #{$idx});
+	// 		--bblr: calc(2px * #{$idx});
+	// 		@extend %bbrr;
+	// 		@extend %bblr;
+	// 	}
 
-		@include selector-class("border-l:radius=#{$idx}") {
-			--btlr: calc(2px * #{$idx});
-			--bblr: calc(2px * #{$idx});
-			@extend %btlr;
-			@extend %bblr;
-		}
-	}
+	// 	@include selector-class("border-l:radius=#{$idx}") {
+	// 		--btlr: calc(2px * #{$idx});
+	// 		--bblr: calc(2px * #{$idx});
+	// 		@extend %btlr;
+	// 		@extend %bblr;
+	// 	}
+	// }
 }

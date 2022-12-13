@@ -3,7 +3,13 @@
  * https://creativecommons.org/publicdomain/zero/1.0/
  */
 
+import type { Plugin } from "vite";
+
+import { exec } from "node:child_process";
 import { defineConfig } from "vite";
+
+// @ts-expect-error : chuuuut
+import pkg from "./package.json" assert { type: "json" };
 
 import vue from "@vitejs/plugin-vue";
 import wasm from "vite-plugin-wasm";
@@ -11,9 +17,31 @@ import topLevelAwait from "vite-plugin-top-level-await";
 
 import path from "node:path";
 
+/// Execute la commande dev:before du package.json.
+function phisyRC_execCargoCommandOnChange(): Plugin {
+	return {
+		name: "phisyRC",
+		configureServer(server) {
+			server.watcher.on("change", (input) => {
+				if (input.includes("_generated.scss")) {
+					return;
+				}
+
+				exec(pkg["scripts"]["dev:before"], (error, stdout, stderr) => {
+					if (error) {
+						console.error(`exec error: ${error}`);
+						server.close();
+						return;
+					}
+				});
+			});
+		},
+	}
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-	plugins: [topLevelAwait(), wasm(), vue()],
+	plugins: [phisyRC_execCargoCommandOnChange(), topLevelAwait(), wasm(), vue()],
 
 	resolve: {
 		alias: [

@@ -6,7 +6,8 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
+		"dev:before": "cargo run --release --bin generate-style -- ./design/_generated.scss",
+		"dev": "pnpm run dev:before && vite",
 		"build": "pnpm run wasm:build && pnpm run vue:build",
 		"vue:build": "vue-tsc && vite build",
 		"wasm:build": "cd wasm && wasm-pack build --release --target bundler --out-dir ../assets/wasm",

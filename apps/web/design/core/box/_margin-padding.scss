@@ -54,36 +54,36 @@
 		margin: 0 auto;
 	}
 
-	@for $idx from 0 through $for-loop-max-iterations {
-		@include selector-class("m=#{$idx}") {
-			--mgn: #{$idx};
-			@extend %margin;
-		}
-		@include selector-class("mt=#{$idx}") {
-			--mgn-t: #{$idx};
-			@extend %margin-top;
-		}
-		@include selector-class("mr=#{$idx}") {
-			--mgn-r: #{$idx};
-			@extend %margin-right;
-		}
-		@include selector-class("mb=#{$idx}") {
-			--mgn-b: #{$idx};
-			@extend %margin-bottom;
-		}
-		@include selector-class("ml=#{$idx}") {
-			--mgn-l: #{$idx};
-			@extend %margin-left;
-		}
-		@include selector-class("mx=#{$idx}") {
-			--mgn-iln: #{$idx};
-			@extend %margin-inline;
-		}
-		@include selector-class("my=#{$idx}") {
-			--mgn-blk: #{$idx};
-			@extend %margin-block;
-		}
-	}
+	// @for $idx from 0 through $for-loop-max-iterations {
+	// 	@include selector-class("m=#{$idx}") {
+	// 		--mgn: #{$idx};
+	// 		@extend %margin;
+	// 	}
+	// 	@include selector-class("mt=#{$idx}") {
+	// 		--mgn-t: #{$idx};
+	// 		@extend %margin-top;
+	// 	}
+	// 	@include selector-class("mr=#{$idx}") {
+	// 		--mgn-r: #{$idx};
+	// 		@extend %margin-right;
+	// 	}
+	// 	@include selector-class("mb=#{$idx}") {
+	// 		--mgn-b: #{$idx};
+	// 		@extend %margin-bottom;
+	// 	}
+	// 	@include selector-class("ml=#{$idx}") {
+	// 		--mgn-l: #{$idx};
+	// 		@extend %margin-left;
+	// 	}
+	// 	@include selector-class("mx=#{$idx}") {
+	// 		--mgn-iln: #{$idx};
+	// 		@extend %margin-inline;
+	// 	}
+	// 	@include selector-class("my=#{$idx}") {
+	// 		--mgn-blk: #{$idx};
+	// 		@extend %margin-block;
+	// 	}
+	// }
 }
 
 @mixin --use-padding {
@@ -132,34 +132,34 @@
 		}
 	}
 
-	@for $idx from 0 through $for-loop-max-iterations {
-		@include selector-class("p=#{$idx}") {
-			--pdng: #{$idx};
-			@extend %padding;
-		}
-		@include selector-class("pt=#{$idx}") {
-			--pdng-t: #{$idx};
-			@extend %padding-top;
-		}
-		@include selector-class("pr=#{$idx}") {
-			--pdng-r: #{$idx};
-			@extend %padding-right;
-		}
-		@include selector-class("pb=#{$idx}") {
-			--pdng-b: #{$idx};
-			@extend %padding-bottom;
-		}
-		@include selector-class("pl=#{$idx}") {
-			--pdng-l: #{$idx};
-			@extend %padding-left;
-		}
-		@include selector-class("px=#{$idx}") {
-			--pdng-iln: #{$idx};
-			@extend %padding-inline;
-		}
-		@include selector-class("py=#{$idx}") {
-			--pdng-blk: #{$idx};
-			@extend %padding-block;
-		}
-	}
+	// @for $idx from 0 through $for-loop-max-iterations {
+	// 	@include selector-class("p=#{$idx}") {
+	// 		--pdng: #{$idx};
+	// 		@extend %padding;
+	// 	}
+	// 	@include selector-class("pt=#{$idx}") {
+	// 		--pdng-t: #{$idx};
+	// 		@extend %padding-top;
+	// 	}
+	// 	@include selector-class("pr=#{$idx}") {
+	// 		--pdng-r: #{$idx};
+	// 		@extend %padding-right;
+	// 	}
+	// 	@include selector-class("pb=#{$idx}") {
+	// 		--pdng-b: #{$idx};
+	// 		@extend %padding-bottom;
+	// 	}
+	// 	@include selector-class("pl=#{$idx}") {
+	// 		--pdng-l: #{$idx};
+	// 		@extend %padding-left;
+	// 	}
+	// 	@include selector-class("px=#{$idx}") {
+	// 		--pdng-iln: #{$idx};
+	// 		@extend %padding-inline;
+	// 	}
+	// 	@include selector-class("py=#{$idx}") {
+	// 		--pdng-blk: #{$idx};
+	// 		@extend %padding-block;
+	// 	}
+	// }
 }

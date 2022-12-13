@@ -18,6 +18,7 @@ members = [
 	"tests",
 	"tools/license",
 	"tools/readme",
+	"tools/resources",
 ]
 exclude = [
 	"apps/web/wasm", # décommenté car l'IDE semble faire n'importe quoi avec.

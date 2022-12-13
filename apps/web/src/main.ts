@@ -4,9 +4,6 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import "design/style.scss";
-import "design/generated.scss";
-
 import { wasm_initialize_logger } from "assets/wasm/phisyrc_wasm";
 
 import { ExitCode } from "@phisyrc/std";

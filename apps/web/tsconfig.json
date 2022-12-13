@@ -18,7 +18,14 @@
 			"~/*": ["src/*"]
 		}
 	},
-	"include": ["types/**/*.d.ts", "**/*.ts", "**/*.vue", "**/**/*.vue"],
+	"include": [
+		"types/**/*.d.ts",
+		"src/**/*.ts",
+		"vite/**/*.ts",
+		"vue/**/*.ts",
+		"vue/**/*.vue",
+		"**/**/*.vue"
+	],
 	"references": [
 		{
 			"path": "./tsconfig.node.json"

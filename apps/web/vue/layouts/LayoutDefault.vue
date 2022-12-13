@@ -12,3 +12,8 @@ import Overlayer from "~vue/organisms/Overlayer/Overlayer.vue";
 	<RouterView />
 	<Overlayer />
 </template>
+
+<style lang="scss">
+@import "design/style.scss";
+@import "design/generated.scss";
+</style>

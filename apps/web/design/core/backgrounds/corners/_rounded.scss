@@ -5,64 +5,7 @@
  */
 
 @mixin --use-corners-rounded {
-	%br {
-		--b-radius: 0;
-		border-radius: var(--b-radius);
-	}
-	%btrr {
-		--btrr: 0;
-		border-top-right-radius: var(--btrr);
-	}
-	%btlr {
-		--btlr: 0;
-		border-top-left-radius: var(--btlr);
-	}
-	%bbrr {
-		--bbrr: 0;
-		border-bottom-right-radius: var(--bbrr);
-	}
-	%bblr {
-		--bblr: 0;
-		border-bottom-left-radius: var(--bblr);
-	}
-
 	@include selector-class("border:radius=full") {
-		--b-radius: 100%;
-		@extend %br;
+		border-radius: 100%;
 	}
-
-	// @for $idx from 0 through $for-loop-max-iterations {
-	// 	@include selector-class("border:radius=#{$idx}") {
-	// 		--b-radius: calc(2px * #{$idx});
-	// 		@extend %br;
-	// 	}
-
-	// 	@include selector-class("border-t:radius=#{$idx}") {
-	// 		--btrr: calc(2px * #{$idx});
-	// 		--btlr: calc(2px * #{$idx});
-	// 		@extend %btrr;
-	// 		@extend %btlr;
-	// 	}
-
-	// 	@include selector-class("border-r:radius=#{$idx}") {
-	// 		--btrr: calc(2px * #{$idx});
-	// 		--bbrr: calc(2px * #{$idx});
-	// 		@extend %btrr;
-	// 		@extend %bbrr;
-	// 	}
-
-	// 	@include selector-class("border-b:radius=#{$idx}") {
-	// 		--bbrr: calc(2px * #{$idx});
-	// 		--bblr: calc(2px * #{$idx});
-	// 		@extend %bbrr;
-	// 		@extend %bblr;
-	// 	}
-
-	// 	@include selector-class("border-l:radius=#{$idx}") {
-	// 		--btlr: calc(2px * #{$idx});
-	// 		--bblr: calc(2px * #{$idx});
-	// 		@extend %btlr;
-	// 		@extend %bblr;
-	// 	}
-	// }
 }

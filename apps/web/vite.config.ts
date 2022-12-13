@@ -24,17 +24,19 @@ function phisyRC_execCargoCommandOnChange(): Plugin {
 		name: "phisyRC",
 		configureServer(server) {
 			server.watcher.on("change", (input) => {
-				if (input.includes("_generated.scss")) {
+				if (input.includes("generated.scss")) {
 					return;
 				}
 
-				exec(pkg["scripts"]["dev:before"], (error, stdout, stderr) => {
-					if (error) {
-						console.error(`exec error: ${error}`);
+				let exec_cb = (err: unknown) => {
+					if (err) {
+						console.error(`exec error: ${err}`);
 						server.close();
 						return;
 					}
-				});
+				};
+
+				exec(pkg["scripts"]["scss:build"], exec_cb);
 			});
 		},
 	}

@@ -5,6 +5,7 @@
  */
 
 import "design/style.scss";
+import "design/generated.scss";
 
 import { wasm_initialize_logger } from "assets/wasm/phisyrc_wasm";
 

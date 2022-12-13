@@ -2,7 +2,7 @@
 
 <template>
 	<div id="design-system--utilities" class="[ size:full scroll:y ]">
-		<article class="pb=3">
+		<article class="[ pb=3 ]">
 			<h1 id="utilities">Utilitaires</h1>
 
 			<p>
@@ -68,8 +68,8 @@
 			</p>
 
 			<ul>
-				<li class="gap=space-between">
-					<strong>.gap=</strong><code>space-between</code>
+				<li class="align-j:space-between">
+					<strong>.align-j:</strong><code>space-between</code>
 				</li>
 				<li class="align-j:space-around">
 					<strong>.align-j:</strong><code>space-around</code>

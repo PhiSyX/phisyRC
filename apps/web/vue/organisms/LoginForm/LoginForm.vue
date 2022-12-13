@@ -184,8 +184,9 @@ function handle_send_connection(evt: Event) {
 			<template #icon>
 				<IconVisualPassword
 					@click="handle_toggle_visual_password"
-					:style="{
-						opacity: can_show_server_password ? 0.5 : 1,
+					:class="{
+						'opacity=.5': can_show_server_password,
+						'opacity=1': !can_show_server_password,
 					}"
 				/>
 			</template>

@@ -8,7 +8,7 @@ import { defineStore } from "pinia";
 import { computed, nextTick, ref } from "vue";
 
 import { is_empty } from "@phisyrc/std";
-import { to_px } from "@phisyrc/css/houdini/unit";
+import { to_px } from "@phisyrc/css";
 
 // ---- //
 // Type //

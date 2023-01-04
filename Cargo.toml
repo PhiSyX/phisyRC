@@ -6,8 +6,6 @@ members = [
 	"constants",
 	"packages/crates/*",
 	"macro",
-	"proto/irc/message",
-	"proto/irc/replies",
 	"tests",
 	"tools/license",
 	"tools/readme",
@@ -39,8 +37,8 @@ setup = { path = "./packages/crates/setup", package = "phisyrc-setup" }
 terminal = { path = "./packages/crates/terminal", package = "phisyrc-terminal" }
 
 ## IRC Protocols
-irc_msg = { path = "./proto/irc/message", package = "proto-irc-msg" }
-irc_replies = { path = "./proto/irc/replies", package = "proto-irc-replies" }
+irc_msg = { path = "./packages/crates/irc-message", package = "proto-irc-msg" }
+irc_replies = { path = "./packages/crates/irc-replies", package = "proto-irc-replies" }
 
 # Dépendances externes
 lang = { git = "https://github.com/PhiSyX/lang" }

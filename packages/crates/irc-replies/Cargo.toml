@@ -16,10 +16,6 @@ json = ["serde_json"]
 [dependencies]
 lang.workspace = true
 logger.workspace = true
-
 serde.workspace = true
-
-irc_msg = { path = "../message", package = "proto-irc-msg", features = [
-	"json",
-] }
 serde_json = { version = "^1.0", optional = true }
+irc_msg = { workspace = true, features = ["json"] }

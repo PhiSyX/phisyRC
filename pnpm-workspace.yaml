@@ -1,4 +1,4 @@
 packages:
     - "apps/web"
-    - "npm/**"
+    - "packages/npm/**"
     - "tools/**"

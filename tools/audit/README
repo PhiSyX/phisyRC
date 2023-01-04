@@ -1,0 +1,20 @@
+Liste les outils utilisés pour les audits de sécurité.
+
+audit
+=====
+
+  Installation: https://github.com/RustSec/rustsec/tree/main/cargo-audit
+
+  Utilisation:
+    cargo audit
+
+deny
+====
+
+  Installation: https://github.com/EmbarkStudios/cargo-deny
+
+  Exemple:
+    cargo deny check -c <config-file>
+
+  Utilisation:
+    cargo deny check -c .\tools\audits\deny.toml

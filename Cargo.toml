@@ -5,7 +5,6 @@ members = [
 	"config",
 	"constants",
 	"packages/crates/*",
-	"macro",
 	"tests",
 	"tools/license",
 	"tools/readme",
@@ -24,7 +23,7 @@ publish = false
 
 [workspace.dependencies]
 # Dépendances internes
-phisyrc = { path = "./macro", package = "phisyrc-macro" }
+phisyrc = { path = "./packages/crates/macro", package = "phisyrc-macro" }
 cli = { path = "./packages/crates/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
 constants = { path = "./constants", package = "phisyrc-constants" }

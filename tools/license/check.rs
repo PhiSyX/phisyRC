@@ -23,7 +23,6 @@ const APPS_DIR: Dir = include_dir!("apps");
 const CONFIG_DIR: Dir = include_dir!("config");
 const CONSTANTS_DIR: Dir = include_dir!("constants");
 const PACKAGES_DIR: Dir = include_dir!("packages");
-const MACRO_DIR: Dir = include_dir!("macro");
 const TOOLS_DIR: Dir = include_dir!("tools");
 
 fn main() -> ExitCode {
@@ -33,7 +32,6 @@ fn main() -> ExitCode {
 	check_license(&CONFIG_DIR, &mut files);
 	check_license(&CONSTANTS_DIR, &mut files);
 	check_license(&PACKAGES_DIR, &mut files);
-	check_license(&MACRO_DIR, &mut files);
 	check_license(&TOOLS_DIR, &mut files);
 
 	if files.is_empty() {

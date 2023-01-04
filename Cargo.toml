@@ -4,14 +4,7 @@ members = [
 
 	"config",
 	"constants",
-	"crates/cli",
-	"crates/database",
-	"crates/env",
-	"crates/helpers",
-	"crates/logger",
-	"crates/network",
-	"crates/setup",
-	"crates/terminal",
+	"packages/crates/*",
 	"macro",
 	"proto/irc/message",
 	"proto/irc/replies",
@@ -34,16 +27,16 @@ publish = false
 [workspace.dependencies]
 # Dépendances internes
 phisyrc = { path = "./macro", package = "phisyrc-macro" }
-cli = { path = "./crates/cli", package = "phisyrc-cli" }
+cli = { path = "./packages/crates/cli", package = "phisyrc-cli" }
 config = { path = "./config", package = "phisyrc-config" }
 constants = { path = "./constants", package = "phisyrc-constants" }
-database = { path = "./crates/database", package = "phisyrc-database" }
-env = { path = "./crates/env", package = "phisyrc-env" }
-helpers = { path = "./crates/helpers", package = "phisyrc-helpers" }
-logger = { path = "./crates/logger", package = "phisyrc-logger" }
-network = { path = "./crates/network", package = "phisyrc-network" }
-setup = { path = "./crates/setup", package = "phisyrc-setup" }
-terminal = { path = "./crates/terminal", package = "phisyrc-terminal" }
+database = { path = "./packages/crates/database", package = "phisyrc-database" }
+env = { path = "./packages/crates/env", package = "phisyrc-env" }
+helpers = { path = "./packages/crates/helpers", package = "phisyrc-helpers" }
+logger = { path = "./packages/crates/logger", package = "phisyrc-logger" }
+network = { path = "./packages/crates/network", package = "phisyrc-network" }
+setup = { path = "./packages/crates/setup", package = "phisyrc-setup" }
+terminal = { path = "./packages/crates/terminal", package = "phisyrc-terminal" }
 
 ## IRC Protocols
 irc_msg = { path = "./proto/irc/message", package = "proto-irc-msg" }
